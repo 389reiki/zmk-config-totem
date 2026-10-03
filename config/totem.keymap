@@ -6,7 +6,7 @@
  *   macOS (default, Bluetooth profile 0)  – host input source "Deutsch",   keycodes from keys_de_mac.h (DE_*)
  *   Windows (overlay, Bluetooth profile 1) – host layout "Deutsch",        keycodes from keys_de_win.h (DEW_*)
  * Every function sits on the same Totem key on both systems; only the keystroke sent differs
- * (e.g. Copy = Cmd+C on macOS, Ctrl+C on Windows). Switch hosts with the two host keys on SYS.
+ * (e.g. Copy = Cmd+C on macOS, Ctrl+C on Windows). Switch hosts with the two host keys on SYS. 
  * After power-off the keyboard starts in macOS mode.
  *
  * Key positions (used by combos and home-row-mod settings):
