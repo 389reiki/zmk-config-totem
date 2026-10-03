@@ -254,7 +254,7 @@
             &kp DE_Q        &kp DE_A_UMLAUT  &kp DE_O          &kp DE_U        &kp DE_Y         &kp DE_V        &kp DE_D        &kp DE_C          &kp DE_L          &kp DE_X
             &hml LCTRL DE_H &hml LALT DE_A   &hml LGUI DE_E    &kp DE_I        &kp DE_COMMA     &kp DE_G        &kp DE_T        &hmr LGUI DE_R    &hmr LALT DE_N    &hmr LCTRL DE_S
 &kp DE_U_UMLAUT  &kp DE_K       &kp DE_Z         &sqt_dqt          &kp DE_DOT      &kp DE_O_UMLAUT  &kp DE_B        &kp DE_P        &kp DE_M          &kp DE_W          &kp DE_F          &kp DE_J
-                                                 &bspc_del         &lt_spc NAV SPACE  &sym_key SYM SYM   &num_key NUM NUM  &sk LSHFT  &kp RET
+                                                 &bspc_del         &sym_key SYM SYM      &lt_spc NAV SPACE              &sk LSHFT  &num_key NUM NUM    &kp RET
             >;
         };
 
