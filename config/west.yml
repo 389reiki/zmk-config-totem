@@ -2,10 +2,19 @@ manifest:
   remotes:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
+    - name: urob
+      url-base: https://github.com/urob
   projects:
+    # Pinned to the ZMK v0.3 release: the TOTEM shield files and the board name
+    # seeeduino_xiao_ble in build.yaml are built for it. ZMK "main" has moved to
+    # Zephyr 4.1 with renamed boards (xiao_ble//zmk), which would break this config.
     - name: zmk
       remote: zmkfirmware
-      revision: main
+      revision: v0.3
       import: app/west.yml
+    # num-word (&num_word); revision matched to the ZMK release
+    - name: zmk-auto-layer
+      remote: urob
+      revision: v0.3
   self:
     path: config

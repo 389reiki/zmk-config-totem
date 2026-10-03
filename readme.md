@@ -16,6 +16,17 @@ TOTEM is a 38 key column-staggered split keyboard running [ZMK](https://zmk.dev/
 
 
 
+
+## Diese Konfiguration (Kurzfassung)
+
+- Firmware: ZMK **v0.3** (fest eingestellt in `config/west.yml` und `.github/workflows/build.yml`), Modul urob/zmk-auto-layer v0.3 für Num-Word.
+- Belegung: `config/totem.keymap` (anymak:END-Variante, Home-Row-Mods, Combos, Ebenen BASE/NAV/SYM/NUM/SYS/MOUSE).
+- **Zwei Rechner, eine Belegung:** macOS ist Standard (Bluetooth-Profil 0), Windows ist ein Overlay (Profil 1). Jede Funktion liegt auf beiden Systemen auf derselben Taste.
+  - Umschalten: Leertaste + Num halten (SYS-Ebene), dann **Mac** (rechte Hand, obere Reihe, innen) oder **Win** (daneben).
+  - Nach dem Ausschalten startet die Tastatur im Mac-Modus.
+- Tastencodes: `keys_de_mac.h` (macOS-Eingabequelle "Deutsch") und `keys_de_win.h` (Windows "Deutsch"). `keys_de.h` ist die frühere Windows-Datei und wird nicht mehr eingebunden.
+- `settings_reset`-Firmware: bei Bluetooth-Problemen auf beide Hälften flashen, danach wieder die normale Firmware.
+
 ## HOW TO USE
 
 - fork this repo
