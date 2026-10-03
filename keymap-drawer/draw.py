@@ -1,0 +1,234 @@
+#!/usr/bin/env python3
+"""Draw the TOTEM keymap with keymap-drawer (one SVG per layer + one overview).
+
+Run from the repo root:  python keymap-drawer/draw.py
+Needs: pip install keymap-drawer==0.21.0 tree-sitter==0.24.0 tree-sitter-devicetree==0.14.1
+
+What it does:
+  1. Copies config/totem.keymap without the two locale #includes, so keycodes like DE_AT
+     stay readable instead of being expanded to raw HID codes.
+  2. Builds a label map (DE_AT -> @) from the comments in config/keys_de_mac.h.
+  3. Parses the keymap, keeps the macOS layers only (the Windows overlays put the same
+     functions on the same keys) and writes function labels where a keystroke alone is unclear.
+     Modifier labels read "Mac/Windows", e.g. Cmd/Ctrl.
+  4. Draws with the real TOTEM geometry (totem_layout.json, from docs/images/TOTEM_layout.svg)
+     and the layer colours: Nav blue, Sym green, Num amber, Mouse pink, Sys grey, combos purple.
+"""
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+import yaml
+
+ROOT = Path(__file__).resolve().parent.parent
+HERE = ROOT / "keymap-drawer"
+OUT = HERE / "svg"
+TMP = HERE / ".tmp"
+
+MAC_LAYERS = ["BASE", "NAV", "SYM", "NUM", "SYS", "MOUSE"]
+COLOR = {"NAV": "#378ADD", "SYM": "#1D9E75", "NUM": "#BA7517", "MOUSE": "#D4537E", "SYS": "#888780"}
+COMBO = "#7F77DD"
+
+# Mac/Windows modifier names
+MODS = {"LGUI": "Cmd/Ctrl", "LALT": "Opt/Alt", "LCTRL": "Ctrl/Win", "LSHFT": "Shift"}
+# On the MOUSE layer the left modifier is "add to selection": Cmd+click / Ctrl+click
+MOUSE_MOD = "Cmd/Ctrl"
+
+# Labels for bindings whose keystroke alone does not say what they do (macOS keystrokes)
+RAW = {
+    "&bspc_del": {"t": "⌫", "s": "Del"},
+    "&sqt_dqt": {"t": "'", "s": '"'},
+    "&tilde_mac": "~",
+    "&caret": "^",
+    "&gif_mac": "@gif",
+    "&host_mac": {"t": "Mac", "s": "BT 0"},
+    "&host_win": {"t": "Win", "s": "BT 1"},
+    "&sk LSHFT": {"t": "Shift", "s": "1×"},
+    "&sym_key SYM SYM": {"t": "Sym 1×", "h": "Sym"},
+    "&num_key NUM NUM": {"t": "NumWord", "h": "Num"},
+    "&lt_spc NAV SPACE": {"t": "␣", "h": "Nav"},
+    "&tog MOUSE": "Mouse",
+    "&kp LG(LS(DE_N5))": "Screenshot",
+    "&kp RA(F18)": "Mail 1",
+    "&kp RA(F19)": "Mail 2",
+    "&kp LG(TAB)": "App ⇄",
+    "&kp LC(LS(TAB))": "Tab ←",
+    "&kp LC(TAB)": "Tab →",
+    "&kp LA(LEFT)": "Word ←",
+    "&kp LA(RIGHT)": "Word →",
+    "&kp LA(BSPC)": "Del word",
+    "&kp PG_UP": "PgUp",
+    "&kp PG_DN": "PgDn",
+    "&kp RET": "↵",
+    "&kp BSPC": "⌫",
+    "&kp DEL": "Del",
+    "&kp ESC": "Esc",
+    "&kp TAB": "Tab",
+    "&kp LG(DE_Z)": "Undo",
+    "&kp LG(DE_X)": "Cut",
+    "&kp LG(DE_C)": "Copy",
+    "&kp LG(DE_V)": "Paste",
+    "&kp LG(LS(DE_Z))": "Redo",
+    "&bt BT_SEL 2": "BT 2",
+    "&bt BT_SEL 3": "BT 3",
+    "&bt BT_CLR": "BT clear",
+    "&out OUT_TOG": "USB/BT",
+    "&bootloader": "Boot",
+    "&mkp LCLK": "Click L",
+    "&mkp RCLK": "Click R",
+    "&mkp MCLK": "Click M",
+    "&mkp MB4": "Back",
+    "&mkp MB5": "Fwd",
+    "&msc SCRL_UP": "Scroll ↑",
+    "&msc SCRL_DOWN": "Scroll ↓",
+    "&msc SCRL_LEFT": "Scroll ←",
+    "&msc SCRL_RIGHT": "Scroll →",
+    "&kp C_PP": "Play",
+    "&kp C_PREV": "Prev",
+    "&kp C_NEXT": "Next",
+    "&kp C_VOL_UP": "Vol +",
+    "&kp C_VOL_DN": "Vol −",
+    "&sys_reset": "Reset",
+}
+# Same keystroke, different job (Cmd+Left is "line start" in text and "back" in browsers)
+BY_POS = {
+    ("NAV", 10): "Line ⇤",
+    ("NAV", 14): "Line ⇥",
+    ("NAV", 21): "Back",
+    ("NAV", 22): "Fwd",
+}
+
+
+# key positions (see the grid in config/totem.keymap)
+TRIG = {("BASE", 33): "NAV", ("BASE", 34): "SYM", ("BASE", 35): "NUM", ("NAV", 20): "MOUSE"}
+HELD = {("NAV", 33): "NAV", ("SYM", 34): "SYM", ("NUM", 35): "NUM",
+        ("SYS", 33): "SYS", ("SYS", 35): "SYS", ("MOUSE", 20): "MOUSE"}
+HELD_LABEL = {("NAV", 33): "Nav", ("SYM", 34): "Sym", ("NUM", 35): "Num",
+              ("SYS", 33): "Nav", ("SYS", 35): "Num", ("MOUSE", 20): "Mouse"}
+
+
+def label_map():
+    """DE_* keycode -> character, read from the comments in keys_de_mac.h."""
+    m, cur = {}, None
+    for line in (ROOT / "config" / "keys_de_mac.h").read_text(encoding="utf-8").splitlines():
+        c = re.match(r"/\* (.+) \*/\s*$", line)
+        if c:
+            cur = c.group(1)
+            continue
+        d = re.match(r"#define (DE_[A-Z0-9_]+) ", line)
+        if d and cur:
+            m[d.group(1)] = cur
+    m.update({"DE_A_UMLAUT": "ä", "DE_O_UMLAUT": "ö", "DE_U_UMLAUT": "ü", "SPACE": "␣",
+              "UP": "↑", "DOWN": "↓", "LEFT": "←", "RIGHT": "→"})
+    return m
+
+
+CSS = """
+rect.key { stroke-width: 1; }
+text { font-size: 15px; }
+text.hold, text.shifted { font-size: 10px; }
+rect.combo { fill: %(combo)s; fill-opacity: .35; stroke: %(combo)s; }
+""" % {"combo": COMBO}
+for name, col in COLOR.items():
+    CSS += f"""
+.layer-{name} rect.key.lay {{ fill: {col}; fill-opacity: .22; stroke: {col}; }}
+rect.key.trig-{name} {{ fill: {col}; fill-opacity: .45; stroke: {col}; }}
+rect.key.held.trig-{name} {{ stroke-width: 4; }}
+"""
+
+
+def run(*args):
+    subprocess.run(args, check=True)
+
+
+def main():
+    OUT.mkdir(parents=True, exist_ok=True)
+    TMP.mkdir(parents=True, exist_ok=True)
+
+    keymap = (ROOT / "config" / "totem.keymap").read_text(encoding="utf-8")
+    keymap = re.sub(r'^#include "keys_de_[a-z]+\.h".*$', "", keymap, flags=re.M)
+    (TMP / "totem.keymap").write_text(keymap, encoding="utf-8")
+
+    cfg = {
+        "parse_config": {
+            "zmk_keycode_map": {**label_map(), **MODS},
+            "raw_binding_map": RAW,
+            "trans_legend": {"t": "▽", "type": "trans"},
+        },
+        "draw_config": {
+            "dark_mode": "auto",
+            "shrink_wide_legends": 5,
+            "svg_extra_style": CSS,
+            "key_w": 60,
+            "key_h": 56,
+            "combo_w": 36,
+            "combo_h": 22,
+        },
+    }
+    cfg_path = TMP / "config.yaml"
+    cfg_path.write_text(yaml.safe_dump(cfg, allow_unicode=True, sort_keys=False), encoding="utf-8")
+
+    parsed = TMP / "parsed.yaml"
+    with parsed.open("w", encoding="utf-8") as f:
+        subprocess.run(["keymap", "-c", str(cfg_path), "parse", "-z", str(TMP / "totem.keymap")],
+                       check=True, stdout=f)
+    data = yaml.safe_load(parsed.read_text(encoding="utf-8"))
+
+    layers = {}
+    for name in MAC_LAYERS:
+        keys = []
+        for pos, k in enumerate(data["layers"][name]):
+            k = dict(k) if isinstance(k, dict) else {"t": k}
+            if (name, pos) in BY_POS:
+                k["t"] = BY_POS[(name, pos)]
+            if name == "MOUSE" and k.get("t") == MODS["LGUI"]:
+                k["t"] = MOUSE_MOD
+            types = set(str(k.get("type", "")).split())
+            if name != "BASE" and "trans" not in types and k.get("t") not in ("", None):
+                types.add("lay")
+            if (name, pos) in TRIG:          # key that opens another layer: that layer's colour
+                types.discard("lay")
+                types.add(f"trig-{TRIG[(name, pos)]}")
+            if (name, pos) in HELD:          # key held to reach this layer: thick border
+                types.difference_update({"lay", "trans"})
+                types.update({"held", f"trig-{HELD[(name, pos)]}"})
+                k["t"] = HELD_LABEL[(name, pos)]
+            k["type"] = " ".join(sorted(t for t in types if t))
+            if not k["type"]:
+                del k["type"]
+            keys.append(k)
+        layers[name] = keys
+
+    combos = []
+    for c in data.get("combos", []):
+        ls = c.get("l")
+        if ls and not any(l in MAC_LAYERS for l in ls):
+            continue  # Windows-only copy of a combo
+        c = dict(c)
+        c["l"] = ["BASE"]
+        c["type"] = "combo"
+        combos.append(c)
+
+    drawn = TMP / "drawn.yaml"
+    drawn.write_text(yaml.safe_dump({"layout": {"qmk_info_json": str(HERE / "totem_layout.json")},
+                                     "layers": layers, "combos": combos},
+                                    allow_unicode=True, sort_keys=False), encoding="utf-8")
+
+    def draw(target, *extra):
+        with target.open("w", encoding="utf-8") as f:
+            subprocess.run(["keymap", "-c", str(cfg_path), "draw", str(drawn), *extra], check=True, stdout=f)
+        svg = target.read_text(encoding="utf-8")
+        # GitHub renders SVGs small; double the declared size (viewBox unchanged)
+        svg = re.sub(r'<svg width="(\d+)" height="(\d+)"',
+                     lambda m: f'<svg width="{2*int(m.group(1))}" height="{2*int(m.group(2))}"', svg, count=1)
+        target.write_text(svg, encoding="utf-8")
+
+    for name in MAC_LAYERS:
+        draw(OUT / f"{name.lower()}.svg", "-s", name)
+    draw(OUT / "totem.svg")
+    print("wrote", ", ".join(sorted(p.name for p in OUT.glob("*.svg"))))
+
+
+if __name__ == "__main__":
+    sys.exit(main())

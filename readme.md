@@ -27,6 +27,28 @@ TOTEM is a 38 key column-staggered split keyboard running [ZMK](https://zmk.dev/
 - Tastencodes: `keys_de_mac.h` (macOS-Eingabequelle "Deutsch") und `keys_de_win.h` (Windows "Deutsch"). `keys_de.h` ist die frühere Windows-Datei und wird nicht mehr eingebunden.
 - `settings_reset`-Firmware: bei Bluetooth-Problemen auf beide Hälften flashen, danach wieder die normale Firmware.
 
+## Belegung
+
+Die Bilder werden bei jedem Hochladen automatisch neu gezeichnet (`keymap-drawer/draw.py`). Beschriftung von Modifiern: Mac/Windows, z. B. `Cmd/Ctrl`. Farben: Nav blau, Sym grün, Num gelb, Mouse rosa, Sys grau, Combos lila; ein dicker Rand zeigt die Taste, die die Ebene öffnet.
+
+### Base
+![Base](keymap-drawer/svg/base.svg)
+
+### Nav (Leertaste halten)
+![Nav](keymap-drawer/svg/nav.svg)
+
+### Sym
+![Sym](keymap-drawer/svg/sym.svg)
+
+### Num
+![Num](keymap-drawer/svg/num.svg)
+
+### Sys (Leertaste + Num halten)
+![Sys](keymap-drawer/svg/sys.svg)
+
+### Mouse
+![Mouse](keymap-drawer/svg/mouse.svg)
+
 ## HOW TO USE
 
 - fork this repo
