@@ -10,7 +10,8 @@ What it does:
   2. Builds a label map (DE_AT -> @) from the comments in config/keys_de_mac.h.
   3. Parses the keymap, keeps the macOS layers only (the Windows overlays put the same
      functions on the same keys) and writes function labels where a keystroke alone is unclear.
-     Modifier labels read "Mac/Windows", e.g. Cmd/Ctrl.
+     Modifier labels read "Mac/Windows", e.g. Cmd/Ctrl. Which key opens which layer is read from
+     the keymap itself, so moving keys needs no change in this file.
   4. Draws with the real TOTEM geometry (totem_layout.json, from docs/images/TOTEM_layout.svg)
      and the layer colours: Nav blue, Sym green, Num amber, Mouse pink, Sys grey, combos purple.
 """
@@ -20,6 +21,9 @@ import sys
 from pathlib import Path
 
 import yaml
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
+from keymap_lib import read_keymap  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 HERE = ROOT / "keymap-drawer"
@@ -49,7 +53,7 @@ RAW = {
     "&num_key NUM NUM": {"t": "NumWord", "h": "Num"},
     "&lt_spc NAV SPACE": {"t": "␣", "h": "Nav"},
     "&tog MOUSE": "Mouse",
-    "&kp LG(LS(DE_N5))": "Screenshot",
+    "&kp LG(LS(DE_N5))": "Shot",
     "&kp RA(F18)": "Mail 1",
     "&kp RA(F19)": "Mail 2",
     "&kp LG(TAB)": "App ⇄",
@@ -91,21 +95,34 @@ RAW = {
     "&kp C_VOL_DN": "Vol −",
     "&sys_reset": "Reset",
 }
-# Same keystroke, different job (Cmd+Left is "line start" in text and "back" in browsers)
-BY_POS = {
-    ("NAV", 10): "Line ⇤",
-    ("NAV", 14): "Line ⇥",
-    ("NAV", 21): "Back",
-    ("NAV", 22): "Fwd",
-}
+# Same keystroke on the Mac, different job: named after the Windows twin key (nav_win_layer)
+AMBIGUOUS = {"&kp LG(LEFT)", "&kp LG(RIGHT)"}
+BY_WIN_TWIN = {"&kp HOME": "Line ⇤", "&kp END": "Line ⇥", "&kp LA(LEFT)": "Back", "&kp LA(RIGHT)": "Fwd"}
 
 
-# key positions (see the grid in config/totem.keymap)
-TRIG = {("BASE", 33): "NAV", ("BASE", 34): "SYM", ("BASE", 35): "NUM", ("NAV", 20): "MOUSE"}
-HELD = {("NAV", 33): "NAV", ("SYM", 34): "SYM", ("NUM", 35): "NUM",
-        ("SYS", 33): "SYS", ("SYS", 35): "SYS", ("MOUSE", 20): "MOUSE"}
-HELD_LABEL = {("NAV", 33): "Nav", ("SYM", 34): "Sym", ("NUM", 35): "Num",
-              ("SYS", 33): "Nav", ("SYS", 35): "Num", ("MOUSE", 20): "Mouse"}
+def layer_keys(km):
+    """Which key opens which layer – read from the keymap, so moving a key needs no change here.
+    Returns (trig, held): trig[(layer, pos)] = layer it opens; held[layer] = {pos: label}."""
+    layers = {l[1]: l[2] for l in km["layers"]}
+    trig = {}
+    for lay in MAC_LAYERS:
+        for pos, b in enumerate(layers[lay]):
+            parts = b.split()
+            if parts[0] in ("&host_mac", "&host_win"):
+                continue
+            for target in COLOR:
+                if target in parts[1:]:
+                    trig[(lay, pos)] = target
+    held = {}
+    for target in COLOR:
+        held[target] = {pos: target.capitalize() for (lay, pos), t in trig.items()
+                        if t == target and lay in ("BASE", target)}
+    for if_layers, then_layer in km["conditional"]:
+        if then_layer in COLOR and not held[then_layer]:
+            for l in if_layers:
+                held[then_layer].update(held.get(l, {}))
+    trig = {k: v for k, v in trig.items() if k[0] != v}
+    return trig, held
 
 
 def label_map():
@@ -175,25 +192,31 @@ def main():
                        check=True, stdout=f)
     data = yaml.safe_load(parsed.read_text(encoding="utf-8"))
 
+    km = read_keymap()
+    raw_layers = {l[1]: l[2] for l in km["layers"]}
+    trig, held = layer_keys(km)
+
     layers = {}
     for name in MAC_LAYERS:
         keys = []
         for pos, k in enumerate(data["layers"][name]):
             k = dict(k) if isinstance(k, dict) else {"t": k}
-            if (name, pos) in BY_POS:
-                k["t"] = BY_POS[(name, pos)]
+            raw = raw_layers[name][pos]
+            twin = raw_layers.get(name + " WIN", [None] * 38)[pos]
+            if raw in AMBIGUOUS and twin in BY_WIN_TWIN:
+                k["t"] = BY_WIN_TWIN[twin]
             if name == "MOUSE" and k.get("t") == MODS["LGUI"]:
                 k["t"] = MOUSE_MOD
             types = set(str(k.get("type", "")).split())
             if name != "BASE" and "trans" not in types and k.get("t") not in ("", None):
                 types.add("lay")
-            if (name, pos) in TRIG:          # key that opens another layer: that layer's colour
+            if (name, pos) in trig:          # key that opens another layer: that layer's colour
                 types.discard("lay")
-                types.add(f"trig-{TRIG[(name, pos)]}")
-            if (name, pos) in HELD:          # key held to reach this layer: thick border
+                types.add(f"trig-{trig[(name, pos)]}")
+            if name in held and pos in held[name]:   # key held to reach this layer: thick border
                 types.difference_update({"lay", "trans"})
-                types.update({"held", f"trig-{HELD[(name, pos)]}"})
-                k["t"] = HELD_LABEL[(name, pos)]
+                types.update({"held", f"trig-{name}"})
+                k["t"] = held[name][pos]
             k["type"] = " ".join(sorted(t for t in types if t))
             if not k["type"]:
                 del k["type"]

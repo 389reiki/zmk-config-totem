@@ -24,7 +24,7 @@ TOTEM is a 38 key column-staggered split keyboard running [ZMK](https://zmk.dev/
 - **Zwei Rechner, eine Belegung:** macOS ist Standard (Bluetooth-Profil 0), Windows ist ein Overlay (Profil 1). Jede Funktion liegt auf beiden Systemen auf derselben Taste.
   - Umschalten: Leertaste + Num halten (SYS-Ebene), dann **Mac** (rechte Hand, obere Reihe, innen) oder **Win** (daneben).
   - Nach dem Ausschalten startet die Tastatur im Mac-Modus.
-- Tastencodes: `keys_de_mac.h` (macOS-Eingabequelle "Deutsch") und `keys_de_win.h` (Windows "Deutsch"). `keys_de.h` ist die frühere Windows-Datei und wird nicht mehr eingebunden.
+- Tastencodes: `keys_de_mac.h` (macOS-Eingabequelle "Deutsch") und `keys_de_win.h` (Windows "Deutsch"). Namen nachschlagen: [docs/keycodes.md](docs/keycodes.md).
 - `settings_reset`-Firmware: bei Bluetooth-Problemen auf beide Hälften flashen, danach wieder die normale Firmware.
 
 ## Belegung
@@ -48,6 +48,14 @@ Die Bilder werden bei jedem Hochladen automatisch neu gezeichnet (`keymap-drawer
 
 ### Mouse
 ![Mouse](keymap-drawer/svg/mouse.svg)
+
+## Belegung ändern
+
+- Nur `config/totem.keymap` bearbeiten (auf github.com: Datei öffnen, Stift-Symbol, "Commit changes"). Oben in der Datei steht eine kurze Anleitung ("HOW TO EDIT").
+- Jede Mac-Ebene hat eine Windows-Kopie direkt darunter (`..._win_layer`). Wer eine Taste ändert, ändert sie an derselben Stelle in der Kopie.
+- Der Build prüft das zuerst (`tools/check_keymap.py`): passt eine Mac-Taste nicht zu ihrer Windows-Kopie, bricht er mit einer verständlichen Meldung ab (GitHub → Actions → "check").
+- Tastennamen nachschlagen: [docs/keycodes.md](docs/keycodes.md) (z. B. § = `DE_SECT` / `DEW_SECT`).
+- Die Bilder oben zeichnen sich nach jedem Hochladen selbst neu. Danach reicht es, die **linke** Hälfte zu flashen.
 
 ## HOW TO USE
 

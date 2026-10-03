@@ -1,13 +1,26 @@
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
+  check:
+    # Stops early with a plain message if a macOS key and its Windows twin don't match
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check Mac/Windows keymap consistency
+        run: python tools/check_keymap.py
+
   build:
+    needs: check
     # pinned to the same ZMK release as config/west.yml
     uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@v0.3
 
   draw:
     # Redraws the layer pictures in keymap-drawer/svg after every change to the keymap
     # and commits them back ("[skip ci]" so this commit does not start another build).
+    needs: check
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:

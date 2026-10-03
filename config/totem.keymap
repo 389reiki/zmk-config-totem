@@ -1,15 +1,33 @@
 /*
- * TOTEM keymap – anymak:END variant (3 swaps), timeless home-row mods,
- * clipboard combos in QWERTZ order, arrows on the left, num-word.
+ * TOTEM keymap – anymak:END variant, timeless home-row mods, combos, num-word.
+ * Pictures of every layer: readme.md (redrawn automatically after each upload).
+ *
+ * ── HOW TO EDIT ──────────────────────────────────────────────────────────────────────────
+ * 1. Edit THIS file only (config/totem.keymap). On github.com: open it, click the pencil, commit.
+ * 2. Each layer's "bindings" list has 38 entries in the order of the position grid below:
+ *    top row 0-9, home row 10-19, bottom row 20-31 (20 and 31 = outer keys), thumbs 32-37.
+ *    Spaces and line breaks don't matter, only the order.
+ * 3. Two systems, one layout. macOS is the default; Windows is an overlay on Bluetooth profile 1.
+ *    Every Mac layer has a Windows twin directly below it ("..._win_layer", e.g. sym_layer ->
+ *    sym_win_layer). If you change a key in a Mac layer, change the same position in its twin:
+ *      - Mac keycodes start with DE_  (keys_de_mac.h), Windows keycodes with DEW_ (keys_de_win.h)
+ *      - &trans in a twin means "same as the Mac key" – fine for letters, digits, layer keys
+ *      - shortcuts: Cmd on macOS = Ctrl on Windows (LG(...) -> LC(...))
+ *    Combos come in pairs too (undo_mac / undo_win ...).
+ *    The GitHub build runs tools/check_keymap.py first and stops with a plain message if a Mac
+ *    key and its Windows twin don't match. (If a difference is intended, see the table at the
+ *    top of tools/check_keymap.py.)
+ * 4. Key names: docs/keycodes.md lists every character with its name (e.g. § = DE_SECT / DEW_SECT).
+ * 5. After the build (GitHub -> Actions -> firmware.zip): for keymap-only changes flashing the
+ *    LEFT half is enough. A typo shows up as a failed build with a line number.
+ * ──────────────────────────────────────────────────────────────────────────────────────────
  *
  * Two hosts, ONE physical layout:
- *   macOS (default, Bluetooth profile 0)  – host input source "Deutsch",   keycodes from keys_de_mac.h (DE_*)
- *   Windows (overlay, Bluetooth profile 1) – host layout "Deutsch",        keycodes from keys_de_win.h (DEW_*)
- * Every function sits on the same Totem key on both systems; only the keystroke sent differs
- * (e.g. Copy = Cmd+C on macOS, Ctrl+C on Windows). Switch hosts with the two host keys on SYS. 
- * After power-off the keyboard starts in macOS mode.
+ *   macOS (default, Bluetooth profile 0)  – input source "Deutsch", keycodes from keys_de_mac.h (DE_*)
+ *   Windows (overlay, Bluetooth profile 1) – layout "Deutsch",      keycodes from keys_de_win.h (DEW_*)
+ * Switch hosts with the "Mac" / "Win" keys on SYS. After power-off the keyboard starts in macOS mode.
  *
- * Key positions (used by combos and home-row-mod settings):
+ * Key positions (used by the bindings lists, combos and home-row-mod settings):
  *
  *        0   1   2   3   4       5   6   7   8   9
  *       10  11  12  13  14      15  16  17  18  19
@@ -24,7 +42,7 @@
 #include <dt-bindings/zmk/pointing.h>
 #include <behaviors/num_word.dtsi>   // from module urob/zmk-auto-layer (see west.yml)
 #include "keys_de_mac.h"             // macOS "Deutsch"   -> DE_*
-#include "keys_de_win.h"             // Windows "Deutsch" -> DEW_* (same as keys_de.h, other prefix)
+#include "keys_de_win.h"             // Windows "Deutsch" -> DEW_*
 
 // Layer order matters: a higher number wins. Each *_WIN layer sits directly above its macOS
 // counterpart and only overrides the keys that differ on Windows (everything else is &trans).
@@ -237,17 +255,9 @@
     keymap {
         compatible = "zmk,keymap";
 
-        // BASE – anymak:END variant. Home-row mods by function, same finger on both systems:
-        //   pinky  = Ctrl (macOS) / Win (Windows)
-        //   ring   = Option       / Alt
-        //   middle = Cmd          / Ctrl     <- the "shortcut" modifier (copy, save, ...)
-        //
-        //         q      ä      o      u      y        v      d      c      l      x
-        //         h/Ctl  a/Opt  e/Cmd  i      ,        g      t      r/Cmd  n/Opt  s/Ctl
-        //   ü     k      z      '      .      ö        b      p      m      w      f      j
-        //                BSPC(Shift: Del)  SPC/NAV  SYM       NUM   SHIFT  ENTER
-        //
-        //   Combos: q+ä=Esc  ä+o=Tab  |  k+z=Undo  z+'=Cut  '+.=Copy  .+ö=Paste  |  w+f=Redo
+        // BASE – letters. Home-row mods by function, same finger on both systems:
+        //   pinky = Ctrl (macOS) / Win (Windows), ring = Option / Alt, middle = Cmd / Ctrl.
+        //   Backspace with Shift = Delete. Combos: see the "combos" section above.
         base_layer {
             display-name = "BASE";
             bindings = <
@@ -269,17 +279,8 @@
             >;
         };
 
-        // NAV – hold Space. Arrows on the LEFT hand (right hand stays on the trackball).
-        //   Function (macOS keystroke / Windows keystroke):
-        //         PgUp   WordL  Up     WordR  PgDn     AppSw  PrevTab NextTab ·     ·
-        //         LineSt Left   Down   Right  LineEnd  ·      Shift  Cmd/Ctl Opt/Alt Ctl/Win
-        //   MOUSE Back   Fwd    DelWrd Del    Enter    ·      ·      ·      ·      ·      ·
-        //   WordL/R  = Opt+Left/Right  / Ctrl+Left/Right
-        //   LineSt/End = Cmd+Left/Right / Home, End
-        //   AppSw    = Cmd+Tab         / Alt+Tab
-        //   Prev/NextTab = Ctrl+(Shift+)Tab on both
-        //   Back/Fwd = Cmd+Left/Right  / Alt+Left/Right
-        //   DelWrd   = Opt+Backspace   / Ctrl+Backspace
+        // NAV – hold Space. Arrows on the left hand (right hand stays on the trackball).
+        //   macOS keystrokes here; the Windows equivalents are in nav_win_layer.
         nav_layer {
             display-name = "NAV";
             bindings = <
@@ -300,13 +301,7 @@
             >;
         };
 
-        // SYM – tap the symbol key for ONE symbol, hold it for several.
-        //   Prose symbols on the home row, pairs next to each other, = + * on top, rare symbols at the edges.
-        //   ~ and ^ are typed directly (no dead key).
-        //
-        //         @      €      #      $      %        &      =      +      *      ~
-        //         !      ?      "      '      /        (      )      -      :      ß
-        //   ;     °      [      ]      {      }        <      >      |      \      ^      _
+        // SYM – tap the Sym key for ONE symbol, hold it for several. ~ and ^ are typed directly.
         sym_layer {
             display-name = "SYM";
             bindings = <
@@ -327,14 +322,8 @@
             >;
         };
 
-        // NUM – tap the Num key for num-word, hold for the layer. Numpad on the LEFT hand,
-        // Enter and 0 on the left thumb, so the right hand can stay on the trackball in Excel.
-        // Identical keycodes on macOS and Windows.
-        //
-        //         *      7      8      9      +        ·  ·  ·  ·  ·
-        //         /      4      5      6      -        ·  ·  ·  ·  ·
-        //   Bspc  .      1      2      3      =        ·  ·  ·  ·  ·  ·
-        //                     Enter  0      ,          ·  ·  ·
+        // NUM – tap the Num key for num-word, hold it for the layer. Numpad on the left hand.
+        //   Identical keycodes on macOS and Windows.
         num_layer {
             display-name = "NUM";
             bindings = <
@@ -356,13 +345,7 @@
             >;
         };
 
-        // SYS – hold Space + hold Num. F-keys mirror the numpad; host keys, Bluetooth, media.
-        //   Mac / Win = host keys (Bluetooth profile 0 + macOS mode / profile 1 + Windows mode)
-        //   Shot = Cmd+Shift+5 (macOS) / PrtSc (Windows)
-        //
-        //         F12    F7     F8     F9     Shot     Mac    Win    BT2    BT3    BOOT
-        //         F11    F4     F5     F6     ·        Prev   Vol-   Vol+   Next   Play
-        //   ·     F10    F1     F2     F3     gif      ·      Mail1  Mail2  USB/BT BTclr  RESET
+        // SYS – hold Nav (Space) + Num. F-keys mirror the numpad; host keys Mac/Win, Bluetooth, media.
         sys_layer {
             display-name = "SYS";
             bindings = <
@@ -384,11 +367,7 @@
         };
 
         // MOUSE – toggled on/off with the bottom-left outer key (from NAV, or here).
-        // Click with the left hand while the right thumb only moves the ball.
-        //
-        //         ·      Back   ScrUp  Fwd    ·        (right hand: normal letters)
-        //         Cmd    RClick MClick LClick Shift    (Cmd+click on macOS = Ctrl+click on Windows)
-        //   OFF   ·      ScrL   ScrDn  ScrR   ·
+        //   Clicks with the left hand while the right thumb moves the ball.
         mouse_layer {
             display-name = "MOUSE";
             bindings = <
