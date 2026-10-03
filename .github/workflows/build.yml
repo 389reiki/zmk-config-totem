@@ -4,3 +4,29 @@ jobs:
   build:
     # pinned to the same ZMK release as config/west.yml
     uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@v0.3
+
+  draw:
+    # Redraws the layer pictures in keymap-drawer/svg after every change to the keymap
+    # and commits them back ("[skip ci]" so this commit does not start another build).
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install keymap-drawer (pinned, these versions work together)
+        run: pip install keymap-drawer==0.21.0 tree-sitter==0.24.0 tree-sitter-devicetree==0.14.1 pyyaml
+      - name: Draw layers
+        run: python keymap-drawer/draw.py
+      - name: Commit pictures
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add keymap-drawer/svg
+          if git diff --cached --quiet; then echo "pictures unchanged"; exit 0; fi
+          git commit -m "Update keymap pictures [skip ci]"
+          git pull --rebase
+          git push
