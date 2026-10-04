@@ -116,7 +116,7 @@ button.b:focus-visible { outline: 3px solid var(--changed); outline-offset: 2px;
 <div class="wrap">
   <header>
     <h1>Totem-Planer</h1>
-    <p>Deine Belegung (macOS-Sicht, Stand: 04.10.2026 13:28) auf der echten TOTEM-Geometrie. Tasten ziehen oder nacheinander antippen, um sie zu tauschen. Das Ergebnis kopierst du und schickst es Claude, der die Keymap samt Windows-Zwillingen umsetzt. An der Firmware ändert diese Seite nichts.</p>
+    <p>Deine Belegung (macOS-Sicht, Stand: 04.10.2026 14:01) auf der echten TOTEM-Geometrie. Tasten ziehen oder nacheinander antippen, um sie zu tauschen. Das Ergebnis kopierst du und schickst es Claude, der die Keymap samt Windows-Zwillingen umsetzt. An der Firmware ändert diese Seite nichts.</p>
   </header>
 
   <nav class="tabs" id="tabs" role="tablist" aria-label="Ebenen"></nav>
@@ -483,7 +483,7 @@ button.b:focus-visible { outline: 3px solid var(--changed); outline-offset: 2px;
 
   function exportText() {
     const lines = changeLines();
-    let s = 'Totem-Planer: Änderungswünsche\n(Positionen wie in totem.keymap, macOS-Sicht; Windows-Zwillinge bitte mitziehen)\nAusgangsbasis: Keymap-Stand 04.10.2026 13:28\n' + ((DATA.planned || []).length ? '\nBereits vorgemerkt:\n' + DATA.planned.map(x => '- ' + x).join('\n') + '\n' : '') + '\nNeue Änderungen:\n';
+    let s = 'Totem-Planer: Änderungswünsche\n(Positionen wie in totem.keymap, macOS-Sicht; Windows-Zwillinge bitte mitziehen)\nAusgangsbasis: Keymap-Stand 04.10.2026 14:01\n' + ((DATA.planned || []).length ? '\nBereits vorgemerkt:\n' + DATA.planned.map(x => '- ' + x).join('\n') + '\n' : '') + '\nNeue Änderungen:\n';
     if (!lines.length) s += '- keine Tasten-Änderungen\n';
     lines.forEach(c => { s += '- ' + c.text + '\n'; });
     if ((state.wishes || '').trim()) s += '\nWeitere Wünsche:\n' + state.wishes.trim() + '\n';
