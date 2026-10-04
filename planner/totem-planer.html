@@ -1,0 +1,513 @@
+<title>Totem-Planer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: layer tabs on top, the real TOTEM geometry as the work surface, a change ledger beside it (stacks below on phones). */
+:root {
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --key: #fbfbfd;
+  --key-edge: #c9ccd6;
+  --fg: #1d2030;
+  --muted: #646a7d;
+  --changed: #c2410c;
+  --nav: #378ADD; --sym: #1D9E75; --num: #BA7517; --mouse: #D4537E; --sys: #888780; --base: #5b6178;
+  --combo: #7F77DD;
+  --font-ui: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15171f; --surface: #1d2029; --key: #252935; --key-edge: #3a3f4f; --fg: #e8eaf2; --muted: #9aa0b4; --changed: #fb923c; --base: #9aa0b4;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #15171f; --surface: #1d2029; --key: #252935; --key-edge: #3a3f4f; --fg: #e8eaf2; --muted: #9aa0b4; --changed: #fb923c; --base: #9aa0b4;
+  color-scheme: dark; }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-ui); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 40px; display: grid; gap: 16px; }
+header h1 { font-size: 1.5rem; margin: 0; text-wrap: balance; }
+header p { margin: 4px 0 0; color: var(--muted); max-width: 70ch; }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tab { font: inherit; font-weight: 700; letter-spacing: .04em; border: 1px solid var(--key-edge); background: var(--surface); color: var(--fg);
+  padding: 6px 12px 6px 10px; border-radius: 999px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.tab .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
+.tab[aria-selected="true"] { background: var(--c); color: #fff; border-color: var(--c); }
+.tab[aria-selected="true"] .dot { background: #fff; }
+.tab .cnt { font-family: var(--font-mono); font-size: .75rem; font-weight: 500; opacity: .85; }
+.tab.drop-hover { outline: 3px solid var(--changed); }
+
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } }
+
+.stage { background: var(--surface); border: 1px solid var(--key-edge); border-radius: 14px; padding: 18px 14px 14px; min-width: 0; }
+.stage-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.stage-head h2 { margin: 0; font-size: 1.05rem; }
+.stage-head span { color: var(--muted); font-size: .85rem; }
+.board-scroll { overflow-x: auto; }
+.board { position: relative; width: 100%; min-width: 620px; --u: 40px; touch-action: none; user-select: none; }
+
+.key { position: absolute; width: calc(var(--u) * .92); height: calc(var(--u) * .92); border-radius: calc(var(--u) * .14);
+  background: var(--key); border: 1.5px solid var(--key-edge); color: var(--fg); font: inherit; padding: 2px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: grab; text-align: center; line-height: 1.05; }
+.key:focus-visible { outline: 3px solid var(--fg); outline-offset: 2px; }
+.key .t { font-size: calc(var(--u) * .30); font-weight: 700; max-width: 100%; white-space: nowrap; }
+.key .t.long { font-size: calc(var(--u) * .19); }
+.key .t.xlong { font-size: calc(var(--u) * .15); white-space: normal; }
+.key .h { font-size: calc(var(--u) * .17); color: var(--muted); }
+.key .pos { position: absolute; top: 2px; left: 4px; font-family: var(--font-mono); font-size: calc(var(--u) * .13); color: var(--muted); opacity: .7; }
+.key.trans { border-style: dashed; background: transparent; }
+.key.trans .t { color: var(--muted); font-weight: 400; }
+.key.none { background: transparent; border-style: dotted; }
+.key.lay { background: color-mix(in srgb, var(--lc) 16%, var(--key)); border-color: color-mix(in srgb, var(--lc) 60%, var(--key-edge)); }
+.key.opens { background: color-mix(in srgb, var(--oc) 34%, var(--key)); border-color: var(--oc); }
+.key.held { border-width: 4px; border-color: var(--hc); background: color-mix(in srgb, var(--hc) 30%, var(--key)); }
+.key.changed::after { content: ""; position: absolute; inset: -6px; border: 2px dashed var(--changed); border-radius: calc(var(--u) * .2); pointer-events: none; }
+.key.selected { box-shadow: 0 0 0 3px var(--surface), 0 0 0 6px var(--fg); }
+.key.drop-target { box-shadow: 0 0 0 3px var(--surface), 0 0 0 6px var(--changed); }
+.key.dragging-src { opacity: .35; }
+.combo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.combo-card { border: 1px solid var(--key-edge); border-radius: 12px; padding: 10px 12px; display: grid; gap: 6px; background: var(--key); min-width: 0; }
+.combo-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.combo-name { font-weight: 700; font-size: 1rem; }
+.combo-keys { font-family: var(--font-mono); font-size: .82rem; color: var(--combo); font-weight: 500; }
+.combo-layers { font-size: .78rem; color: var(--muted); }
+.mini { width: 100%; height: auto; display: block; }
+.mini .mk { fill: var(--surface); stroke: var(--key-edge); stroke-width: .04; }
+.mini .mk.on { fill: var(--combo); stroke: var(--combo); }
+.mini .mt { fill: #fff; font-size: .46px; font-weight: 700; text-anchor: middle; font-family: var(--font-ui); }
+.ghost { position: fixed; z-index: 50; pointer-events: none; transform: translate(-50%, -50%) rotate(-4deg); width: 64px; height: 60px;
+  border-radius: 10px; background: var(--surface); border: 2px solid var(--changed); display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.25); color: var(--fg); }
+.ghost small { font-weight: 400; font-size: 11px; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 12px; font-size: .82rem; color: var(--muted); }
+.legend i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; border: 1.5px solid var(--key-edge); }
+
+.panel { display: grid; gap: 12px; min-width: 0; }
+.card { background: var(--surface); border: 1px solid var(--key-edge); border-radius: 14px; padding: 14px; display: grid; gap: 8px; min-width: 0; }
+.card h3 { margin: 0; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.sel-empty { color: var(--muted); }
+.sel-title { font-weight: 700; font-size: 1.05rem; }
+.sel-meta { font-family: var(--font-mono); font-size: .78rem; color: var(--muted); overflow-wrap: anywhere; }
+label { font-size: .85rem; color: var(--muted); }
+input[type=text], textarea { width: 100%; font: inherit; color: var(--fg); background: var(--key); border: 1px solid var(--key-edge); border-radius: 8px; padding: 7px 9px; }
+textarea { min-height: 76px; resize: vertical; }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+button.b { font: inherit; font-weight: 700; border-radius: 8px; padding: 8px 12px; cursor: pointer; border: 1px solid var(--key-edge); background: var(--key); color: var(--fg); }
+button.b.primary { background: var(--fg); color: var(--surface); border-color: var(--fg); }
+button.b.warn { color: var(--changed); border-color: var(--changed); }
+button.b:focus-visible { outline: 3px solid var(--changed); outline-offset: 2px; }
+.changes { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: .88rem; max-height: 340px; overflow: auto; }
+.changes li { border-left: 3px solid var(--changed); padding: 2px 0 2px 8px; }
+.changes .l { font-family: var(--font-mono); font-size: .75rem; color: var(--muted); }
+.status { font-size: .85rem; color: var(--muted); min-height: 1.2em; }
+.ref { margin: 0; display: grid; gap: 4px; font-size: .88rem; }
+.ref dt { font-weight: 700; margin-top: 6px; }
+.ref dt .l { font-weight: 400; color: var(--muted); font-size: .8rem; }
+.ref dd { margin: 0; color: var(--fg); }
+.howto { margin: 0; padding-left: 18px; color: var(--muted); font-size: .88rem; display: grid; gap: 3px; }
+#exportBox { font-family: var(--font-mono); font-size: .78rem; min-height: 140px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Totem-Planer</h1>
+    <p>Deine Belegung (macOS-Sicht, Stand: 04.10.2026 13:28) auf der echten TOTEM-Geometrie. Tasten ziehen oder nacheinander antippen, um sie zu tauschen. Das Ergebnis kopierst du und schickst es Claude, der die Keymap samt Windows-Zwillingen umsetzt. An der Firmware ändert diese Seite nichts.</p>
+  </header>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Ebenen"></nav>
+
+  <div class="main">
+    <section class="stage">
+      <div class="stage-head"><h2 id="layerTitle">Basis</h2><span id="layerHint"></span></div>
+      <div class="board-scroll" id="boardWrap"><div class="board" id="board" aria-label="Tastatur"></div></div>
+      <div class="combo-grid" id="comboView" hidden></div>
+      <div class="legend" id="legend">
+        <span><i style="background:color-mix(in srgb,var(--nav) 34%,var(--key));border-color:var(--nav)"></i>öffnet eine Ebene</span>
+        <span><i style="border-width:3px;border-color:var(--sym)"></i>wird für diese Ebene gehalten</span>
+        <span><i style="border-style:dashed;background:transparent"></i>durchlässig (Taste darunter)</span>
+        <span><i style="border:2px dashed var(--changed);background:transparent"></i>geändert</span>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="card" id="selCard">
+        <h3>Ausgewählte Taste</h3>
+        <div id="selBody" class="sel-empty">Tippe eine Taste an. Tippst du danach eine zweite an, auch auf einer anderen Ebene, werden beide getauscht.</div>
+      </div>
+
+      <div class="card">
+        <h3>Vorgemerkt, noch nicht in der Firmware (im Planer schon eingezeichnet)</h3>
+        <ul class="changes" id="planned"></ul>
+      </div>
+
+      <div class="card">
+        <h3>Neue Änderungen</h3>
+        <ul class="changes" id="changes"></ul>
+        <label for="wishes">Weitere Wünsche (Kombos, Timing, neue Funktionen …)</label>
+        <textarea id="wishes" placeholder="z. B. Kombo für Esc auf andere Tasten, ß woanders hin …"></textarea>
+        <div class="btns">
+          <button class="b primary" id="copyBtn" type="button">Änderungen kopieren</button>
+          <button class="b warn" id="resetBtn" type="button">Alles zurücksetzen</button>
+        </div>
+        <div class="status" id="status" role="status"></div>
+        <textarea id="exportBox" readonly hidden aria-label="Exporttext"></textarea>
+      </div>
+
+      <div class="card">
+        <h3>Spickzettel</h3>
+        <dl class="ref">
+          <dt>Backspace <span class="l">(Position 32)</span></dt>
+          <dd>Antippen: ⌫. Mit Shift davor: Del.<br>Halten: Wort löschen, wiederholt Wort für Wort (Mac Opt+⌫, Windows Ctrl+⌫).<br>Antippen, dann sofort halten: ⌫ wiederholt Zeichen für Zeichen.</dd>
+          <dt>Del in Serie</dt>
+          <dd>Space (rechter Daumen) halten = Nav, dann mit dem linken Zeigefinger Position 24 tippen oder halten.</dd>
+          <dt>Sys-Ebene</dt>
+          <dd>Space (35) und Num (36) gleichzeitig mit dem rechten Daumen halten. Dort: F-Tasten, Medien, Mac/Win umschalten, Bluetooth, Bootloader.</dd>
+          <dt>Enter</dt>
+          <dd>t + r + n (rechte Grundreihe, Zeige-, Mittel-, Ringfinger) gleichzeitig drücken. Direkt nach dem letzten Zeichen kurz absetzen (ca. 0,1 s), sonst kommen die Buchstaben.</dd>
+          <dt>Maus</dt>
+          <dd>d + c (rechts oben) gleichzeitig: Maus-Ebene an. Klicken und Scrollen mit links. Jede andere Taste (z. B. Space) schaltet sie aus.</dd>
+          <dt>App wechseln (Swapper)</dt>
+          <dd>Space halten (Nav), Position 5 (rechter Zeigefinger, oben innen) mehrmals tippen: jede Runde eine App weiter. Position 6 (Mittelfinger daneben) geht zurück. Nav loslassen wählt die App.</dd>
+          <dt>Mac / Windows</dt>
+          <dd>Auf Sys: "Mac" oder "Win" tippen. Nach dem Ausschalten startet die Tastatur im Mac-Modus.</dd>
+        </dl>
+      </div>
+      <div class="card">
+        <h3>So geht's</h3>
+        <ol class="howto">
+          <li>Taste ziehen und auf eine andere fallen lassen: beide tauschen.</li>
+          <li>Auf eine Ebene ziehen: Zieh über den Reiter, kurz warten, dann ablegen.</li>
+          <li>Ohne Ziehen: antippen, Ebene wechseln, Ziel antippen.</li>
+          <li>Für Neues (andere Funktion, Zeichen): Taste wählen und einen Wunsch eintragen.</li>
+          <li>Kombos stehen im Reiter „Kombos“. Sie hängen an Positionen und wandern beim Tauschen nicht mit.</li>
+        </ol>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script type="application/json" id="data">{"geometry": [{"x": 0.733, "y": 1.512, "r": -10, "rx": 1.233, "ry": 2.012}, {"x": 1.857, "y": 0.6, "r": -4, "rx": 2.357, "ry": 1.1}, {"x": 3.0, "y": 0.0}, {"x": 4.0, "y": 0.498}, {"x": 5.0, "y": 0.656}, {"x": 8.204, "y": 0.656}, {"x": 9.204, "y": 0.498}, {"x": 10.204, "y": 0.0}, {"x": 11.345, "y": 0.6, "r": 4, "rx": 11.845, "ry": 1.1}, {"x": 12.471, "y": 1.512, "r": 10, "rx": 12.971, "ry": 2.012}, {"x": 0.896, "y": 2.498, "r": -10, "rx": 1.396, "ry": 2.998}, {"x": 1.924, "y": 1.598, "r": -4, "rx": 2.424, "ry": 2.098}, {"x": 3.0, "y": 0.998}, {"x": 4.0, "y": 1.498}, {"x": 5.0, "y": 1.656}, {"x": 8.204, "y": 1.656}, {"x": 9.204, "y": 1.498}, {"x": 10.204, "y": 0.998}, {"x": 11.278, "y": 1.598, "r": 4, "rx": 11.778, "ry": 2.098}, {"x": 12.308, "y": 2.498, "r": 10, "rx": 12.808, "ry": 2.998}, {"x": 0.0, "y": 3.224, "r": -10, "rx": 0.5, "ry": 3.724}, {"x": 1.061, "y": 3.481, "r": -10, "rx": 1.561, "ry": 3.981}, {"x": 1.988, "y": 2.593, "r": -4, "rx": 2.488, "ry": 3.093}, {"x": 3.0, "y": 1.998}, {"x": 4.0, "y": 2.498}, {"x": 5.0, "y": 2.654}, {"x": 8.204, "y": 2.654}, {"x": 9.204, "y": 2.498}, {"x": 10.204, "y": 1.998}, {"x": 11.214, "y": 2.593, "r": 4, "rx": 11.714, "ry": 3.093}, {"x": 12.143, "y": 3.481, "r": 10, "rx": 12.643, "ry": 3.981}, {"x": 13.202, "y": 3.224, "r": 10, "rx": 13.702, "ry": 3.724}, {"x": 3.72, "y": 3.712}, {"x": 4.829, "y": 3.871, "r": 15, "rx": 5.329, "ry": 4.371}, {"x": 5.853, "y": 4.324, "r": 30, "rx": 6.353, "ry": 4.824}, {"x": 7.351, "y": 4.324, "r": -30, "rx": 7.851, "ry": 4.824}, {"x": 8.375, "y": 3.873, "r": -15, "rx": 8.875, "ry": 4.373}, {"x": 9.482, "y": 3.712}], "layers": [{"name": "BASE", "keys": [{"t": "q", "raw": "&kp DE_Q"}, {"t": "ä", "raw": "&kp DE_A_UMLAUT"}, {"t": "o", "raw": "&kp DE_O"}, {"t": "u", "raw": "&kp DE_U"}, {"t": "y", "raw": "&kp DE_Y"}, {"t": "v", "raw": "&kp DE_V"}, {"t": "d", "raw": "&kp DE_D"}, {"t": "c", "raw": "&kp DE_C"}, {"t": "l", "raw": "&kp DE_L"}, {"t": "x", "raw": "&kp DE_X"}, {"t": "h", "h": "Ctrl", "raw": "&hml LCTRL DE_H"}, {"t": "a", "h": "Opt", "raw": "&hml LALT DE_A"}, {"t": "e", "h": "Cmd", "raw": "&hml LGUI DE_E"}, {"t": "i", "raw": "&kp DE_I"}, {"t": ",", "raw": "&kp DE_COMMA", "h": "⇧ ;"}, {"t": "g", "raw": "&kp DE_G"}, {"t": "t", "raw": "&kp DE_T"}, {"t": "r", "h": "Cmd", "raw": "&hmr LGUI DE_R"}, {"t": "n", "h": "Opt", "raw": "&hmr LALT DE_N"}, {"t": "s", "h": "Ctrl", "raw": "&hmr LCTRL DE_S"}, {"t": "ü", "raw": "&kp DE_U_UMLAUT"}, {"t": "k", "raw": "&kp DE_K"}, {"t": "z", "raw": "&kp DE_Z"}, {"t": "'", "h": "⇧ \"", "raw": "&sqt_dqt"}, {"t": ".", "raw": "&kp DE_DOT", "h": "⇧ :"}, {"t": "ö", "raw": "&kp DE_O_UMLAUT"}, {"t": "b", "raw": "&kp DE_B"}, {"t": "p", "raw": "&kp DE_P"}, {"t": "m", "raw": "&kp DE_M"}, {"t": "w", "raw": "&kp DE_W"}, {"t": "f", "raw": "&kp DE_F"}, {"t": "j", "raw": "&kp DE_J"}, {"t": "⌫", "h": "halten: Wort", "raw": "&bsw LA(BSPC) 0"}, {"t": "Sym 1×", "h": "Sym", "raw": "&sym_key SYM SYM"}, {"t": "Shift", "h": "1×", "raw": "&sk LSHFT"}, {"t": "␣", "h": "Nav", "raw": "&lt_spc NAV SPACE"}, {"t": "NumWord", "h": "Num", "raw": "&num_key NUM NUM"}, {"t": "↵", "raw": "&kp RET"}]}, {"name": "NAV", "keys": [{"t": "PgUp", "raw": "&kp PG_UP"}, {"t": "Wort ←", "raw": "&kp LA(LEFT)"}, {"t": "↑", "raw": "&kp UP"}, {"t": "Wort →", "raw": "&kp LA(RIGHT)"}, {"t": "PgDn", "raw": "&kp PG_DN"}, {"t": "App ⇢", "raw": "&swapper_mac"}, {"t": "App ⇠", "raw": "&kp LS(TAB)"}, {"t": "Tab ←", "raw": "&kp LC(LS(TAB))"}, {"t": "Tab →", "raw": "&kp LC(TAB)"}, {"t": "", "none": true, "raw": "&none"}, {"t": "Zeile ⇤", "raw": "&kp LG(LEFT)"}, {"t": "←", "raw": "&kp LEFT"}, {"t": "↓", "raw": "&kp DOWN"}, {"t": "→", "raw": "&kp RIGHT"}, {"t": "Zeile ⇥", "raw": "&kp LG(RIGHT)"}, {"t": "", "none": true, "raw": "&none"}, {"t": "Shift", "raw": "&kp LSHFT"}, {"t": "Cmd", "raw": "&kp LGUI"}, {"t": "Opt", "raw": "&kp LALT"}, {"t": "Ctrl", "raw": "&kp LCTRL"}, {"t": "Maus an", "raw": "&smart_mouse"}, {"t": "Zurück", "raw": "&kp LG(LEFT)"}, {"t": "Vor", "raw": "&kp LG(RIGHT)"}, {"t": "Wort ⌫", "raw": "&kp LA(BSPC)"}, {"t": "Del", "raw": "&kp DEL"}, {"t": "", "none": true, "raw": "&none"}, {"t": "", "none": true, "raw": "&none"}, {"t": "", "none": true, "raw": "&none"}, {"t": "", "none": true, "raw": "&none"}, {"t": "", "none": true, "raw": "&none"}, {"t": "", "none": true, "raw": "&none"}, {"t": "", "none": true, "raw": "&none"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}]}, {"name": "SYM", "keys": [{"t": "!", "raw": "&kp DE_EXCL"}, {"t": "@", "raw": "&kp DE_AT"}, {"t": "?", "raw": "&kp DE_QMARK"}, {"t": "=", "raw": "&kp DE_EQUAL"}, {"t": "%", "raw": "&kp DE_PRCNT"}, {"t": "_", "raw": "&kp DE_UNDER"}, {"t": "$", "raw": "&kp DE_DLLR"}, {"t": "+", "raw": "&kp DE_PLUS"}, {"t": "*", "raw": "&kp DE_STAR"}, {"t": "~", "raw": "&tilde_mac"}, {"t": "#", "raw": "&kp DE_HASH"}, {"t": "&", "raw": "&kp DE_AMPS"}, {"t": "€", "raw": "&kp DE_EURO"}, {"t": "{", "raw": "&kp DE_LBRC"}, {"t": "(", "raw": "&kp DE_LPAR"}, {"t": ")", "raw": "&kp DE_RPAR"}, {"t": "}", "raw": "&kp DE_RBRC"}, {"t": "-", "raw": "&kp DE_MINUS"}, {"t": "|", "raw": "&kp DE_PIPE"}, {"t": "ß", "raw": "&kp DE_SZ"}, {"t": "", "none": true, "raw": "&none"}, {"t": "°", "raw": "&kp DE_DEG"}, {"t": "", "none": true, "raw": "&none"}, {"t": "/", "raw": "&kp DE_SLASH"}, {"t": "<", "raw": "&kp DE_LT"}, {"t": "[", "raw": "&kp DE_LBKT"}, {"t": "]", "raw": "&kp DE_RBKT"}, {"t": ">", "raw": "&kp DE_GT"}, {"t": "\\", "raw": "&kp DE_BSLH"}, {"t": "", "none": true, "raw": "&none"}, {"t": "^", "raw": "&caret"}, {"t": "", "none": true, "raw": "&none"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}]}, {"name": "NUM", "keys": [{"t": "*", "raw": "&kp DE_STAR"}, {"t": "7", "raw": "&kp DE_N7"}, {"t": "8", "raw": "&kp DE_N8"}, {"t": "9", "raw": "&kp DE_N9"}, {"t": "+", "raw": "&kp DE_PLUS"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "/", "raw": "&kp DE_SLASH"}, {"t": "4", "raw": "&kp DE_N4"}, {"t": "5", "raw": "&kp DE_N5"}, {"t": "6", "raw": "&kp DE_N6"}, {"t": "-", "raw": "&kp DE_MINUS"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "⌫", "raw": "&kp BSPC"}, {"t": ".", "raw": "&kp DE_DOT"}, {"t": "1", "raw": "&kp DE_N1"}, {"t": "2", "raw": "&kp DE_N2"}, {"t": "3", "raw": "&kp DE_N3"}, {"t": "=", "raw": "&kp DE_EQUAL"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "↵", "raw": "&kp RET"}, {"t": "0", "raw": "&kp DE_N0"}, {"t": ",", "raw": "&kp DE_COMMA"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}]}, {"name": "SYS", "keys": [{"t": "F12", "raw": "&kp F12"}, {"t": "F7", "raw": "&kp F7"}, {"t": "F8", "raw": "&kp F8"}, {"t": "F9", "raw": "&kp F9"}, {"t": "Screenshot", "raw": "&kp LG(LS(DE_N5))"}, {"t": "Mac", "h": "BT 0", "raw": "&host_mac"}, {"t": "Win", "h": "BT 1", "raw": "&host_win"}, {"t": "BT 2", "raw": "&bt BT_SEL 2"}, {"t": "BT 3", "raw": "&bt BT_SEL 3"}, {"t": "Boot", "raw": "&bootloader"}, {"t": "F11", "raw": "&kp F11"}, {"t": "F4", "raw": "&kp F4"}, {"t": "F5", "raw": "&kp F5"}, {"t": "F6", "raw": "&kp F6"}, {"t": "", "none": true, "raw": "&none"}, {"t": "Prev", "raw": "&kp C_PREV"}, {"t": "Vol −", "raw": "&kp C_VOL_DN"}, {"t": "Vol +", "raw": "&kp C_VOL_UP"}, {"t": "Next", "raw": "&kp C_NEXT"}, {"t": "Play", "raw": "&kp C_PP"}, {"t": "", "none": true, "raw": "&none"}, {"t": "F10", "raw": "&kp F10"}, {"t": "F1", "raw": "&kp F1"}, {"t": "F2", "raw": "&kp F2"}, {"t": "F3", "raw": "&kp F3"}, {"t": "@gif", "raw": "&gif_mac"}, {"t": "", "none": true, "raw": "&none"}, {"t": "Mail 1", "raw": "&kp RA(F18)"}, {"t": "Mail 2", "raw": "&kp RA(F19)"}, {"t": "USB/BT", "raw": "&out OUT_TOG"}, {"t": "BT löschen", "raw": "&bt BT_CLR"}, {"t": "Reset", "raw": "&sys_reset"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}]}, {"name": "MOUSE", "keys": [{"t": "", "none": true, "raw": "&none"}, {"t": "Zurück", "h": "Cmd+[", "raw": "&kp LG(DE_LBKT)"}, {"t": "Klick M", "raw": "&mkp MCLK"}, {"t": "Vor", "h": "Cmd+]", "raw": "&kp LG(DE_RBKT)"}, {"t": "", "none": true, "raw": "&none"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "Cmd", "raw": "&kp LGUI"}, {"t": "Klick R", "raw": "&mkp RCLK"}, {"t": "Scroll ↑", "raw": "&msc SCRL_UP"}, {"t": "Klick L", "raw": "&mkp LCLK"}, {"t": "Shift", "raw": "&kp LSHFT"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "none": true, "raw": "&none"}, {"t": "", "none": true, "raw": "&none"}, {"t": "Scroll ←", "raw": "&msc SCRL_LEFT"}, {"t": "Scroll ↓", "raw": "&msc SCRL_DOWN"}, {"t": "Scroll →", "raw": "&msc SCRL_RIGHT"}, {"t": "", "none": true, "raw": "&none"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}, {"t": "", "trans": true, "raw": "&trans"}]}], "combos": [{"pos": [0, 1], "label": "Esc", "layers": ["BASE", "NAV", "SYM", "NUM", "SYS"]}, {"pos": [1, 2], "label": "Tab", "layers": ["BASE", "NAV", "SYM", "NUM", "SYS"]}, {"pos": [16, 17, 18], "label": "Enter ↵", "layers": ["BASE", "NAV"]}, {"pos": [6, 7], "label": "Maus an", "layers": ["BASE", "NAV"]}, {"pos": [21, 22], "label": "Undo", "layers": ["BASE", "NAV", "SYM", "NUM", "SYS"]}, {"pos": [22, 23], "label": "Cut", "layers": ["BASE", "NAV", "SYM", "NUM", "SYS"]}, {"pos": [23, 24], "label": "Copy", "layers": ["BASE", "NAV", "SYM", "NUM", "SYS"]}, {"pos": [24, 25], "label": "Paste", "layers": ["BASE", "NAV", "SYM", "NUM", "SYS"]}, {"pos": [29, 30], "label": "Redo", "layers": ["BASE", "NAV", "SYM", "NUM", "SYS"]}], "planned": []}</script>
+<script>
+(function () {
+  const DATA = JSON.parse(document.getElementById('data').textContent);
+  const NAMES = { BASE: 'Basis', NAV: 'Nav', SYM: 'Sym', NUM: 'Num', SYS: 'Sys', MOUSE: 'Maus' };
+  const COLOR = { BASE: 'var(--base)', NAV: 'var(--nav)', SYM: 'var(--sym)', NUM: 'var(--num)', SYS: 'var(--sys)', MOUSE: 'var(--mouse)' };
+  const HINT = {
+    BASE: 'Grundebene. Kleine Zweitbeschriftung: beim Halten, oder mit ⇧ = mit Shift.',
+    NAV: 'Space/Nav halten (rechter Daumen).',
+    SYM: 'Daumen-Taste mit Sym halten.',
+    NUM: 'Daumen-Taste mit Num halten (antippen = NumWord).',
+    SYS: 'Space/Nav und Num gleichzeitig halten (beide rechter Daumen).',
+    MOUSE: 'd + c gleichzeitig (oder Nav + Position 20) schaltet ein, jede andere Taste schaltet aus.'
+  };
+  const LAYERS = DATA.layers.map(l => l.name);
+  const STORE = 'totem-planer-351247c17f';
+
+  // ---------- state ----------
+  function freshState() {
+    const s = {};
+    DATA.layers.forEach(l => { s[l.name] = l.keys.map((k, i) => Object.assign({ id: l.name + ':' + i, note: '' }, k)); });
+    return { keys: s, wishes: '' };
+  }
+  let state = freshState();
+  try { const saved = JSON.parse(localStorage.getItem(STORE) || 'null'); if (saved && saved.keys && saved.keys.BASE) state = saved; } catch (e) {}
+  const save = () => { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} };
+
+  let cur = 'BASE';
+  let sel = null; // {layer, pos}
+
+  const orig = (layer, pos) => DATA.layers.find(l => l.name === layer).keys[pos];
+
+  // ---------- geometry ----------
+  const G = DATA.geometry.map(k => {
+    const cx = k.x + .5, cy = k.y + .5, r = (k.r || 0) * Math.PI / 180;
+    const rx = k.rx ?? cx, ry = k.ry ?? cy;
+    return { x: rx + (cx - rx) * Math.cos(r) - (cy - ry) * Math.sin(r), y: ry + (cx - rx) * Math.sin(r) + (cy - ry) * Math.cos(r), r: k.r || 0 };
+  });
+  const minX = Math.min(...G.map(g => g.x)) - .6, maxX = Math.max(...G.map(g => g.x)) + .6;
+  const minY = Math.min(...G.map(g => g.y)) - .6, maxY = Math.max(...G.map(g => g.y)) + .6;
+  const W = maxX - minX, H = maxY - minY;
+
+  // ---------- helpers ----------
+  const FL = ['kleiner Finger', 'Ringfinger', 'Mittelfinger', 'Zeigefinger', 'Zeigefinger innen'];
+  function where(pos) {
+    const th = { 32: 'linker Daumen, eingezogen (unter dem Zeigefinger)', 33: 'linker Daumen, Mitte', 34: 'linker Daumen, gestreckt (zur Tastaturmitte)', 35: 'rechter Daumen, gestreckt (zur Tastaturmitte)', 36: 'rechter Daumen, Mitte', 37: 'rechter Daumen, eingezogen (unter dem Zeigefinger)' };
+    if (th[pos]) return th[pos];
+    if (pos === 20) return 'links unten, ganz außen';
+    if (pos === 31) return 'rechts unten, ganz außen';
+    let row, col;
+    if (pos < 10) { row = 'oben'; col = pos; } else if (pos < 20) { row = 'Grundreihe'; col = pos - 10; } else { row = 'unten'; col = pos - 21; }
+    const left = col < 5;
+    return (left ? 'links' : 'rechts') + ', ' + row + ', ' + (left ? FL[col] : FL[9 - col]);
+  }
+  const opensLayer = k => { const p = (k.raw || '').split(/\s+/); if (p[0] === '&tog') return null; for (const L of ['NAV', 'SYM', 'NUM']) if (p.slice(1).includes(L)) return L; return null; };
+  function label(k) {
+    if (k.trans) return '▽ durchlässig';
+    if (k.none) return 'leer';
+    return k.t + (k.h ? ' / ' + k.h : '');
+  }
+  function keyText(k, pos) {
+    if (k.trans) { const b = state.keys.BASE[pos]; return { t: b && !b.trans ? b.t : '', h: '' }; }
+    return { t: k.t || '', h: k.h || '' };
+  }
+  function isChanged(layer, pos) { const k = state.keys[layer][pos]; return k.id !== layer + ':' + pos || !!k.note; }
+  function heldFor(layer) {
+    const base = state.keys.BASE, out = [];
+    const find = L => base.findIndex(k => opensLayer(k) === L);
+    if (layer === 'NAV' || layer === 'SYM' || layer === 'NUM') { const i = find(layer); if (i >= 0) out.push(i); }
+    if (layer === 'SYS') { [find('NAV'), find('NUM')].forEach(i => i >= 0 && out.push(i)); }
+    return out;
+  }
+
+  // ---------- render ----------
+  const tabsEl = document.getElementById('tabs');
+  const board = document.getElementById('board');
+  function renderTabs() {
+    tabsEl.innerHTML = '';
+    LAYERS.forEach(L => {
+      const n = state.keys[L].filter((k, i) => isChanged(L, i)).length;
+      const b = document.createElement('button');
+      b.className = 'tab'; b.type = 'button'; b.role = 'tab'; b.dataset.layer = L;
+      b.style.setProperty('--c', COLOR[L]);
+      b.setAttribute('aria-selected', L === cur ? 'true' : 'false');
+      b.innerHTML = '<span class="dot"></span>' + NAMES[L] + (n ? ' <span class="cnt">' + n + '</span>' : '');
+      b.addEventListener('click', () => { cur = L; renderAll(); });
+      tabsEl.appendChild(b);
+    });
+    const cb = document.createElement('button');
+    cb.className = 'tab'; cb.type = 'button'; cb.role = 'tab'; cb.dataset.layer = 'COMBOS';
+    cb.style.setProperty('--c', 'var(--combo)');
+    cb.setAttribute('aria-selected', cur === 'COMBOS' ? 'true' : 'false');
+    cb.innerHTML = '<span class="dot"></span>Kombos <span class="cnt">' + DATA.combos.length + '</span>';
+    cb.addEventListener('click', () => { cur = 'COMBOS'; sel = null; renderAll(); });
+    tabsEl.appendChild(cb);
+  }
+  function sizeBoard() {
+    const u = board.clientWidth / W;
+    board.style.setProperty('--u', u + 'px');
+    board.style.height = (u * H) + 'px';
+  }
+  function renderCombos() {
+    const view = document.getElementById('comboView');
+    view.innerHTML = '';
+    const NS = 'http://www.w3.org/2000/svg';
+    DATA.combos.forEach(c => {
+      const card = document.createElement('div'); card.className = 'combo-card';
+      const head = document.createElement('div'); head.className = 'combo-head';
+      const name = document.createElement('span'); name.className = 'combo-name'; name.textContent = c.label;
+      const keys = document.createElement('span'); keys.className = 'combo-keys';
+      keys.textContent = c.pos.map(p => { const k = state.keys.BASE[p]; return (k && k.t) || p; }).join(' + ');
+      head.append(name, keys);
+      const svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('class', 'mini');
+      svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', c.label + ': ' + keys.textContent);
+      G.forEach((g, p) => {
+        const on = c.pos.includes(p);
+        const x = g.x - minX, y = g.y - minY;
+        const grp = document.createElementNS(NS, 'g');
+        grp.setAttribute('transform', 'rotate(' + g.r + ' ' + x + ' ' + y + ')');
+        const r = document.createElementNS(NS, 'rect');
+        r.setAttribute('x', x - .43); r.setAttribute('y', y - .43); r.setAttribute('width', .86); r.setAttribute('height', .86); r.setAttribute('rx', .14);
+        r.setAttribute('class', on ? 'mk on' : 'mk');
+        grp.appendChild(r);
+        if (on) {
+          const tx = document.createElementNS(NS, 'text');
+          tx.setAttribute('x', x); tx.setAttribute('y', y + .16); tx.setAttribute('class', 'mt');
+          tx.textContent = (state.keys.BASE[p] && state.keys.BASE[p].t) || '';
+          grp.appendChild(tx);
+        }
+        svg.appendChild(grp);
+      });
+      const foot = document.createElement('div'); foot.className = 'combo-layers';
+      foot.textContent = 'Aktiv auf: ' + (c.layers || []).map(l => NAMES[l]).join(', ');
+      card.append(head, svg, foot);
+      view.appendChild(card);
+    });
+  }
+  function renderBoard() {
+    const isCombo = cur === 'COMBOS';
+    document.getElementById('boardWrap').hidden = isCombo;
+    document.getElementById('legend').hidden = isCombo;
+    document.getElementById('comboView').hidden = !isCombo;
+    if (isCombo) {
+      document.getElementById('layerTitle').textContent = 'Kombos';
+      document.getElementById('layerHint').textContent = 'Die markierten Tasten gleichzeitig drücken. Kombos hängen an Positionen, nicht an Tasten.';
+      renderCombos();
+      return;
+    }
+    board.innerHTML = '';
+    document.getElementById('layerTitle').textContent = NAMES[cur];
+    document.getElementById('layerHint').textContent = HINT[cur];
+    const held = heldFor(cur);
+    state.keys[cur].forEach((k, pos) => {
+      const g = G[pos];
+      const el = document.createElement('button');
+      el.type = 'button';
+      el.className = 'key';
+      el.dataset.pos = pos;
+      el.style.left = 'calc(var(--u) * ' + (g.x - minX) + ' - var(--u) * .46)';
+      el.style.top = 'calc(var(--u) * ' + (g.y - minY) + ' - var(--u) * .46)';
+      if (g.r) el.style.transform = 'rotate(' + g.r + 'deg)';
+      const tx = keyText(k, pos);
+      if (k.trans) el.classList.add('trans');
+      else if (k.none) el.classList.add('none');
+      else if (cur !== 'BASE') { el.classList.add('lay'); el.style.setProperty('--lc', COLOR[cur]); }
+      const op = opensLayer(k);
+      if (op && cur === 'BASE') { el.classList.add('opens'); el.style.setProperty('--oc', COLOR[op]); }
+      if (held.includes(pos)) { el.classList.add('held'); el.style.setProperty('--hc', COLOR[cur]); }
+      if (isChanged(cur, pos)) el.classList.add('changed');
+      if (sel && sel.layer === cur && sel.pos === pos) el.classList.add('selected');
+      const t = tx.t || '';
+      el.innerHTML = '<span class="pos">' + pos + '</span><span class="t' + (t.length > 8 ? ' xlong' : t.length > 4 ? ' long' : '') + '"></span>' + (tx.h ? '<span class="h"></span>' : '');
+      el.querySelector('.t').textContent = held.includes(pos) && cur !== 'BASE' ? 'hält' : t;
+      if (tx.h) el.querySelector('.h').textContent = tx.h;
+      if (k.note) el.title = 'Wunsch: ' + k.note;
+      el.setAttribute('aria-label', 'Position ' + pos + ', ' + where(pos) + ': ' + label(k));
+      board.appendChild(el);
+    });
+  }
+  function renderSel() {
+    const body = document.getElementById('selBody');
+    if (!sel) { body.className = 'sel-empty'; body.textContent = 'Tippe eine Taste an. Tippst du danach eine zweite an, auch auf einer anderen Ebene, werden beide getauscht.'; return; }
+    const k = state.keys[sel.layer][sel.pos];
+    body.className = '';
+    body.innerHTML = '';
+    const t = document.createElement('div'); t.className = 'sel-title'; t.textContent = NAMES[sel.layer] + ' · Position ' + sel.pos + ': ' + label(k);
+    const m = document.createElement('div'); m.className = 'sel-meta'; m.textContent = where(sel.pos) + ' · ' + (k.raw || '') + (k.id !== sel.layer + ':' + sel.pos ? ' · kommt von ' + k.id.replace(':', ' Pos ') : '');
+    const lab = document.createElement('label'); lab.htmlFor = 'noteInput'; lab.textContent = 'Wunsch für diese Position (frei formulieren)';
+    const inp = document.createElement('input'); inp.type = 'text'; inp.id = 'noteInput'; inp.value = k.note || ''; inp.placeholder = 'z. B. hier soll ß hin';
+    inp.addEventListener('input', () => { k.note = inp.value; save(); renderTabs(); renderBoard(); renderChanges(); });
+    const btns = document.createElement('div'); btns.className = 'btns';
+    const done = document.createElement('button'); done.className = 'b'; done.type = 'button'; done.textContent = 'Auswahl aufheben';
+    done.addEventListener('click', () => { sel = null; renderAll(); });
+    btns.appendChild(done);
+    body.append(t, m, lab, inp, btns);
+  }
+  function changeLines() {
+    const out = [];
+    LAYERS.forEach(L => state.keys[L].forEach((k, pos) => {
+      if (!isChanged(L, pos)) return;
+      const was = label(orig(L, pos));
+      let line = NAMES[L] + ', Position ' + pos + ' (' + where(pos) + '): ';
+      if (k.id !== L + ':' + pos) {
+        const [fl, fp] = k.id.split(':');
+        line += was + ' → ' + label(k) + ' (von ' + NAMES[fl] + ', Position ' + fp + ')';
+      } else line += label(k) + ' bleibt';
+      if (k.note) line += '. Wunsch: ' + k.note;
+      out.push({ L, text: line });
+    }));
+    return out;
+  }
+  function renderChanges() {
+    const ul = document.getElementById('changes');
+    ul.innerHTML = '';
+    const lines = changeLines();
+    if (!lines.length) { const li = document.createElement('li'); li.style.borderColor = 'var(--key-edge)'; li.textContent = 'Noch keine Änderungen.'; ul.appendChild(li); return; }
+    lines.forEach(c => { const li = document.createElement('li'); li.textContent = c.text; ul.appendChild(li); });
+  }
+  const pl = document.getElementById('planned');
+  if (!(DATA.planned || []).length) { const li = document.createElement('li'); li.style.borderColor = 'var(--key-edge)'; li.textContent = 'Nichts. Alles Besprochene ist in der Firmware.'; pl.appendChild(li); }
+  (DATA.planned || []).forEach(x => { const li = document.createElement('li'); li.style.borderColor = 'var(--sym)'; li.textContent = x; pl.appendChild(li); });
+  function renderAll() { renderTabs(); renderBoard(); renderSel(); renderChanges(); }
+
+  // ---------- actions ----------
+  function swap(a, b) {
+    if (a.layer === b.layer && a.pos === b.pos) return;
+    const A = state.keys[a.layer], B = state.keys[b.layer];
+    const t = A[a.pos]; A[a.pos] = B[b.pos]; B[b.pos] = t;
+    save();
+    status('Getauscht: ' + NAMES[a.layer] + ' ' + a.pos + ' ↔ ' + NAMES[b.layer] + ' ' + b.pos);
+  }
+  function status(msg) { document.getElementById('status').textContent = msg; }
+  function clickKey(pos) {
+    if (sel && !(sel.layer === cur && sel.pos === pos)) { swap(sel, { layer: cur, pos }); sel = null; }
+    else if (sel) sel = null;
+    else sel = { layer: cur, pos };
+    renderAll();
+  }
+
+  // pointer drag (mouse, pen and touch)
+  let drag = null;
+  board.addEventListener('pointerdown', e => {
+    const el = e.target.closest('.key'); if (!el || e.button > 0) return;
+    drag = { pos: +el.dataset.pos, layer: cur, x: e.clientX, y: e.clientY, active: false, el, ghost: null, tabTimer: null, overTab: null };
+  });
+  window.addEventListener('pointermove', e => {
+    if (!drag) return;
+    if (!drag.active && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 6) {
+      drag.active = true;
+      const k = state.keys[drag.layer][drag.pos];
+      const g = document.createElement('div'); g.className = 'ghost';
+      const tx = keyText(k, drag.pos);
+      g.innerHTML = '<span></span><small></small>'; g.firstChild.textContent = tx.t || '·'; g.lastChild.textContent = tx.h || '';
+      document.body.appendChild(g); drag.ghost = g;
+      drag.el.classList.add('dragging-src');
+    }
+    if (!drag.active) return;
+    e.preventDefault();
+    drag.ghost.style.left = e.clientX + 'px'; drag.ghost.style.top = e.clientY + 'px';
+    const under = document.elementFromPoint(e.clientX, e.clientY);
+    document.querySelectorAll('.drop-target,.drop-hover').forEach(n => n.classList.remove('drop-target', 'drop-hover'));
+    const k = under && under.closest('.key'); if (k) k.classList.add('drop-target');
+    const tab = under && under.closest('.tab');
+    if (tab) {
+      tab.classList.add('drop-hover');
+      if (drag.overTab !== tab.dataset.layer) {
+        clearTimeout(drag.tabTimer); drag.overTab = tab.dataset.layer;
+        drag.tabTimer = setTimeout(() => { if (drag && drag.overTab && drag.overTab !== cur) { cur = drag.overTab; renderTabs(); renderBoard(); } }, 450);
+      }
+    } else { clearTimeout(drag && drag.tabTimer); if (drag) drag.overTab = null; }
+  }, { passive: false });
+  window.addEventListener('pointerup', e => {
+    if (!drag) return;
+    const d = drag; drag = null; clearTimeout(d.tabTimer);
+    if (d.ghost) d.ghost.remove();
+    document.querySelectorAll('.drop-target,.drop-hover,.dragging-src').forEach(n => n.classList.remove('drop-target', 'drop-hover', 'dragging-src'));
+    if (!d.active) { clickKey(d.pos); return; }
+    const under = document.elementFromPoint(e.clientX, e.clientY);
+    const k = under && under.closest('.key');
+    if (k) { swap({ layer: d.layer, pos: d.pos }, { layer: cur, pos: +k.dataset.pos }); sel = null; }
+    renderAll();
+  });
+  window.addEventListener('pointercancel', () => { if (drag && drag.ghost) drag.ghost.remove(); drag = null; renderBoard(); });
+  board.addEventListener('keydown', e => { const el = e.target.closest('.key'); if (el && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); clickKey(+el.dataset.pos); } });
+
+  const wishes = document.getElementById('wishes');
+  wishes.value = state.wishes || '';
+  wishes.addEventListener('input', () => { state.wishes = wishes.value; save(); });
+
+  function exportText() {
+    const lines = changeLines();
+    let s = 'Totem-Planer: Änderungswünsche\n(Positionen wie in totem.keymap, macOS-Sicht; Windows-Zwillinge bitte mitziehen)\nAusgangsbasis: Keymap-Stand 04.10.2026 13:28\n' + ((DATA.planned || []).length ? '\nBereits vorgemerkt:\n' + DATA.planned.map(x => '- ' + x).join('\n') + '\n' : '') + '\nNeue Änderungen:\n';
+    if (!lines.length) s += '- keine Tasten-Änderungen\n';
+    lines.forEach(c => { s += '- ' + c.text + '\n'; });
+    if ((state.wishes || '').trim()) s += '\nWeitere Wünsche:\n' + state.wishes.trim() + '\n';
+    return s;
+  }
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    const txt = exportText();
+    const box = document.getElementById('exportBox');
+    box.value = txt;
+    const fallback = () => { box.hidden = false; box.focus(); box.select(); status('Kopieren nicht erlaubt. Text ist markiert, bitte mit Cmd+C kopieren.'); };
+    try {
+      navigator.clipboard.writeText(txt).then(() => { box.hidden = true; status('Kopiert. Füge den Text im Chat mit Claude ein.'); }, fallback);
+    } catch (e) { fallback(); }
+  });
+  const resetBtn = document.getElementById('resetBtn');
+  let armed = false;
+  resetBtn.addEventListener('click', () => {
+    if (!armed) { armed = true; resetBtn.textContent = 'Wirklich zurücksetzen?'; setTimeout(() => { armed = false; resetBtn.textContent = 'Alles zurücksetzen'; }, 4000); return; }
+    armed = false; resetBtn.textContent = 'Alles zurücksetzen';
+    state = freshState(); sel = null; wishes.value = ''; save(); renderAll();
+    status('Zurückgesetzt auf die Ausgangsbasis.');
+  });
+
+  new ResizeObserver(sizeBoard).observe(board);
+  sizeBoard(); renderAll();
+})();
+</script>

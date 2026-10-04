@@ -51,6 +51,15 @@ Die Bilder werden bei jedem Hochladen automatisch neu gezeichnet (`keymap-drawer
 ### Mouse (d + c gleichzeitig; jede andere Taste schaltet sie wieder aus)
 ![Mouse](keymap-drawer/svg/mouse.svg)
 
+## Planer (Tasten per Drag & Drop umplanen)
+
+`planner/totem-planer.html` herunterladen (auf GitHub: Datei öffnen → Download) und im Browser öffnen. Es zeigt die aktuelle Belegung auf der echten TOTEM-Geometrie, dazu einen Reiter mit allen Kombos und einen Spickzettel.
+
+- Tasten ziehen oder nacheinander antippen: Sie werden getauscht, auch zwischen Ebenen. Für Neues einen Wunsch eintragen.
+- **"Änderungen kopieren"** und den Text Claude schicken, der die Keymap samt Windows-Zwillingen anpasst.
+- Der Entwurf liegt nur in diesem Browser. Er wird zurückgesetzt, sobald sich die Keymap ändert. Vorher kopieren.
+- Der Planer wird bei jedem Hochladen automatisch neu erzeugt (`tools/make_planner.py`, Vorlage `planner/template.html`).
+
 ## Belegung ändern
 
 - Nur `config/totem.keymap` bearbeiten (auf github.com: Datei öffnen, Stift-Symbol, "Commit changes"). Oben in der Datei steht eine kurze Anleitung ("HOW TO EDIT").
