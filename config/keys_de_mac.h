@@ -7,10 +7,11 @@
  * modifier groups, so the CLDR file was filtered before generating:
  *   - kept only the base, Shift, Option and Option+Shift key maps
  *     (dropped Caps, Ctrl and Cmd maps, which produced wrong/duplicate defines)
- *   - swapped ISO positions E00 and B00 (CLDR macOS data uses Apple's ANSI key
- *     numbering). Assumes macOS treats the Totem as an ISO (European) keyboard.
- *     If ^/° and </> come out swapped, set the keyboard type to ISO in
- *     System Settings > Keyboard, or swap those two keys here.
+ *   - the key left of 1 (^ °) and the key right of left Shift (< >) are sent
+ *     swapped (GRAVE_ACCENT <-> NON_US_BACKSLASH) compared with Windows: tested
+ *     on the user's Mac, macOS swaps these two keys for the Totem even with the
+ *     keyboard type set to ISO. Keep the Mac on ISO (System Settings > Keyboard >
+ *     Change Keyboard Type); with ANSI they come out swapped again.
  *   - DE_SINGLE_QUOTE set to Shift+# (CLDR also has Option+´; both type ' on macOS),
  *     to match the Windows header.
  * Key names are identical to keys_de.h (DE_ prefix), so the keymap needs no renames.
@@ -132,14 +133,14 @@
 #define DE_SEMI (DE_SEMICOLON)
 
 /* < */
-#define DE_LESS_THAN (ZMK_HID_USAGE(HID_USAGE_KEY, HID_USAGE_KEY_KEYBOARD_NON_US_BACKSLASH_AND_PIPE))
+#define DE_LESS_THAN (ZMK_HID_USAGE(HID_USAGE_KEY, HID_USAGE_KEY_KEYBOARD_GRAVE_ACCENT_AND_TILDE))
 #define DE_LT (DE_LESS_THAN)
 
 /* = */
 #define DE_EQUAL (LS(ZMK_HID_USAGE(HID_USAGE_KEY, HID_USAGE_KEY_KEYBOARD_0_AND_RIGHT_PARENTHESIS)))
 
 /* > */
-#define DE_GREATER_THAN (LS(ZMK_HID_USAGE(HID_USAGE_KEY, HID_USAGE_KEY_KEYBOARD_NON_US_BACKSLASH_AND_PIPE)))
+#define DE_GREATER_THAN (LS(ZMK_HID_USAGE(HID_USAGE_KEY, HID_USAGE_KEY_KEYBOARD_GRAVE_ACCENT_AND_TILDE)))
 #define DE_GT (DE_GREATER_THAN)
 
 /* ? */
@@ -163,7 +164,7 @@
 #define DE_RBKT (DE_RIGHT_BRACKET)
 
 /* ^ */
-#define DE_CARET (ZMK_HID_USAGE(HID_USAGE_KEY, HID_USAGE_KEY_KEYBOARD_GRAVE_ACCENT_AND_TILDE))
+#define DE_CARET (ZMK_HID_USAGE(HID_USAGE_KEY, HID_USAGE_KEY_KEYBOARD_NON_US_BACKSLASH_AND_PIPE))
 
 /* _ */
 #define DE_UNDERSCORE (LS(ZMK_HID_USAGE(HID_USAGE_KEY, HID_USAGE_KEY_KEYBOARD_SLASH_AND_QUESTION_MARK)))
@@ -309,7 +310,7 @@
 #define DE_MACR (DE_MACRON)
 
 /* ° */
-#define DE_DEGREE (LS(ZMK_HID_USAGE(HID_USAGE_KEY, HID_USAGE_KEY_KEYBOARD_GRAVE_ACCENT_AND_TILDE)))
+#define DE_DEGREE (LS(ZMK_HID_USAGE(HID_USAGE_KEY, HID_USAGE_KEY_KEYBOARD_NON_US_BACKSLASH_AND_PIPE)))
 #define DE_DEG (DE_DEGREE)
 
 /* ± */
@@ -442,7 +443,7 @@
 #define DE_RIGHT_DOUBLE_QUOTE (LA(LS(ZMK_HID_USAGE(HID_USAGE_KEY, HID_USAGE_KEY_KEYBOARD_2_AND_AT))))
 
 /* „ */
-#define DE_DOUBLE_LOW_9_QUOTE (LA(ZMK_HID_USAGE(HID_USAGE_KEY, HID_USAGE_KEY_KEYBOARD_GRAVE_ACCENT_AND_TILDE)))
+#define DE_DOUBLE_LOW_9_QUOTE (LA(ZMK_HID_USAGE(HID_USAGE_KEY, HID_USAGE_KEY_KEYBOARD_NON_US_BACKSLASH_AND_PIPE)))
 
 /* • */
 #define DE_BULLET (LA(ZMK_HID_USAGE(HID_USAGE_KEY, HID_USAGE_KEY_KEYBOARD_LEFT_BRACKET_AND_LEFT_BRACE)))

@@ -32,6 +32,7 @@ EQUIVALENT = {
     "&kp LG(LS(⟨z⟩))": {"&kp LC(⟨y⟩)", "&kp LC(LS(⟨z⟩))"},  # redo
     "&gif_mac": {"&gif_win"},
     "&tilde_mac": {"&kp ⟨~⟩"},
+    "&caret_mac": {"&caret_win"},
     "&bsw LA(BSPC) 0": {"&bsw LC(BSPC) 0"},              # Backspace key, hold = delete word
     "&swapper_mac": {"&swapper_win"},                    # Cmd-Tab / Alt-Tab swapper
     "&kp LG(⟨[⟩)": {"&kp LA(LEFT)"},                    # back (mouse layer)

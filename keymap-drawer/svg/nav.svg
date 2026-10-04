@@ -319,13 +319,13 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key trans"/>
 <text x="0" y="0" class="key trans tap">▽</text>
 </g>
-<g transform="translate(444, 270) rotate(-30.0)" class="key held trig-NAV keypos-35">
-<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key held trig-NAV"/>
-<text x="0" y="0" class="key held trig-NAV tap">Nav</text>
-</g>
-<g transform="translate(501, 245) rotate(-15.0)" class="key trans keypos-36">
+<g transform="translate(444, 270) rotate(-30.0)" class="key trans keypos-35">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key trans"/>
 <text x="0" y="0" class="key trans tap">▽</text>
+</g>
+<g transform="translate(501, 245) rotate(-15.0)" class="key held trig-NAV keypos-36">
+<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key held trig-NAV"/>
+<text x="0" y="0" class="key held trig-NAV tap">Nav</text>
 </g>
 <g transform="translate(563, 236)" class="key trans keypos-37">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key trans"/>

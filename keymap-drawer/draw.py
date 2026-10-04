@@ -47,7 +47,7 @@ RAW = {
     "&smart_mouse": "Maus",
     "&sqt_dqt": {"t": "'", "s": '"'},
     "&tilde_mac": "~",
-    "&caret": "^",
+    "&caret_mac": "^",
     "&gif_mac": "@gif",
     "&host_mac": {"t": "Mac", "s": "BT 0"},
     "&host_win": {"t": "Win", "s": "BT 1"},

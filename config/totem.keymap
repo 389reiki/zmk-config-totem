@@ -293,11 +293,17 @@
             bindings = <&macro_tap &kp DE_TILDE &kp SPACE>;
         };
 
-        // ^ is a dead key on both systems; add Space so ^ appears immediately
-        caret: caret {
+        // ^ is a dead key on both systems; add Space so ^ appears immediately.
+        // Separate Mac/Windows versions: the ^ key is sent differently on macOS (see keys_de_mac.h).
+        caret_mac: caret_mac {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
             bindings = <&macro_tap &kp DE_CARET &kp SPACE>;
+        };
+        caret_win: caret_win {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&macro_tap &kp DEW_CARET &kp SPACE>;
         };
 
         // types @gif (from the original keymap; now with the German @)
@@ -318,16 +324,17 @@
 
         // BASE – letters. Home-row mods by function, same finger on both systems:
         //   pinky = Ctrl (macOS) / Win (Windows), ring = Option / Alt, middle = Cmd / Ctrl.
-        //   Thumbs: left Backspace | Sym | Shift, right Space/Nav | Num | Enter.
+        //   Thumbs: left Backspace | Shift | Sym, right Num | Space/Nav | (free). Shift and Space on the middle keys.
         //   Backspace: tap = Backspace (with Shift: Delete), hold = delete word, tap+hold = repeat.
-        //   Combos (see "combos" above): Enter = t+r+n, mouse = d+c, Esc/Tab, clipboard.
+        //   Combos (see "combos" above): Enter = t+r+n (the only Enter besides NUM pos 32), mouse = d+c,
+        //   Esc/Tab, clipboard.
         base_layer {
             display-name = "BASE";
             bindings = <
             &kp DE_Q        &kp DE_A_UMLAUT  &kp DE_O          &kp DE_U        &kp DE_Y         &kp DE_V        &kp DE_D        &kp DE_C          &kp DE_L          &kp DE_X
             &hml LCTRL DE_H &hml LALT DE_A   &hml LGUI DE_E    &kp DE_I        &kp DE_COMMA     &kp DE_G        &kp DE_T        &hmr LGUI DE_R    &hmr LALT DE_N    &hmr LCTRL DE_S
 &kp DE_U_UMLAUT  &kp DE_K       &kp DE_Z         &sqt_dqt          &kp DE_DOT      &kp DE_O_UMLAUT  &kp DE_B        &kp DE_P        &kp DE_M          &kp DE_W          &kp DE_F          &kp DE_J
-                                                 &bsw LA(BSPC) 0   &sym_key SYM SYM      &sk LSHFT                      &lt_spc NAV SPACE  &num_key NUM NUM    &kp RET
+                                                 &bsw LA(BSPC) 0   &sk LSHFT             &sym_key SYM SYM               &num_key NUM NUM   &lt_spc NAV SPACE   &none
             >;
         };
 
@@ -342,7 +349,7 @@
             >;
         };
 
-        // NAV – hold Space (right thumb). Arrows on the left hand, mods on the right home row.
+        // NAV – hold Space (right thumb, middle key). Arrows on the left hand, mods on the right home row.
         //   Pos 5 = swapper (tap repeatedly to walk through apps), pos 6 = back one app, pos 20 = smart-mouse.
         //   macOS keystrokes here; the Windows equivalents are in nav_win_layer.
         nav_layer {
@@ -373,7 +380,7 @@
             bindings = <
             &kp DE_EXCL   &kp DE_AT     &kp DE_QMARK  &kp DE_EQUAL  &kp DE_PRCNT    &kp DE_UNDER  &kp DE_DLLR   &kp DE_PLUS   &kp DE_STAR   &tilde_mac
             &kp DE_HASH   &kp DE_AMPS   &kp DE_EURO   &kp DE_LBRC   &kp DE_LPAR     &kp DE_RPAR   &kp DE_RBRC   &kp DE_MINUS  &kp DE_PIPE   &kp DE_SZ
-&none       &kp DE_DEG    &none         &kp DE_SLASH  &kp DE_LT     &kp DE_LBKT     &kp DE_RBKT   &kp DE_GT     &kp DE_BSLH   &none         &caret        &none
+&none       &kp DE_DEG    &none         &kp DE_SLASH  &kp DE_LT     &kp DE_LBKT     &kp DE_RBKT   &kp DE_GT     &kp DE_BSLH   &none         &caret_mac    &none
                                         &trans        &trans        &trans          &trans        &trans        &trans
             >;
         };
@@ -383,7 +390,7 @@
             bindings = <
             &kp DEW_EXCL   &kp DEW_AT     &kp DEW_QMARK  &kp DEW_EQUAL  &kp DEW_PRCNT    &kp DEW_UNDER  &kp DEW_DLLR   &kp DEW_PLUS   &kp DEW_STAR   &kp DEW_TILDE
             &kp DEW_HASH   &kp DEW_AMPS   &kp DEW_EURO   &kp DEW_LBRC   &kp DEW_LPAR     &kp DEW_RPAR   &kp DEW_RBRC   &kp DEW_MINUS  &kp DEW_PIPE   &kp DEW_SZ
-&none       &kp DEW_DEG    &none         &kp DEW_SLASH  &kp DEW_LT     &kp DEW_LBKT     &kp DEW_RBKT   &kp DEW_GT     &kp DEW_BSLH   &none         &caret        &none
+&none       &kp DEW_DEG    &none         &kp DEW_SLASH  &kp DEW_LT     &kp DEW_LBKT     &kp DEW_RBKT   &kp DEW_GT     &kp DEW_BSLH   &none         &caret_win    &none
                                         &trans        &trans        &trans          &trans        &trans        &trans
             >;
         };
@@ -411,7 +418,7 @@
             >;
         };
 
-        // SYS – hold Nav (Space) + Num, both right thumb. F-keys mirror the numpad; host keys Mac/Win, Bluetooth, media.
+        // SYS – hold Nav (Space, pos 36) + Num (pos 35), both right thumb. F-keys mirror the numpad; host keys Mac/Win, Bluetooth, media.
         sys_layer {
             display-name = "SYS";
             bindings = <

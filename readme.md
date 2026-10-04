@@ -21,7 +21,7 @@ TOTEM is a 38 key column-staggered split keyboard running [ZMK](https://zmk.dev/
 
 - Firmware: ZMK **v0.3** (fest eingestellt in `config/west.yml` und `.github/workflows/build.yml`), Modul urob/zmk-auto-layer v0.3 für Num-Word.
 - Belegung: `config/totem.keymap` (anymak:END-Variante, Home-Row-Mods, Combos, Ebenen BASE/NAV/SYM/NUM/SYS/MOUSE).
-- **Daumen:** links Backspace | Sym | Shift, rechts Leertaste/Nav | Num | Enter. Backspace: antippen = ⌫ (mit Shift: Entf), halten = Wort löschen, antippen und dann halten = ⌫ wiederholt.
+- **Daumen:** links Backspace | Shift | Sym, rechts Num | Leertaste/Nav | (frei). Enter nur noch als Kombo t + r + n (und auf Num). Backspace: antippen = ⌫ (mit Shift: Entf), halten = Wort löschen, antippen und dann halten = ⌫ wiederholt.
 - **Kombos:** Enter = t + r + n, Maus-Ebene an = d + c, Esc = q + ä, Tab = ä + o, Zwischenablage auf der unteren Reihe links. Auf der Maus-Ebene gelten keine Kombos.
 - **Zwei Rechner, eine Belegung:** macOS ist Standard (Bluetooth-Profil 0), Windows ist ein Overlay (Profil 1). Jede Funktion liegt auf beiden Systemen auf derselben Taste.
   - Umschalten: Leertaste + Num halten (SYS-Ebene, beide mit dem rechten Daumen), dann **Mac** (rechte Hand, obere Reihe, innen) oder **Win** (daneben).
