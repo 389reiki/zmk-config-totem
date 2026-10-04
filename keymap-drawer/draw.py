@@ -42,6 +42,9 @@ MOUSE_MOD = "Cmd/Ctrl"
 # Labels for bindings whose keystroke alone does not say what they do (macOS keystrokes)
 RAW = {
     "&bspc_del": {"t": "⌫", "s": "Del"},
+    "&bsw LA(BSPC) 0": {"t": "⌫", "s": "⇧ Del", "h": "Wort ⌫"},
+    "&swapper_mac": "App ⇄",
+    "&smart_mouse": "Maus",
     "&sqt_dqt": {"t": "'", "s": '"'},
     "&tilde_mac": "~",
     "&caret": "^",

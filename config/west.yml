@@ -16,5 +16,9 @@ manifest:
     - name: zmk-auto-layer
       remote: urob
       revision: v0.3
+    # tri-state behavior: smart-mouse and the Cmd/Alt-Tab swapper; revision matched to the ZMK release
+    - name: zmk-tri-state
+      remote: urob
+      revision: v0.3
   self:
     path: config

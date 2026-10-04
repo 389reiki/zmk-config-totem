@@ -32,9 +32,11 @@ EQUIVALENT = {
     "&kp LG(LS(⟨z⟩))": {"&kp LC(⟨y⟩)", "&kp LC(LS(⟨z⟩))"},  # redo
     "&gif_mac": {"&gif_win"},
     "&tilde_mac": {"&kp ⟨~⟩"},
+    "&bsw LA(BSPC) 0": {"&bsw LC(BSPC) 0"},              # Backspace key, hold = delete word
+    "&swapper_mac": {"&swapper_win"},                    # Cmd-Tab / Alt-Tab swapper
 }
 # Keys that do the same on both systems even though their name ends in _mac
-NEUTRAL = {"&host_mac", "&host_win"}
+NEUTRAL = {"&host_mac", "&host_win", "&smart_mouse"}
 SWAP_MODS = {"LGUI": "LCTRL", "LCTRL": "LGUI", "RGUI": "RCTRL", "RCTRL": "RGUI"}
 
 
