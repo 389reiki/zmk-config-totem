@@ -34,6 +34,8 @@ EQUIVALENT = {
     "&tilde_mac": {"&kp ⟨~⟩"},
     "&bsw LA(BSPC) 0": {"&bsw LC(BSPC) 0"},              # Backspace key, hold = delete word
     "&swapper_mac": {"&swapper_win"},                    # Cmd-Tab / Alt-Tab swapper
+    "&kp LG(⟨[⟩)": {"&kp LA(LEFT)"},                    # back (mouse layer)
+    "&kp LG(⟨]⟩)": {"&kp LA(RIGHT)"},                   # forward (mouse layer)
 }
 # Keys that do the same on both systems even though their name ends in _mac
 NEUTRAL = {"&host_mac", "&host_win", "&smart_mouse"}

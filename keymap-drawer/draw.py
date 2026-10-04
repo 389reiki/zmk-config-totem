@@ -86,6 +86,9 @@ RAW = {
     "&mkp RCLK": "Click R",
     "&mkp MCLK": "Click M",
     "&mkp MB4": "Back",
+    "&kp LG(DE_LBKT)": "Zurück",
+    "&kp LG(DE_RBKT)": "Vor",
+    "&kp LS(TAB)": "App ⇠",
     "&mkp MB5": "Fwd",
     "&msc SCRL_UP": "Scroll ↑",
     "&msc SCRL_DOWN": "Scroll ↓",
@@ -99,6 +102,8 @@ RAW = {
     "&sys_reset": "Reset",
 }
 # Same keystroke on the Mac, different job: named after the Windows twin key (nav_win_layer)
+# Shift variants shown on the base layer (they are not on SYM)
+BASE_SHIFTED = {"&kp DE_COMMA": ";", "&kp DE_DOT": ":"}
 AMBIGUOUS = {"&kp LG(LEFT)", "&kp LG(RIGHT)"}
 BY_WIN_TWIN = {"&kp HOME": "Line ⇤", "&kp END": "Line ⇥", "&kp LA(LEFT)": "Back", "&kp LA(RIGHT)": "Fwd"}
 
@@ -208,6 +213,8 @@ def main():
             twin = raw_layers.get(name + " WIN", [None] * 38)[pos]
             if raw in AMBIGUOUS and twin in BY_WIN_TWIN:
                 k["t"] = BY_WIN_TWIN[twin]
+            if name == "BASE" and raw in BASE_SHIFTED:   # show the Shift variant of , . on the base layer
+                k["s"] = BASE_SHIFTED[raw]
             if name == "MOUSE" and k.get("t") == MODS["LGUI"]:
                 k["t"] = MOUSE_MOD
             types = set(str(k.get("type", "")).split())

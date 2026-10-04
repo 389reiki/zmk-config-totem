@@ -137,19 +137,19 @@
         };
 
         // Swapper (Callum/urob, tri-state module): first tap holds Cmd (Windows: Alt) and taps Tab,
-        // further taps send Tab. Shift (pos 16) and the arrows keep it open; releasing Nav or any
+        // further taps send Tab. Pos 6 (Shift+Tab) goes back; Shift and the arrows keep it open; releasing Nav or any
         // other key releases Cmd/Alt and selects the app.
         swapper_mac: swapper_mac {
             compatible = "zmk,behavior-tri-state";
             #binding-cells = <0>;
             bindings = <&kt LGUI>, <&kp TAB>, <&kt LGUI>;
-            ignored-key-positions = <2 11 12 13 16>;
+            ignored-key-positions = <2 6 11 12 13 16>;
         };
         swapper_win: swapper_win {
             compatible = "zmk,behavior-tri-state";
             #binding-cells = <0>;
             bindings = <&kt LALT>, <&kp TAB>, <&kt LALT>;
-            ignored-key-positions = <2 11 12 13 16>;
+            ignored-key-positions = <2 6 11 12 13 16>;
         };
 
         // Smart-mouse (urob, tri-state module): turns MOUSE on; pressing any key that is not a
@@ -343,14 +343,14 @@
         };
 
         // NAV – hold Space (right thumb). Arrows on the left hand, mods on the right home row.
-        //   Pos 5 = swapper (tap repeatedly to walk through apps), pos 20 = smart-mouse.
+        //   Pos 5 = swapper (tap repeatedly to walk through apps), pos 6 = back one app, pos 20 = smart-mouse.
         //   macOS keystrokes here; the Windows equivalents are in nav_win_layer.
         nav_layer {
             display-name = "NAV";
             bindings = <
-            &kp PG_UP     &kp LA(LEFT)  &kp UP        &kp LA(RIGHT)  &kp PG_DN      &swapper_mac &kp LC(LS(TAB))  &kp LC(TAB)  &none     &none
+            &kp PG_UP     &kp LA(LEFT)  &kp UP        &kp LA(RIGHT)  &kp PG_DN      &swapper_mac &kp LS(TAB)      &kp LC(LS(TAB))  &kp LC(TAB)  &none
             &kp LG(LEFT)  &kp LEFT      &kp DOWN      &kp RIGHT      &kp LG(RIGHT)  &none        &kp LSHFT        &kp LGUI     &kp LALT  &kp LCTRL
-&smart_mouse &kp LG(LEFT) &kp LG(RIGHT) &kp LA(BSPC)  &kp DEL        &kp RET        &none        &none            &none        &none     &none     &none
+&smart_mouse &kp LG(LEFT) &kp LG(RIGHT) &kp LA(BSPC)  &kp DEL        &none           &none        &none            &none        &none     &none     &none
                                         &trans        &trans         &trans         &trans       &trans           &trans
             >;
         };
@@ -366,12 +366,14 @@
         };
 
         // SYM – tap the Sym key for ONE symbol, hold it for several. ~ and ^ are typed directly.
+        //   Bracket pairs mirrored: ( ) inner home row, { } next to them, [ ] and < > bottom row.
+        //   ' " : ; are not here: they are Shift on the base layer (' → ", , → ;, . → :).
         sym_layer {
             display-name = "SYM";
             bindings = <
-            &kp DE_AT     &kp DE_EURO   &kp DE_HASH   &kp DE_DLLR   &kp DE_PRCNT    &kp DE_AMPS   &kp DE_EQUAL  &kp DE_PLUS   &kp DE_STAR   &tilde_mac
-            &kp DE_EXCL   &kp DE_QMARK  &kp DE_DQT    &kp DE_SQT    &kp DE_SLASH    &kp DE_LPAR   &kp DE_RPAR   &kp DE_MINUS  &kp DE_COLON  &kp DE_SZ
-&kp DE_SEMI &kp DE_DEG    &kp DE_LBKT   &kp DE_RBKT   &kp DE_LBRC   &kp DE_RBRC     &kp DE_LT     &kp DE_GT     &kp DE_PIPE   &kp DE_BSLH   &caret        &kp DE_UNDER
+            &kp DE_EXCL   &kp DE_AT     &kp DE_QMARK  &kp DE_EQUAL  &kp DE_PRCNT    &kp DE_UNDER  &kp DE_DLLR   &kp DE_PLUS   &kp DE_STAR   &tilde_mac
+            &kp DE_HASH   &kp DE_AMPS   &kp DE_EURO   &kp DE_LBRC   &kp DE_LPAR     &kp DE_RPAR   &kp DE_RBRC   &kp DE_MINUS  &kp DE_PIPE   &kp DE_SZ
+&none       &kp DE_DEG    &none         &kp DE_SLASH  &kp DE_LT     &kp DE_LBKT     &kp DE_RBKT   &kp DE_GT     &kp DE_BSLH   &none         &caret        &none
                                         &trans        &trans        &trans          &trans        &trans        &trans
             >;
         };
@@ -379,9 +381,9 @@
         sym_win_layer {
             display-name = "SYM WIN";
             bindings = <
-            &kp DEW_AT    &kp DEW_EURO  &kp DEW_HASH  &kp DEW_DLLR  &kp DEW_PRCNT   &kp DEW_AMPS  &kp DEW_EQUAL &kp DEW_PLUS  &kp DEW_STAR  &kp DEW_TILDE
-            &kp DEW_EXCL  &kp DEW_QMARK &kp DEW_DQT   &kp DEW_SQT   &kp DEW_SLASH   &kp DEW_LPAR  &kp DEW_RPAR  &kp DEW_MINUS &kp DEW_COLON &kp DEW_SZ
-&kp DEW_SEMI &kp DEW_DEG  &kp DEW_LBKT  &kp DEW_RBKT  &kp DEW_LBRC  &kp DEW_RBRC    &kp DEW_LT    &kp DEW_GT    &kp DEW_PIPE  &kp DEW_BSLH  &caret        &kp DEW_UNDER
+            &kp DEW_EXCL   &kp DEW_AT     &kp DEW_QMARK  &kp DEW_EQUAL  &kp DEW_PRCNT    &kp DEW_UNDER  &kp DEW_DLLR   &kp DEW_PLUS   &kp DEW_STAR   &kp DEW_TILDE
+            &kp DEW_HASH   &kp DEW_AMPS   &kp DEW_EURO   &kp DEW_LBRC   &kp DEW_LPAR     &kp DEW_RPAR   &kp DEW_RBRC   &kp DEW_MINUS  &kp DEW_PIPE   &kp DEW_SZ
+&none       &kp DEW_DEG    &none         &kp DEW_SLASH  &kp DEW_LT     &kp DEW_LBKT     &kp DEW_RBKT   &kp DEW_GT     &kp DEW_BSLH   &none         &caret        &none
                                         &trans        &trans        &trans          &trans        &trans        &trans
             >;
         };
@@ -432,11 +434,12 @@
 
         // MOUSE – smart-mouse: on with d+c (or NAV pos 20), off with any non-mouse key.
         //   Clicks with the left hand while the right thumb moves the ball. No combos here.
+        //   Back/Forward: macOS Cmd+[ / Cmd+], Windows Alt+Left / Alt+Right.
         mouse_layer {
             display-name = "MOUSE";
             bindings = <
-            &none       &mkp MB4        &msc SCRL_UP    &mkp MB5         &none        &trans  &trans  &trans  &trans  &trans
-            &kp LGUI    &mkp RCLK       &mkp MCLK       &mkp LCLK        &kp LSHFT    &trans  &trans  &trans  &trans  &trans
+            &none       &kp LG(DE_LBKT) &mkp MCLK       &kp LG(DE_RBKT)  &none        &trans  &trans  &trans  &trans  &trans
+            &kp LGUI    &mkp RCLK       &msc SCRL_UP    &mkp LCLK        &kp LSHFT    &trans  &trans  &trans  &trans  &trans
 &none       &none       &msc SCRL_LEFT  &msc SCRL_DOWN  &msc SCRL_RIGHT  &none        &trans  &trans  &trans  &trans  &trans  &trans
                                         &trans          &trans           &trans       &trans  &trans  &trans
             >;
@@ -445,7 +448,7 @@
         mouse_win_layer {
             display-name = "MOUSE WIN";
             bindings = <
-            &trans      &trans          &trans          &trans           &trans       &trans  &trans  &trans  &trans  &trans
+            &trans      &kp LA(LEFT)    &trans          &kp LA(RIGHT)           &trans       &trans  &trans  &trans  &trans  &trans
             &kp LCTRL   &trans          &trans          &trans           &trans       &trans  &trans  &trans  &trans  &trans
 &trans      &trans      &trans          &trans          &trans           &trans       &trans  &trans  &trans  &trans  &trans  &trans
                                         &trans          &trans           &trans       &trans  &trans  &trans
