@@ -56,6 +56,7 @@ RAW = {
     "&num_key NUM NUM": {"t": "NumWord", "h": "Num"},
     "&lt_spc NAV SPACE": {"t": "␣", "h": "Nav"},
     "&tog MOUSE": "Mouse",
+    "&mo SYS": {"t": "Sys", "h": "halten"},
     "&kp LG(LS(DE_N5))": "Shot",
     "&kp RA(F18)": "Mail 1",
     "&kp RA(F19)": "Mail 2",

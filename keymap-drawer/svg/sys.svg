@@ -166,7 +166,7 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 <g transform="translate(0, 56)">
 <g transform="translate(73, 113) rotate(-10.0)" class="key lay keypos-0">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">F12</text>
+<text x="0" y="0" class="key lay tap">F10</text>
 </g>
 <g transform="translate(136, 62) rotate(-4.0)" class="key lay keypos-1">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
@@ -258,7 +258,7 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 </g>
 <g transform="translate(92, 223) rotate(-10.0)" class="key lay keypos-21">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">F10</text>
+<text x="0" y="0" class="key lay tap">F12</text>
 </g>
 <g transform="translate(144, 173) rotate(-4.0)" class="key lay keypos-22">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
@@ -319,17 +319,17 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key trans"/>
 <text x="0" y="0" class="key trans tap">▽</text>
 </g>
-<g transform="translate(444, 270) rotate(-30.0)" class="key held trig-SYS keypos-35">
-<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key held trig-SYS"/>
-<text x="0" y="0" class="key held trig-SYS tap">Num</text>
-</g>
-<g transform="translate(501, 245) rotate(-15.0)" class="key held trig-SYS keypos-36">
-<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key held trig-SYS"/>
-<text x="0" y="0" class="key held trig-SYS tap">Nav</text>
-</g>
-<g transform="translate(563, 236)" class="key trans keypos-37">
+<g transform="translate(444, 270) rotate(-30.0)" class="key trans keypos-35">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key trans"/>
 <text x="0" y="0" class="key trans tap">▽</text>
+</g>
+<g transform="translate(501, 245) rotate(-15.0)" class="key trans keypos-36">
+<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key trans"/>
+<text x="0" y="0" class="key trans tap">▽</text>
+</g>
+<g transform="translate(563, 236)" class="key held trig-SYS keypos-37">
+<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key held trig-SYS"/>
+<text x="0" y="0" class="key held trig-SYS tap">Sys</text>
 </g>
 </g>
 </g>

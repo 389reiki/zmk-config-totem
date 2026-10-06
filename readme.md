@@ -21,10 +21,10 @@ TOTEM is a 38 key column-staggered split keyboard running [ZMK](https://zmk.dev/
 
 - Firmware: ZMK **v0.3** (fest eingestellt in `config/west.yml` und `.github/workflows/build.yml`), Modul urob/zmk-auto-layer v0.3 für Num-Word.
 - Belegung: `config/totem.keymap` (anymak:END-Variante, Home-Row-Mods, Combos, Ebenen BASE/NAV/SYM/NUM/SYS/MOUSE).
-- **Daumen:** links Backspace | Shift | Sym, rechts Num | Leertaste/Nav | (frei). Enter nur noch als Kombo t + r + n (und auf Num). Backspace: antippen = ⌫ (mit Shift: Entf), halten = Wort löschen, antippen und dann halten = ⌫ wiederholt.
+- **Daumen:** links Backspace | Shift | Sym, rechts Num | Leertaste/Nav | Sys (halten). Enter nur noch als Kombo t + r + n (und auf Num). Backspace: antippen = ⌫ (mit Shift: Entf), halten = Wort löschen, antippen und dann halten = ⌫ wiederholt.
 - **Kombos:** Enter = t + r + n, Maus-Ebene an = d + c, Esc = q + ä, Tab = ä + o, Zwischenablage auf der unteren Reihe links. Auf der Maus-Ebene gelten keine Kombos.
 - **Zwei Rechner, eine Belegung:** macOS ist Standard (Bluetooth-Profil 0), Windows ist ein Overlay (Profil 1). Jede Funktion liegt auf beiden Systemen auf derselben Taste.
-  - Umschalten: Leertaste + Num halten (SYS-Ebene, beide mit dem rechten Daumen), dann **Mac** (rechte Hand, obere Reihe, innen) oder **Win** (daneben).
+  - Umschalten: rechte äußere Daumentaste halten (SYS-Ebene), dann **Mac** (rechte Hand, obere Reihe, innen) oder **Win** (daneben).
   - Nach dem Ausschalten startet die Tastatur im Mac-Modus.
 - Tastencodes: `keys_de_mac.h` (macOS-Eingabequelle "Deutsch") und `keys_de_win.h` (Windows "Deutsch"). Namen nachschlagen: [docs/keycodes.md](docs/keycodes.md).
 - `settings_reset`-Firmware: bei Bluetooth-Problemen auf beide Hälften flashen, danach wieder die normale Firmware.
@@ -45,7 +45,7 @@ Die Bilder werden bei jedem Hochladen automatisch neu gezeichnet (`keymap-drawer
 ### Num
 ![Num](keymap-drawer/svg/num.svg)
 
-### Sys (Leertaste + Num halten)
+### Sys (rechte äußere Daumentaste halten)
 ![Sys](keymap-drawer/svg/sys.svg)
 
 ### Mouse (d + c gleichzeitig; jede andere Taste schaltet sie wieder aus)

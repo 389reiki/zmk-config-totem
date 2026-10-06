@@ -200,17 +200,11 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 <tspan x="0" dy="-0.6em">App</tspan><tspan x="0" dy="1.2em">⇠</tspan>
 </text>
 </g>
-<g transform="translate(604, 28)" class="key lay keypos-7">
-<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">
-<tspan x="0" dy="-0.6em">Tab</tspan><tspan x="0" dy="1.2em">←</tspan>
-</text>
+<g transform="translate(604, 28)" class="key keypos-7">
+<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
 </g>
-<g transform="translate(668, 62) rotate(4.0)" class="key lay keypos-8">
-<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">
-<tspan x="0" dy="-0.6em">Tab</tspan><tspan x="0" dy="1.2em">→</tspan>
-</text>
+<g transform="translate(668, 62) rotate(4.0)" class="key keypos-8">
+<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
 </g>
 <g transform="translate(731, 113) rotate(10.0)" class="key keypos-9">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
@@ -264,9 +258,8 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 <tspan x="0" dy="-0.6em">Ctrl/</tspan><tspan x="0" dy="1.2em">Win</tspan>
 </text>
 </g>
-<g transform="translate(32, 209) rotate(-10.0)" class="key lay keypos-20">
-<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">Maus</text>
+<g transform="translate(32, 209) rotate(-10.0)" class="key keypos-20">
+<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
 </g>
 <g transform="translate(92, 223) rotate(-10.0)" class="key lay keypos-21">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
@@ -276,15 +269,11 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
 <text x="0" y="0" class="key lay tap">Fwd</text>
 </g>
-<g transform="translate(200, 140)" class="key lay keypos-23">
-<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">
-<tspan x="0" dy="-0.6em">Del</tspan><tspan x="0" dy="1.2em">word</tspan>
-</text>
+<g transform="translate(200, 140)" class="key keypos-23">
+<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
 </g>
-<g transform="translate(256, 168)" class="key lay keypos-24">
-<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">Del</text>
+<g transform="translate(256, 168)" class="key keypos-24">
+<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
 </g>
 <g transform="translate(312, 177)" class="key keypos-25">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
@@ -307,17 +296,21 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 <g transform="translate(772, 209) rotate(10.0)" class="key keypos-31">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
 </g>
-<g transform="translate(241, 236)" class="key trans keypos-32">
-<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key trans"/>
-<text x="0" y="0" class="key trans tap">▽</text>
+<g transform="translate(241, 236)" class="key lay keypos-32">
+<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
+<text x="0" y="0" class="key lay tap">Del</text>
 </g>
-<g transform="translate(303, 245) rotate(15.0)" class="key trans keypos-33">
-<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key trans"/>
-<text x="0" y="0" class="key trans tap">▽</text>
+<g transform="translate(303, 245) rotate(15.0)" class="key lay keypos-33">
+<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
+<text x="0" y="0" class="key lay tap">
+<tspan x="0" dy="-0.6em">Tab</tspan><tspan x="0" dy="1.2em">←</tspan>
+</text>
 </g>
-<g transform="translate(360, 270) rotate(30.0)" class="key trans keypos-34">
-<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key trans"/>
-<text x="0" y="0" class="key trans tap">▽</text>
+<g transform="translate(360, 270) rotate(30.0)" class="key lay keypos-34">
+<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
+<text x="0" y="0" class="key lay tap">
+<tspan x="0" dy="-0.6em">Tab</tspan><tspan x="0" dy="1.2em">→</tspan>
+</text>
 </g>
 <g transform="translate(444, 270) rotate(-30.0)" class="key trans keypos-35">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key trans"/>

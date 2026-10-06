@@ -1,195 +1,257 @@
 <title>Totem-Planer</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: layer tabs on top, the real TOTEM geometry as the work surface, a change ledger beside it (stacks below on phones). */
+/* Layout: header with search and views; layer list left, large keyboard right; fixed action bar at the bottom. Light theme only.
+   Keycaps follow the keymap editor (nickcoutsos.github.io/keymap-editor): flat grey caps without outline, regular-weight system font. */
 :root {
-  --bg: #f3f4f6;
+  --bg: #f3f4f7;
   --surface: #ffffff;
-  --key: #fbfbfd;
-  --key-edge: #c9ccd6;
-  --fg: #1d2030;
-  --muted: #646a7d;
+  --key: #ffffff;
+  --line: #d9dce5;
+  --line-soft: #e8eaf0;
+  --fg: #1c1f2b;
+  --muted: #6a7083;
+  --faint: #a3a8b8;
   --changed: #c2410c;
-  --nav: #378ADD; --sym: #1D9E75; --num: #BA7517; --mouse: #D4537E; --sys: #888780; --base: #5b6178;
+  --focus: #2c5bd6;
+  --base: #5b6178; --nav: #378ADD; --sym: #1D9E75; --num: #BA7517; --sys: #7d7c78; --mouse: #D4537E;
   --combo: #7F77DD;
-  --font-ui: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --cap: #e2e3e7;
+  --cap-text: #2b2e38;
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #15171f; --surface: #1d2029; --key: #252935; --key-edge: #3a3f4f; --fg: #e8eaf2; --muted: #9aa0b4; --changed: #fb923c; --base: #9aa0b4;
-  color-scheme: dark; } }
-:root[data-theme="dark"] {
-  --bg: #15171f; --surface: #1d2029; --key: #252935; --key-edge: #3a3f4f; --fg: #e8eaf2; --muted: #9aa0b4; --changed: #fb923c; --base: #9aa0b4;
-  color-scheme: dark; }
-
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-body { background: var(--bg); color: var(--fg); font-family: var(--font-ui); font-size: 15px; line-height: 1.45; }
-.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 40px; display: grid; gap: 16px; }
-header h1 { font-size: 1.5rem; margin: 0; text-wrap: balance; }
-header p { margin: 4px 0 0; color: var(--muted); max-width: 70ch; }
+html, body { background: var(--bg); color: var(--fg); }
+body { font-family: var(--font-ui); font-size: 15px; line-height: 1.45; }
+button { font: inherit; color: inherit; }
+button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
-.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
-.tab { font: inherit; font-weight: 700; letter-spacing: .04em; border: 1px solid var(--key-edge); background: var(--surface); color: var(--fg);
-  padding: 6px 12px 6px 10px; border-radius: 999px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
-.tab .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
-.tab[aria-selected="true"] { background: var(--c); color: #fff; border-color: var(--c); }
-.tab[aria-selected="true"] .dot { background: #fff; }
-.tab .cnt { font-family: var(--font-mono); font-size: .75rem; font-weight: 500; opacity: .85; }
-.tab.drop-hover { outline: 3px solid var(--changed); }
+.app { max-width: 1320px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 96px; display: grid; gap: 14px; }
 
-.main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
-@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } }
+/* header */
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.top > * { min-width: 0; max-width: 100%; }
+.brand { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin-right: auto; }
+.brand h1 { margin: 0; font-size: 1.3rem; font-weight: 600; }
+.brand .stand { color: var(--muted); font-size: .82rem; }
+.views { display: inline-flex; overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; gap: 2px; }
+.views button { border: 0; background: transparent; padding: 6px 12px; border-radius: 7px; cursor: pointer; font-weight: 700; color: var(--muted); }
+.views button[aria-pressed="true"] { background: var(--fg); color: #fff; }
+.search { position: relative; }
+.search input { width: 190px; max-width: 46vw; font: inherit; border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px 7px 30px; background: var(--surface); color: var(--fg); }
+.search svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; stroke: var(--muted); fill: none; stroke-width: 2; }
+.results { position: absolute; right: 0; top: calc(100% + 4px); z-index: 30; min-width: 260px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 4px; list-style: none; margin: 0; box-shadow: 0 6px 20px rgba(20, 24, 40, .12); }
+.results button { width: 100%; text-align: left; border: 0; background: transparent; padding: 6px 8px; border-radius: 6px; cursor: pointer; display: flex; gap: 10px; align-items: baseline; }
+.results button:hover, .results button:focus-visible { background: var(--bg); }
+.results .ch { font-weight: 700; min-width: 2.5em; }
+.results .wh { color: var(--muted); font-size: .85rem; }
+.help-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); font-weight: 700; cursor: pointer; }
 
-.stage { background: var(--surface); border: 1px solid var(--key-edge); border-radius: 14px; padding: 18px 14px 14px; min-width: 0; }
-.stage-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
-.stage-head h2 { margin: 0; font-size: 1.05rem; }
-.stage-head span { color: var(--muted); font-size: .85rem; }
+/* layers view */
+.workspace { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 14px; align-items: start; }
+.layers { min-width: 0; display: grid; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 6px; }
+.layer-item { display: flex; align-items: center; gap: 10px; border: 0; background: transparent; padding: 8px 10px; border-radius: 8px; cursor: pointer; text-align: left; }
+.layer-item .sw { width: 12px; height: 12px; border-radius: 4px; background: var(--c); flex: none; }
+.layer-item .nm { font-weight: 700; flex: 1; }
+.layer-item .ct { font-family: var(--font-mono); font-size: .75rem; color: var(--changed); }
+.layer-item:hover { background: var(--bg); }
+.layer-item[aria-current="true"] { background: color-mix(in srgb, var(--c) 14%, var(--surface)); }
+.layer-item.drop-hover { outline: 2px solid var(--changed); }
+.layers hr { border: 0; border-top: 1px solid var(--line-soft); margin: 4px 2px; }
+.toggle { display: flex; align-items: center; gap: 8px; padding: 6px 10px; font-size: .85rem; color: var(--muted); cursor: pointer; }
+@media (max-width: 760px) {
+  .workspace { grid-template-columns: minmax(0, 1fr); }
+  .layers { grid-auto-flow: column; grid-auto-columns: max-content; overflow-x: auto; }
+  .layers hr, .layers .toggle { display: none; }
+}
+
+.stage { background: color-mix(in srgb, var(--lc) 7%, var(--surface)); border: 1px solid color-mix(in srgb, var(--lc) 30%, var(--line)); border-radius: 14px; padding: 14px; min-width: 0; display: grid; gap: 10px; }
+.app > *, .stage > *, .workspace > * { min-width: 0; }
+.stage-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 14px; flex-wrap: wrap; }
+.stage-head h2 { margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+.stage-head h2::before { content: ""; width: 12px; height: 12px; border-radius: 4px; background: var(--lc); }
+.stage-head .hint { color: var(--muted); font-size: .88rem; }
 .board-scroll { overflow-x: auto; }
-.board { position: relative; width: 100%; min-width: 620px; --u: 40px; touch-action: none; user-select: none; }
+.board { position: relative; width: 100%; min-width: 560px; --u: 48px; touch-action: none; user-select: none; }
+.board.small { min-width: 0; touch-action: auto; }
 
-.key { position: absolute; width: calc(var(--u) * .92); height: calc(var(--u) * .92); border-radius: calc(var(--u) * .14);
-  background: var(--key); border: 1.5px solid var(--key-edge); color: var(--fg); font: inherit; padding: 2px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: grab; text-align: center; line-height: 1.05; }
-.key:focus-visible { outline: 3px solid var(--fg); outline-offset: 2px; }
-.key .t { font-size: calc(var(--u) * .30); font-weight: 700; max-width: 100%; white-space: nowrap; }
+.key { position: absolute; width: calc(var(--u) * .93); height: calc(var(--u) * .93); border-radius: calc(var(--u) * .13);
+  background: var(--cap); border: 0; padding: 0; cursor: grab; display: block; color: var(--cap-text); }
+.board.small .key { cursor: pointer; }
+.key .t { position: absolute; left: 4%; right: 4%; top: 50%; transform: translateY(-58%); text-align: center; font-weight: 400; font-size: calc(var(--u) * .3); line-height: 1.05; white-space: nowrap; }
 .key .t.long { font-size: calc(var(--u) * .19); }
-.key .t.xlong { font-size: calc(var(--u) * .15); white-space: normal; }
-.key .h { font-size: calc(var(--u) * .17); color: var(--muted); }
-.key .pos { position: absolute; top: 2px; left: 4px; font-family: var(--font-mono); font-size: calc(var(--u) * .13); color: var(--muted); opacity: .7; }
-.key.trans { border-style: dashed; background: transparent; }
-.key.trans .t { color: var(--muted); font-weight: 400; }
-.key.none { background: transparent; border-style: dotted; }
-.key.lay { background: color-mix(in srgb, var(--lc) 16%, var(--key)); border-color: color-mix(in srgb, var(--lc) 60%, var(--key-edge)); }
-.key.opens { background: color-mix(in srgb, var(--oc) 34%, var(--key)); border-color: var(--oc); }
-.key.held { border-width: 4px; border-color: var(--hc); background: color-mix(in srgb, var(--hc) 30%, var(--key)); }
-.key.changed::after { content: ""; position: absolute; inset: -6px; border: 2px dashed var(--changed); border-radius: calc(var(--u) * .2); pointer-events: none; }
-.key.selected { box-shadow: 0 0 0 3px var(--surface), 0 0 0 6px var(--fg); }
-.key.drop-target { box-shadow: 0 0 0 3px var(--surface), 0 0 0 6px var(--changed); }
+.key .t.xlong { font-size: calc(var(--u) * .155); white-space: normal; }
+.key .h { position: absolute; left: 0; right: 0; bottom: 7%; text-align: center; font-size: calc(var(--u) * .155); color: var(--muted); white-space: nowrap; }
+.key .s { position: absolute; right: 8%; top: 5%; font-size: calc(var(--u) * .17); color: var(--muted); }
+.key .p { position: absolute; left: 8%; top: 5%; font-family: var(--font-mono); font-size: calc(var(--u) * .13); color: var(--faint); }
+.key.trans { background: #eeeff2; }
+.key.trans .t { color: var(--faint); }
+.key.none { background: #f0f1f4; }
+.key.opens { background: color-mix(in srgb, var(--oc) 32%, var(--cap)); }
+.key.held { background: var(--hc); }
+.key.held .t, .key.held .h { color: #fff; }
+.key.changed::after { content: ""; position: absolute; top: 7%; left: 7%; width: calc(var(--u) * .11); height: calc(var(--u) * .11); border-radius: 50%; background: var(--changed); }
+.key.selected { outline: 3px solid var(--focus); outline-offset: 2px; }
+.key.drop-target { outline: 3px solid var(--changed); outline-offset: 2px; }
+.key.flash { animation: flash 1.6s ease-out 1; }
+@keyframes flash { 0%, 40% { outline: 4px solid var(--changed); outline-offset: 4px; } 100% { outline: 0 solid transparent; outline-offset: 0; } }
+@media (prefers-reduced-motion: reduce) { .key.flash { animation: none; outline: 3px solid var(--changed); } }
 .key.dragging-src { opacity: .35; }
-.combo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
-.combo-card { border: 1px solid var(--key-edge); border-radius: 12px; padding: 10px 12px; display: grid; gap: 6px; background: var(--key); min-width: 0; }
-.combo-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-.combo-name { font-weight: 700; font-size: 1rem; }
-.combo-keys { font-family: var(--font-mono); font-size: .82rem; color: var(--combo); font-weight: 500; }
-.combo-layers { font-size: .78rem; color: var(--muted); }
-.mini { width: 100%; height: auto; display: block; }
-.mini .mk { fill: var(--surface); stroke: var(--key-edge); stroke-width: .04; }
-.mini .mk.on { fill: var(--combo); stroke: var(--combo); }
-.mini .mt { fill: #fff; font-size: .46px; font-weight: 700; text-anchor: middle; font-family: var(--font-ui); }
-.ghost { position: fixed; z-index: 50; pointer-events: none; transform: translate(-50%, -50%) rotate(-4deg); width: 64px; height: 60px;
-  border-radius: 10px; background: var(--surface); border: 2px solid var(--changed); display: flex; flex-direction: column; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.25); color: var(--fg); }
-.ghost small { font-weight: 400; font-size: 11px; color: var(--muted); }
-.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 12px; font-size: .82rem; color: var(--muted); }
-.legend i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; border: 1.5px solid var(--key-edge); }
+.ghost { position: fixed; z-index: 50; pointer-events: none; transform: translate(-50%, -50%); width: 60px; height: 56px; border-radius: 8px;
+  background: var(--surface); border: 2px solid var(--changed); display: grid; place-items: center; font-weight: 700; font-size: 17px; }
 
-.panel { display: grid; gap: 12px; min-width: 0; }
-.card { background: var(--surface); border: 1px solid var(--key-edge); border-radius: 14px; padding: 14px; display: grid; gap: 8px; min-width: 0; }
-.card h3 { margin: 0; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
-.sel-empty { color: var(--muted); }
-.sel-title { font-weight: 700; font-size: 1.05rem; }
-.sel-meta { font-family: var(--font-mono); font-size: .78rem; color: var(--muted); overflow-wrap: anywhere; }
-label { font-size: .85rem; color: var(--muted); }
-input[type=text], textarea { width: 100%; font: inherit; color: var(--fg); background: var(--key); border: 1px solid var(--key-edge); border-radius: 8px; padding: 7px 9px; }
-textarea { min-height: 76px; resize: vertical; }
-.btns { display: flex; flex-wrap: wrap; gap: 8px; }
-button.b { font: inherit; font-weight: 700; border-radius: 8px; padding: 8px 12px; cursor: pointer; border: 1px solid var(--key-edge); background: var(--key); color: var(--fg); }
-button.b.primary { background: var(--fg); color: var(--surface); border-color: var(--fg); }
-button.b.warn { color: var(--changed); border-color: var(--changed); }
-button.b:focus-visible { outline: 3px solid var(--changed); outline-offset: 2px; }
-.changes { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: .88rem; max-height: 340px; overflow: auto; }
-.changes li { border-left: 3px solid var(--changed); padding: 2px 0 2px 8px; }
-.changes .l { font-family: var(--font-mono); font-size: .75rem; color: var(--muted); }
-.status { font-size: .85rem; color: var(--muted); min-height: 1.2em; }
-.ref { margin: 0; display: grid; gap: 4px; font-size: .88rem; }
-.ref dt { font-weight: 700; margin-top: 6px; }
-.ref dt .l { font-weight: 400; color: var(--muted); font-size: .8rem; }
-.ref dd { margin: 0; color: var(--fg); }
-.howto { margin: 0; padding-left: 18px; color: var(--muted); font-size: .88rem; display: grid; gap: 3px; }
+.selbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: .9rem; min-width: 0; }
+.selbar .what { font-weight: 700; }
+.selbar .desc { color: var(--muted); flex: 1 1 260px; min-width: 0; }
+.selbar input { flex: 1 1 220px; min-width: 0; font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 6px 9px; background: var(--key); color: var(--fg); }
+.selbar .empty { color: var(--muted); }
+
+.tip { position: fixed; z-index: 40; pointer-events: none; max-width: 300px; background: var(--fg); color: #fff; font-size: .82rem; line-height: 1.4; padding: 7px 10px; border-radius: 8px; }
+.tip b { display: block; margin-bottom: 2px; }
+
+/* overview */
+.overview { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr)); gap: 14px; }
+.ov-card { background: color-mix(in srgb, var(--lc) 7%, var(--surface)); border: 1px solid color-mix(in srgb, var(--lc) 30%, var(--line)); border-radius: 14px; padding: 12px; display: grid; gap: 8px; cursor: pointer; text-align: left; min-width: 0; }
+.ov-card h3 { margin: 0; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+.ov-card h3::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--lc); }
+
+/* combos */
+.filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 12px; cursor: pointer; font-weight: 700; font-size: .85rem; }
+.chip[aria-pressed="true"] { background: var(--combo); border-color: var(--combo); color: #fff; }
+.combo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 12px; }
+.combo-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 8px; min-width: 0; }
+.combo-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.combo-name { font-weight: 700; font-size: 1.05rem; }
+.combo-keys { font-family: var(--font-mono); font-size: .85rem; color: var(--combo); font-weight: 500; }
+.combo-layers { font-size: .8rem; color: var(--muted); }
+.mini { width: 100%; height: auto; display: block; }
+.mini .mk { fill: var(--cap); }
+.mini .mk.on { fill: var(--combo); }
+.mini .mt { fill: #fff; font-size: .44px; font-weight: 700; text-anchor: middle; font-family: var(--font-ui); }
+
+/* cheat sheet */
+.sheet { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 12px; }
+.sheet section { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.sheet h3 { margin: 0 0 4px; font-size: 1rem; }
+.sheet p { margin: 0; color: var(--fg); font-size: .92rem; }
+.sheet .k { font-family: var(--font-mono); font-size: .85em; background: var(--bg); border: 1px solid var(--line); border-radius: 5px; padding: 0 4px; }
+
+/* bottom bar + drawer */
+.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--surface); border-top: 1px solid var(--line);
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); }
+.bar-in { max-width: 1320px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.bar .count { margin-right: auto; font-size: .92rem; }
+.bar .count b { color: var(--changed); }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 9px; padding: 7px 13px; font-weight: 700; cursor: pointer; }
+.btn.primary { background: var(--fg); border-color: var(--fg); color: #fff; }
+.btn.warn { color: var(--changed); border-color: color-mix(in srgb, var(--changed) 50%, var(--line)); }
+.status { width: 100%; font-size: .82rem; color: var(--muted); min-height: 0; }
+.status:empty { display: none; }
+.drawer { position: fixed; left: 0; right: 0; bottom: 58px; z-index: 19; max-height: min(70vh, 560px); overflow: auto; background: var(--surface); border-top: 1px solid var(--line); box-shadow: 0 -10px 30px rgba(20, 24, 40, .10); }
+.drawer-in { max-width: 1320px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 18px; }
+.drawer h3 { margin: 0 0 8px; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: .9rem; }
+.list li { border-left: 3px solid var(--changed); padding: 1px 0 1px 9px; }
+.list.planned li { border-color: var(--sym); }
+.list li.empty { border-color: var(--line); color: var(--muted); }
+textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--key); color: var(--fg); resize: vertical; }
 #exportBox { font-family: var(--font-mono); font-size: .78rem; min-height: 140px; }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* help dialog */
+.modal { position: fixed; inset: 0; z-index: 60; background: rgba(20, 24, 40, .35); display: grid; place-items: center; padding: 16px; }
+.modal-card { background: var(--surface); border-radius: 14px; max-width: 560px; width: 100%; padding: 18px 20px; display: grid; gap: 10px; max-height: 85vh; overflow: auto; }
+.modal-card h2 { margin: 0; font-size: 1.15rem; }
+.modal-card ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
 </style>
 
-<div class="wrap">
-  <header>
-    <h1>Totem-Planer</h1>
-    <p>Deine Belegung (macOS-Sicht, Stand: __STAND__) auf der echten TOTEM-Geometrie. Tasten ziehen oder nacheinander antippen, um sie zu tauschen. Das Ergebnis kopierst du und schickst es Claude, der die Keymap samt Windows-Zwillingen umsetzt. An der Firmware ändert diese Seite nichts.</p>
+<div class="app">
+  <header class="top">
+    <div class="brand"><h1>Totem-Planer</h1><span class="stand">Keymap-Stand __STAND__ · macOS-Sicht</span></div>
+    <div class="views" role="group" aria-label="Ansicht">
+      <button type="button" data-view="layers">Ebenen</button>
+      <button type="button" data-view="overview">Übersicht</button>
+      <button type="button" data-view="combos">Kombos</button>
+      <button type="button" data-view="sheet">Spickzettel</button>
+    </div>
+    <div class="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+      <input type="search" id="search" placeholder="Wo ist …? z. B. €" aria-label="Zeichen oder Funktion suchen" autocomplete="off">
+      <ul class="results" id="results" hidden></ul>
+    </div>
+    <button class="help-btn" type="button" id="helpBtn" aria-label="Hilfe">?</button>
   </header>
 
-  <nav class="tabs" id="tabs" role="tablist" aria-label="Ebenen"></nav>
-
-  <div class="main">
-    <section class="stage">
-      <div class="stage-head"><h2 id="layerTitle">Basis</h2><span id="layerHint"></span></div>
-      <div class="board-scroll" id="boardWrap"><div class="board" id="board" aria-label="Tastatur"></div></div>
-      <div class="combo-grid" id="comboView" hidden></div>
-      <div class="legend" id="legend">
-        <span><i style="background:color-mix(in srgb,var(--nav) 34%,var(--key));border-color:var(--nav)"></i>öffnet eine Ebene</span>
-        <span><i style="border-width:3px;border-color:var(--sym)"></i>wird für diese Ebene gehalten</span>
-        <span><i style="border-style:dashed;background:transparent"></i>durchlässig (Taste darunter)</span>
-        <span><i style="border:2px dashed var(--changed);background:transparent"></i>geändert</span>
-      </div>
+  <!-- Ebenen -->
+  <div class="workspace" id="viewLayers">
+    <nav class="layers" id="layerList" aria-label="Ebenen"></nav>
+    <section class="stage" id="stage">
+      <div class="stage-head"><h2 id="layerTitle">Basis</h2><span class="hint" id="layerHint"></span></div>
+      <div class="board-scroll"><div class="board" id="board" aria-label="Tastatur"></div></div>
+      <div class="selbar" id="selbar"></div>
     </section>
+  </div>
 
-    <aside class="panel">
-      <div class="card" id="selCard">
-        <h3>Ausgewählte Taste</h3>
-        <div id="selBody" class="sel-empty">Tippe eine Taste an. Tippst du danach eine zweite an, auch auf einer anderen Ebene, werden beide getauscht.</div>
-      </div>
+  <div class="overview" id="viewOverview" hidden></div>
 
-      <div class="card">
-        <h3>Vorgemerkt, noch nicht in der Firmware (im Planer schon eingezeichnet)</h3>
-        <ul class="changes" id="planned"></ul>
-      </div>
+  <section id="viewCombos" hidden>
+    <div class="filters" id="comboFilters" style="margin-bottom:12px"></div>
+    <div class="combo-grid" id="comboGrid"></div>
+  </section>
 
-      <div class="card">
-        <h3>Neue Änderungen</h3>
-        <ul class="changes" id="changes"></ul>
-        <label for="wishes">Weitere Wünsche (Kombos, Timing, neue Funktionen …)</label>
-        <textarea id="wishes" placeholder="z. B. Kombo für Esc auf andere Tasten, ß woanders hin …"></textarea>
-        <div class="btns">
-          <button class="b primary" id="copyBtn" type="button">Änderungen kopieren</button>
-          <button class="b warn" id="resetBtn" type="button">Alles zurücksetzen</button>
-        </div>
-        <div class="status" id="status" role="status"></div>
-        <textarea id="exportBox" readonly hidden aria-label="Exporttext"></textarea>
-      </div>
-
-      <div class="card">
-        <h3>Spickzettel</h3>
-        <dl class="ref">
-          <dt>Backspace <span class="l">(Position 32)</span></dt>
-          <dd>Antippen: ⌫. Mit Shift davor: Del.<br>Halten: Wort löschen, wiederholt Wort für Wort (Mac Opt+⌫, Windows Ctrl+⌫).<br>Antippen, dann sofort halten: ⌫ wiederholt Zeichen für Zeichen.</dd>
-          <dt>Del in Serie</dt>
-          <dd>Space (rechter Daumen) halten = Nav, dann mit dem linken Zeigefinger Position 24 tippen oder halten.</dd>
-          <dt>Sys-Ebene</dt>
-          <dd>Space (36) und Num (35) gleichzeitig mit dem rechten Daumen halten. Dort: F-Tasten, Medien, Mac/Win umschalten, Bluetooth, Bootloader.</dd>
-          <dt>Enter</dt>
-          <dd>t + r + n (rechte Grundreihe, Zeige-, Mittel-, Ringfinger) gleichzeitig drücken. Direkt nach dem letzten Zeichen kurz absetzen (ca. 0,1 s), sonst kommen die Buchstaben.</dd>
-          <dt>Maus</dt>
-          <dd>d + c (rechts oben) gleichzeitig: Maus-Ebene an. Klicken und Scrollen mit links. Jede andere Taste (z. B. Space) schaltet sie aus.</dd>
-          <dt>App wechseln (Swapper)</dt>
-          <dd>Space halten (Nav), Position 5 (rechter Zeigefinger, oben innen) mehrmals tippen: jede Runde eine App weiter. Position 6 (Mittelfinger daneben) geht zurück. Nav loslassen wählt die App.</dd>
-          <dt>Mac / Windows</dt>
-          <dd>Auf Sys: "Mac" oder "Win" tippen. Nach dem Ausschalten startet die Tastatur im Mac-Modus.</dd>
-        </dl>
-      </div>
-      <div class="card">
-        <h3>So geht's</h3>
-        <ol class="howto">
-          <li>Taste ziehen und auf eine andere fallen lassen: beide tauschen.</li>
-          <li>Auf eine Ebene ziehen: Zieh über den Reiter, kurz warten, dann ablegen.</li>
-          <li>Ohne Ziehen: antippen, Ebene wechseln, Ziel antippen.</li>
-          <li>Für Neues (andere Funktion, Zeichen): Taste wählen und einen Wunsch eintragen.</li>
-          <li>Kombos stehen im Reiter „Kombos“. Sie hängen an Positionen und wandern beim Tauschen nicht mit.</li>
-        </ol>
-      </div>
-    </aside>
+  <div class="sheet" id="viewSheet" hidden>
+    <section><h3>Backspace</h3><p>Antippen: ⌫, mit Shift davor Entf. Halten: Wort löschen, Wort für Wort. Antippen und sofort halten: ⌫ wiederholt.</p></section>
+    <section><h3>Entf in Serie</h3><p>Space halten (Nav), dann mit dem linken Daumen Position 32 tippen oder halten.</p></section>
+    <section><h3>Sys-Ebene</h3><p>Position 37 halten (rechter Daumen, eingezogen). Dort: F-Tasten, Medien, Mac/Win, Bluetooth, Bootloader.</p></section>
+    <section><h3>Enter</h3><p><span class="k">t</span> + <span class="k">r</span> + <span class="k">n</span> gleichzeitig. Nach dem letzten Zeichen kurz absetzen (ca. 0,1 s), sonst kommen die Buchstaben. Auf Num zusätzlich Position 20.</p></section>
+    <section><h3>Maus</h3><p><span class="k">d</span> + <span class="k">c</span> gleichzeitig: Maus-Ebene an. Klicken und scrollen mit links. Jede andere Taste schaltet sie aus.</p></section>
+    <section><h3>App wechseln</h3><p>Space halten (Nav), Position 5 mehrmals tippen: jede Runde eine App weiter. Position 6 geht zurück. Nav loslassen wählt die App.</p></section>
+    <section><h3>Browser-Tabs</h3><p>Space halten (Nav), dann mit dem linken Daumen: Position 33 = Tab zurück, 34 = Tab vor.</p></section>
+    <section><h3>Mac / Windows</h3><p>Auf Sys "Mac" oder "Win" tippen. Nach dem Ausschalten startet die Tastatur im Mac-Modus.</p></section>
+    <section><h3>Shift-Varianten</h3><p><span class="k">'</span> mit Shift gibt <span class="k">"</span>, <span class="k">,</span> gibt <span class="k">;</span>, <span class="k">.</span> gibt <span class="k">:</span>. Sie stehen klein oben rechts auf der Taste.</p></section>
   </div>
 </div>
+
+<div class="drawer" id="drawer" hidden>
+  <div class="drawer-in">
+    <div><h3>Vorgemerkt, noch nicht in der Firmware</h3><ul class="list planned" id="planned"></ul></div>
+    <div><h3>Deine Änderungen</h3><ul class="list" id="changes"></ul></div>
+    <div>
+      <h3>Weitere Wünsche</h3>
+      <label for="wishes" hidden>Weitere Wünsche</label>
+      <textarea id="wishes" placeholder="z. B. Kombo für Esc woanders, ß verschieben …"></textarea>
+      <textarea id="exportBox" readonly hidden aria-label="Exporttext" style="margin-top:8px"></textarea>
+    </div>
+  </div>
+</div>
+
+<div class="bar" role="region" aria-label="Änderungen">
+  <div class="bar-in">
+    <span class="count" id="count"></span>
+    <button class="btn" type="button" id="drawerBtn" aria-expanded="false">Liste</button>
+    <button class="btn primary" type="button" id="copyBtn">Änderungen kopieren</button>
+    <button class="btn warn" type="button" id="resetBtn">Zurücksetzen</button>
+    <div class="status" id="status" role="status"></div>
+  </div>
+</div>
+
+<div class="modal" id="help" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <h2 id="helpTitle">So geht's</h2>
+    <ol>
+      <li>Ebene links wählen. Fährst du über eine Taste, steht dort, was sie tut.</li>
+      <li>Tauschen: Taste auf eine andere ziehen, oder zwei Tasten nacheinander antippen. Über Ebenen hinweg: beim Ziehen kurz über der Ebene links verweilen, oder antippen, Ebene wechseln, Ziel antippen.</li>
+      <li>Für Neues: Taste antippen und unten einen Wunsch eintragen.</li>
+      <li>"Wo ist …?" sucht Zeichen und Funktionen und zeigt die Taste.</li>
+      <li>Fertig: "Änderungen kopieren" und den Text Claude schicken. Der Entwurf liegt nur in diesem Browser und wird zurückgesetzt, wenn sich die Keymap ändert.</li>
+      <li>Kombos hängen an Positionen, nicht an Tasten. Sie wandern beim Tauschen nicht mit.</li>
+    </ol>
+    <div><button class="btn primary" type="button" id="helpClose">Schließen</button></div>
+  </div>
+</div>
+<div class="tip" id="tip" hidden></div>
 
 <script type="application/json" id="data">__DATA__</script>
 <script>
@@ -197,46 +259,39 @@ button.b:focus-visible { outline: 3px solid var(--changed); outline-offset: 2px;
   const DATA = JSON.parse(document.getElementById('data').textContent);
   const NAMES = { BASE: 'Basis', NAV: 'Nav', SYM: 'Sym', NUM: 'Num', SYS: 'Sys', MOUSE: 'Maus' };
   const COLOR = { BASE: 'var(--base)', NAV: 'var(--nav)', SYM: 'var(--sym)', NUM: 'var(--num)', SYS: 'var(--sys)', MOUSE: 'var(--mouse)' };
-  const HINT = {
-    BASE: 'Grundebene. Kleine Zweitbeschriftung: beim Halten, oder mit ⇧ = mit Shift.',
-    NAV: 'Space/Nav halten (rechter Daumen).',
-    SYM: 'Daumen-Taste mit Sym halten.',
-    NUM: 'Daumen-Taste mit Num halten (antippen = NumWord).',
-    SYS: 'Space/Nav und Num gleichzeitig halten (beide rechter Daumen).',
-    MOUSE: 'd + c gleichzeitig (oder Nav + Position 20) schaltet ein, jede andere Taste schaltet aus.'
-  };
   const LAYERS = DATA.layers.map(l => l.name);
   const STORE = 'totem-planer-__STAMP__';
+  const PREF = 'totem-planer-prefs';
 
   // ---------- state ----------
-  function freshState() {
+  const fresh = () => {
     const s = {};
     DATA.layers.forEach(l => { s[l.name] = l.keys.map((k, i) => Object.assign({ id: l.name + ':' + i, note: '' }, k)); });
     return { keys: s, wishes: '' };
-  }
-  let state = freshState();
-  try { const saved = JSON.parse(localStorage.getItem(STORE) || 'null'); if (saved && saved.keys && saved.keys.BASE) state = saved; } catch (e) {}
+  };
+  let state = fresh();
+  try { const v = JSON.parse(localStorage.getItem(STORE) || 'null'); if (v && v.keys && v.keys.BASE) state = v; } catch (e) {}
   const save = () => { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} };
+  let prefs = { nums: false };
+  try { prefs = Object.assign(prefs, JSON.parse(localStorage.getItem(PREF) || '{}')); } catch (e) {}
+  const savePrefs = () => { try { localStorage.setItem(PREF, JSON.stringify(prefs)); } catch (e) {} };
 
-  let cur = 'BASE';
-  let sel = null; // {layer, pos}
-
-  const orig = (layer, pos) => DATA.layers.find(l => l.name === layer).keys[pos];
+  let view = 'layers', cur = 'BASE', sel = null, comboFilter = 'ALL';
+  const orig = (L, p) => DATA.layers.find(l => l.name === L).keys[p];
 
   // ---------- geometry ----------
   const G = DATA.geometry.map(k => {
-    const cx = k.x + .5, cy = k.y + .5, r = (k.r || 0) * Math.PI / 180;
-    const rx = k.rx ?? cx, ry = k.ry ?? cy;
+    const cx = k.x + .5, cy = k.y + .5, r = (k.r || 0) * Math.PI / 180, rx = k.rx ?? cx, ry = k.ry ?? cy;
     return { x: rx + (cx - rx) * Math.cos(r) - (cy - ry) * Math.sin(r), y: ry + (cx - rx) * Math.sin(r) + (cy - ry) * Math.cos(r), r: k.r || 0 };
   });
-  const minX = Math.min(...G.map(g => g.x)) - .6, maxX = Math.max(...G.map(g => g.x)) + .6;
-  const minY = Math.min(...G.map(g => g.y)) - .6, maxY = Math.max(...G.map(g => g.y)) + .6;
+  const minX = Math.min(...G.map(g => g.x)) - .72, maxX = Math.max(...G.map(g => g.x)) + .72;
+  const minY = Math.min(...G.map(g => g.y)) - .72, maxY = Math.max(...G.map(g => g.y)) + .72;
   const W = maxX - minX, H = maxY - minY;
 
-  // ---------- helpers ----------
+  // ---------- describing keys ----------
   const FL = ['kleiner Finger', 'Ringfinger', 'Mittelfinger', 'Zeigefinger', 'Zeigefinger innen'];
   function where(pos) {
-    const th = { 32: 'linker Daumen, eingezogen (unter dem Zeigefinger)', 33: 'linker Daumen, Mitte', 34: 'linker Daumen, gestreckt (zur Tastaturmitte)', 35: 'rechter Daumen, gestreckt (zur Tastaturmitte)', 36: 'rechter Daumen, Mitte', 37: 'rechter Daumen, eingezogen (unter dem Zeigefinger)' };
+    const th = { 32: 'linker Daumen, eingezogen', 33: 'linker Daumen, Mitte', 34: 'linker Daumen, gestreckt', 35: 'rechter Daumen, gestreckt', 36: 'rechter Daumen, Mitte', 37: 'rechter Daumen, eingezogen' };
     if (th[pos]) return th[pos];
     if (pos === 20) return 'links unten, ganz außen';
     if (pos === 31) return 'rechts unten, ganz außen';
@@ -245,269 +300,363 @@ button.b:focus-visible { outline: 3px solid var(--changed); outline-offset: 2px;
     const left = col < 5;
     return (left ? 'links' : 'rechts') + ', ' + row + ', ' + (left ? FL[col] : FL[9 - col]);
   }
-  const opensLayer = k => { const p = (k.raw || '').split(/\s+/); if (p[0] === '&tog') return null; for (const L of ['NAV', 'SYM', 'NUM']) if (p.slice(1).includes(L)) return L; return null; };
+  const opensLayer = k => { const p = (k.raw || '').split(/\s+/); if (p[0] === '&tog') return null; for (const L of ['NAV', 'SYM', 'NUM', 'SYS']) if (p.slice(1).includes(L)) return L; return null; };
+  // second label: "⇧ x" = with Shift (shown top right), anything else = when held (shown bottom)
+  function parts(k, pos) {
+    if (k.trans) { const b = state.keys.BASE[pos]; return { t: b && !b.trans ? b.t : '', h: '', s: '' }; }
+    const sec = k.h || '';
+    if (sec.startsWith('⇧')) return { t: k.t || '', h: '', s: sec.replace(/^⇧\s*(=\s*)?/, '') };
+    return { t: k.t || '', h: sec, s: '' };
+  }
   function label(k) {
     if (k.trans) return '▽ durchlässig';
     if (k.none) return 'leer';
     return k.t + (k.h ? ' / ' + k.h : '');
   }
-  function keyText(k, pos) {
-    if (k.trans) { const b = state.keys.BASE[pos]; return { t: b && !b.trans ? b.t : '', h: '' }; }
-    return { t: k.t || '', h: k.h || '' };
+  function describe(k, pos) {
+    if (k.none) return 'Leer.';
+    if (k.trans) { const b = state.keys.BASE[pos]; return 'Durchlässig: wirkt wie die Basis-Taste' + (b && b.t ? ' (' + b.t + ')' : '') + '.'; }
+    const raw = k.raw || '', p = parts(k, pos);
+    const lay = opensLayer(k);
+    if (raw.startsWith('&bsw')) return 'Tippen: ⌫ (mit Shift: Entf). Halten: Wort löschen, Wort für Wort. Tippen und sofort halten: ⌫ wiederholt.';
+    if (raw.startsWith('&lt_spc')) return 'Tippen: Leertaste. Halten: Nav-Ebene.';
+    if (raw.startsWith('&sym_key')) return 'Tippen: genau ein Zeichen von Sym. Halten: Sym-Ebene.';
+    if (raw.startsWith('&num_key')) return 'Tippen: NumWord, Zahlen bis zum nächsten Leerzeichen. Halten: Num-Ebene.';
+    if (raw.startsWith('&mo ') && lay) return 'Halten: ' + NAMES[lay] + '-Ebene.';
+    if (raw === '&sk LSHFT') return 'Tippen: nächster Buchstabe groß. Halten: Shift.';
+    if (raw.startsWith('&hml') || raw.startsWith('&hmr')) return 'Tippen: ' + p.t + '. Halten: ' + p.h + ' (nur zusammen mit einer Taste der anderen Hand).';
+    if (raw === '&swapper_mac') return 'App-Wechsel: mehrmals tippen geht App für App weiter, Cmd bleibt gehalten, bis du Nav loslässt.';
+    if (raw === '&kp LS(TAB)') return 'Beim App-Wechsel eine App zurück.';
+    if (raw === '&smart_mouse') return 'Maus-Ebene an. Jede Taste, die nicht zur Maus gehört, schaltet sie wieder aus.';
+    if (raw === '&host_mac') return 'Auf den Mac umschalten (Bluetooth-Profil 0).';
+    if (raw === '&host_win') return 'Auf Windows umschalten (Bluetooth-Profil 1).';
+    let s = 'Tippen: ' + (p.t || label(k));
+    if (p.s) s += '. Mit Shift: ' + p.s;
+    if (p.h) s += '. ' + p.h;
+    return s + '.';
   }
-  function isChanged(layer, pos) { const k = state.keys[layer][pos]; return k.id !== layer + ':' + pos || !!k.note; }
-  function heldFor(layer) {
-    const base = state.keys.BASE, out = [];
-    const find = L => base.findIndex(k => opensLayer(k) === L);
-    if (layer === 'NAV' || layer === 'SYM' || layer === 'NUM') { const i = find(layer); if (i >= 0) out.push(i); }
-    if (layer === 'SYS') { [find('NAV'), find('NUM')].forEach(i => i >= 0 && out.push(i)); }
+  const isChanged = (L, p) => { const k = state.keys[L][p]; return k.id !== L + ':' + p || !!k.note; };
+  function heldFor(L) {
+    const base = state.keys.BASE, find = x => base.findIndex(k => opensLayer(k) === x), out = [];
+    if (['NAV', 'SYM', 'NUM'].includes(L)) { const i = find(L); if (i >= 0) out.push(i); }
+    if (L === 'SYS') { const s = find('SYS'); if (s >= 0) out.push(s); else [find('NAV'), find('NUM')].forEach(i => i >= 0 && out.push(i)); }
     return out;
   }
+  const HINT = L => {
+    const held = heldFor(L).map(i => (parts(state.keys.BASE[i], i).t || i)).join(' + ');
+    return { BASE: 'Grundebene. Klein unten: beim Halten. Klein oben rechts: mit Shift.', MOUSE: 'An mit d + c, aus mit jeder anderen Taste.' }[L]
+      || (held ? 'Erreichbar durch Halten von ' + held + '.' : '');
+  };
 
-  // ---------- render ----------
-  const tabsEl = document.getElementById('tabs');
-  const board = document.getElementById('board');
-  function renderTabs() {
-    tabsEl.innerHTML = '';
-    LAYERS.forEach(L => {
-      const n = state.keys[L].filter((k, i) => isChanged(L, i)).length;
-      const b = document.createElement('button');
-      b.className = 'tab'; b.type = 'button'; b.role = 'tab'; b.dataset.layer = L;
-      b.style.setProperty('--c', COLOR[L]);
-      b.setAttribute('aria-selected', L === cur ? 'true' : 'false');
-      b.innerHTML = '<span class="dot"></span>' + NAMES[L] + (n ? ' <span class="cnt">' + n + '</span>' : '');
-      b.addEventListener('click', () => { cur = L; renderAll(); });
-      tabsEl.appendChild(b);
-    });
-    const cb = document.createElement('button');
-    cb.className = 'tab'; cb.type = 'button'; cb.role = 'tab'; cb.dataset.layer = 'COMBOS';
-    cb.style.setProperty('--c', 'var(--combo)');
-    cb.setAttribute('aria-selected', cur === 'COMBOS' ? 'true' : 'false');
-    cb.innerHTML = '<span class="dot"></span>Kombos <span class="cnt">' + DATA.combos.length + '</span>';
-    cb.addEventListener('click', () => { cur = 'COMBOS'; sel = null; renderAll(); });
-    tabsEl.appendChild(cb);
-  }
-  function sizeBoard() {
-    const u = board.clientWidth / W;
-    board.style.setProperty('--u', u + 'px');
-    board.style.height = (u * H) + 'px';
-  }
-  function renderCombos() {
-    const view = document.getElementById('comboView');
-    view.innerHTML = '';
-    const NS = 'http://www.w3.org/2000/svg';
-    DATA.combos.forEach(c => {
-      const card = document.createElement('div'); card.className = 'combo-card';
-      const head = document.createElement('div'); head.className = 'combo-head';
-      const name = document.createElement('span'); name.className = 'combo-name'; name.textContent = c.label;
-      const keys = document.createElement('span'); keys.className = 'combo-keys';
-      keys.textContent = c.pos.map(p => { const k = state.keys.BASE[p]; return (k && k.t) || p; }).join(' + ');
-      head.append(name, keys);
-      const svg = document.createElementNS(NS, 'svg');
-      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('class', 'mini');
-      svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', c.label + ': ' + keys.textContent);
-      G.forEach((g, p) => {
-        const on = c.pos.includes(p);
-        const x = g.x - minX, y = g.y - minY;
-        const grp = document.createElementNS(NS, 'g');
-        grp.setAttribute('transform', 'rotate(' + g.r + ' ' + x + ' ' + y + ')');
-        const r = document.createElementNS(NS, 'rect');
-        r.setAttribute('x', x - .43); r.setAttribute('y', y - .43); r.setAttribute('width', .86); r.setAttribute('height', .86); r.setAttribute('rx', .14);
-        r.setAttribute('class', on ? 'mk on' : 'mk');
-        grp.appendChild(r);
-        if (on) {
-          const tx = document.createElementNS(NS, 'text');
-          tx.setAttribute('x', x); tx.setAttribute('y', y + .16); tx.setAttribute('class', 'mt');
-          tx.textContent = (state.keys.BASE[p] && state.keys.BASE[p].t) || '';
-          grp.appendChild(tx);
-        }
-        svg.appendChild(grp);
-      });
-      const foot = document.createElement('div'); foot.className = 'combo-layers';
-      foot.textContent = 'Aktiv auf: ' + (c.layers || []).map(l => NAMES[l]).join(', ');
-      card.append(head, svg, foot);
-      view.appendChild(card);
-    });
-  }
-  function renderBoard() {
-    const isCombo = cur === 'COMBOS';
-    document.getElementById('boardWrap').hidden = isCombo;
-    document.getElementById('legend').hidden = isCombo;
-    document.getElementById('comboView').hidden = !isCombo;
-    if (isCombo) {
-      document.getElementById('layerTitle').textContent = 'Kombos';
-      document.getElementById('layerHint').textContent = 'Die markierten Tasten gleichzeitig drücken. Kombos hängen an Positionen, nicht an Tasten.';
-      renderCombos();
-      return;
-    }
+  // ---------- rendering keys ----------
+  function sizeBoard(board) { const u = board.clientWidth / W; board.style.setProperty('--u', u + 'px'); board.style.height = (u * H) + 'px'; }
+  const ro = new ResizeObserver(es => es.forEach(e => sizeBoard(e.target)));
+  function drawBoard(board, L, interactive) {
     board.innerHTML = '';
-    document.getElementById('layerTitle').textContent = NAMES[cur];
-    document.getElementById('layerHint').textContent = HINT[cur];
-    const held = heldFor(cur);
-    state.keys[cur].forEach((k, pos) => {
-      const g = G[pos];
-      const el = document.createElement('button');
-      el.type = 'button';
-      el.className = 'key';
-      el.dataset.pos = pos;
-      el.style.left = 'calc(var(--u) * ' + (g.x - minX) + ' - var(--u) * .46)';
-      el.style.top = 'calc(var(--u) * ' + (g.y - minY) + ' - var(--u) * .46)';
+    const held = heldFor(L);
+    state.keys[L].forEach((k, pos) => {
+      const g = G[pos], el = document.createElement('button');
+      el.type = 'button'; el.className = 'key'; el.dataset.pos = pos; el.dataset.layer = L;
+      el.style.left = 'calc(var(--u) * ' + (g.x - minX - .465) + ')';
+      el.style.top = 'calc(var(--u) * ' + (g.y - minY - .465) + ')';
       if (g.r) el.style.transform = 'rotate(' + g.r + 'deg)';
-      const tx = keyText(k, pos);
-      if (k.trans) el.classList.add('trans');
-      else if (k.none) el.classList.add('none');
-      else if (cur !== 'BASE') { el.classList.add('lay'); el.style.setProperty('--lc', COLOR[cur]); }
+      const p = parts(k, pos);
+      if (k.trans) el.classList.add('trans'); else if (k.none) el.classList.add('none');
       const op = opensLayer(k);
-      if (op && cur === 'BASE') { el.classList.add('opens'); el.style.setProperty('--oc', COLOR[op]); }
-      if (held.includes(pos)) { el.classList.add('held'); el.style.setProperty('--hc', COLOR[cur]); }
-      if (isChanged(cur, pos)) el.classList.add('changed');
-      if (sel && sel.layer === cur && sel.pos === pos) el.classList.add('selected');
-      const t = tx.t || '';
-      el.innerHTML = '<span class="pos">' + pos + '</span><span class="t' + (t.length > 8 ? ' xlong' : t.length > 4 ? ' long' : '') + '"></span>' + (tx.h ? '<span class="h"></span>' : '');
-      el.querySelector('.t').textContent = held.includes(pos) && cur !== 'BASE' ? 'hält' : t;
-      if (tx.h) el.querySelector('.h').textContent = tx.h;
-      if (k.note) el.title = 'Wunsch: ' + k.note;
-      el.setAttribute('aria-label', 'Position ' + pos + ', ' + where(pos) + ': ' + label(k));
+      if (op && L === 'BASE') { el.classList.add('opens'); el.style.setProperty('--oc', COLOR[op]); }
+      const isHeld = held.includes(pos) && L !== 'BASE';
+      if (isHeld) { el.classList.add('held'); el.style.setProperty('--hc', COLOR[L]); }
+      if (interactive && isChanged(L, pos)) el.classList.add('changed');
+      if (interactive && sel && sel.layer === L && sel.pos === pos) el.classList.add('selected');
+      const t = isHeld ? 'halten' : p.t;
+      el.innerHTML = '<span class="t"></span>' + (p.h && !isHeld ? '<span class="h"></span>' : '') + (p.s ? '<span class="s"></span>' : '') + (prefs.nums && interactive ? '<span class="p"></span>' : '');
+      const te = el.querySelector('.t'); te.textContent = t;
+      if (t.length > 8) te.classList.add('xlong'); else if (t.length > 3) te.classList.add('long');
+      if (p.h && !isHeld) el.querySelector('.h').textContent = p.h;
+      if (p.s) el.querySelector('.s').textContent = p.s;
+      if (prefs.nums && interactive) el.querySelector('.p').textContent = pos;
+      el.setAttribute('aria-label', NAMES[L] + ', Position ' + pos + ': ' + describe(k, pos));
+      if (!interactive) el.tabIndex = -1;
       board.appendChild(el);
     });
   }
-  function renderSel() {
-    const body = document.getElementById('selBody');
-    if (!sel) { body.className = 'sel-empty'; body.textContent = 'Tippe eine Taste an. Tippst du danach eine zweite an, auch auf einer anderen Ebene, werden beide getauscht.'; return; }
-    const k = state.keys[sel.layer][sel.pos];
-    body.className = '';
-    body.innerHTML = '';
-    const t = document.createElement('div'); t.className = 'sel-title'; t.textContent = NAMES[sel.layer] + ' · Position ' + sel.pos + ': ' + label(k);
-    const m = document.createElement('div'); m.className = 'sel-meta'; m.textContent = where(sel.pos) + ' · ' + (k.raw || '') + (k.id !== sel.layer + ':' + sel.pos ? ' · kommt von ' + k.id.replace(':', ' Pos ') : '');
-    const lab = document.createElement('label'); lab.htmlFor = 'noteInput'; lab.textContent = 'Wunsch für diese Position (frei formulieren)';
-    const inp = document.createElement('input'); inp.type = 'text'; inp.id = 'noteInput'; inp.value = k.note || ''; inp.placeholder = 'z. B. hier soll ß hin';
-    inp.addEventListener('input', () => { k.note = inp.value; save(); renderTabs(); renderBoard(); renderChanges(); });
-    const btns = document.createElement('div'); btns.className = 'btns';
-    const done = document.createElement('button'); done.className = 'b'; done.type = 'button'; done.textContent = 'Auswahl aufheben';
-    done.addEventListener('click', () => { sel = null; renderAll(); });
-    btns.appendChild(done);
-    body.append(t, m, lab, inp, btns);
+
+  // ---------- views ----------
+  const $ = id => document.getElementById(id);
+  function renderViews() {
+    document.querySelectorAll('.views button').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === view ? 'true' : 'false'));
+    $('viewLayers').hidden = view !== 'layers';
+    $('viewOverview').hidden = view !== 'overview';
+    $('viewCombos').hidden = view !== 'combos';
+    $('viewSheet').hidden = view !== 'sheet';
+    if (view === 'layers') renderLayers();
+    if (view === 'overview') renderOverview();
+    if (view === 'combos') renderCombos();
   }
+  function renderLayerList() {
+    const nav = $('layerList'); nav.innerHTML = '';
+    LAYERS.forEach(L => {
+      const n = state.keys[L].filter((k, i) => isChanged(L, i)).length;
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'layer-item'; b.dataset.layer = L; b.style.setProperty('--c', COLOR[L]);
+      if (L === cur) b.setAttribute('aria-current', 'true');
+      b.innerHTML = '<span class="sw"></span><span class="nm"></span>' + (n ? '<span class="ct"></span>' : '');
+      b.querySelector('.nm').textContent = NAMES[L];
+      if (n) b.querySelector('.ct').textContent = n;
+      b.addEventListener('click', () => { cur = L; renderLayers(); });
+      nav.appendChild(b);
+    });
+    nav.appendChild(document.createElement('hr'));
+    const lab = document.createElement('label'); lab.className = 'toggle';
+    lab.innerHTML = '<input type="checkbox" id="numsToggle"> Positionsnummern';
+    nav.appendChild(lab);
+    const cb = lab.querySelector('input'); cb.checked = prefs.nums;
+    cb.addEventListener('change', () => { prefs.nums = cb.checked; savePrefs(); renderLayers(); });
+  }
+  function renderLayers() {
+    renderLayerList();
+    $('stage').style.setProperty('--lc', COLOR[cur]);
+    $('layerTitle').textContent = NAMES[cur];
+    $('layerHint').textContent = HINT(cur);
+    drawBoard($('board'), cur, true);
+    renderSel();
+  }
+  function renderSel() {
+    const bar = $('selbar'); bar.innerHTML = '';
+    if (!sel) { const s = document.createElement('span'); s.className = 'empty'; s.textContent = 'Taste antippen und dann eine zweite: beide tauschen, auch über Ebenen. Oder Taste ziehen.'; bar.appendChild(s); return; }
+    const k = state.keys[sel.layer][sel.pos];
+    const what = document.createElement('span'); what.className = 'what'; what.textContent = NAMES[sel.layer] + ' · ' + sel.pos + ' · ' + where(sel.pos);
+    const desc = document.createElement('span'); desc.className = 'desc'; desc.textContent = describe(k, sel.pos) + (k.id !== sel.layer + ':' + sel.pos ? ' (kommt von ' + NAMES[k.id.split(':')[0]] + ' ' + k.id.split(':')[1] + ')' : '');
+    const inp = document.createElement('input'); inp.type = 'text'; inp.id = 'noteInput'; inp.placeholder = 'Wunsch für diese Position, z. B. hier soll ß hin'; inp.value = k.note || '';
+    inp.setAttribute('aria-label', 'Wunsch für diese Position');
+    inp.addEventListener('input', () => { k.note = inp.value; save(); drawBoard($('board'), cur, true); renderLayerList(); renderCounts(); });
+    const x = document.createElement('button'); x.type = 'button'; x.className = 'btn'; x.textContent = 'Auswahl aufheben';
+    x.addEventListener('click', () => { sel = null; renderLayers(); });
+    bar.append(what, desc, inp, x);
+  }
+  function renderOverview() {
+    const box = $('viewOverview'); box.innerHTML = '';
+    LAYERS.forEach(L => {
+      const c = document.createElement('button'); c.type = 'button'; c.className = 'ov-card'; c.style.setProperty('--lc', COLOR[L]);
+      const h = document.createElement('h3'); h.textContent = NAMES[L];
+      const b = document.createElement('div'); b.className = 'board small';
+      c.append(h, b); box.appendChild(c);
+      drawBoard(b, L, false); ro.observe(b); sizeBoard(b);
+      c.addEventListener('click', () => { view = 'layers'; cur = L; renderViews(); });
+    });
+  }
+  function renderCombos() {
+    const f = $('comboFilters'); f.innerHTML = '';
+    ['ALL'].concat(LAYERS.filter(L => DATA.combos.some(c => (c.layers || []).includes(L)))).forEach(L => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'chip';
+      b.textContent = L === 'ALL' ? 'Alle' : NAMES[L];
+      b.setAttribute('aria-pressed', comboFilter === L ? 'true' : 'false');
+      b.addEventListener('click', () => { comboFilter = L; renderCombos(); });
+      f.appendChild(b);
+    });
+    const grid = $('comboGrid'); grid.innerHTML = '';
+    const NS = 'http://www.w3.org/2000/svg';
+    DATA.combos.filter(c => comboFilter === 'ALL' || (c.layers || []).includes(comboFilter)).forEach(c => {
+      const card = document.createElement('div'); card.className = 'combo-card';
+      const head = document.createElement('div'); head.className = 'combo-head';
+      const nm = document.createElement('span'); nm.className = 'combo-name'; nm.textContent = c.label;
+      const ks = document.createElement('span'); ks.className = 'combo-keys';
+      ks.textContent = c.pos.map(p => (state.keys.BASE[p] && state.keys.BASE[p].t) || p).join(' + ');
+      head.append(nm, ks);
+      const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('class', 'mini');
+      svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', c.label + ': ' + ks.textContent);
+      G.forEach((g, p) => {
+        const on = c.pos.includes(p), x = g.x - minX, y = g.y - minY;
+        const gr = document.createElementNS(NS, 'g'); gr.setAttribute('transform', 'rotate(' + g.r + ' ' + x + ' ' + y + ')');
+        const r = document.createElementNS(NS, 'rect');
+        r.setAttribute('x', x - .43); r.setAttribute('y', y - .43); r.setAttribute('width', .86); r.setAttribute('height', .86); r.setAttribute('rx', .12);
+        r.setAttribute('class', on ? 'mk on' : 'mk'); gr.appendChild(r);
+        if (on) { const t = document.createElementNS(NS, 'text'); t.setAttribute('x', x); t.setAttribute('y', y + .15); t.setAttribute('class', 'mt'); t.textContent = (state.keys.BASE[p] && state.keys.BASE[p].t) || ''; gr.appendChild(t); }
+        svg.appendChild(gr);
+      });
+      const ft = document.createElement('div'); ft.className = 'combo-layers'; ft.textContent = 'Aktiv auf: ' + (c.layers || []).map(l => NAMES[l]).join(', ');
+      card.append(head, svg, ft); grid.appendChild(card);
+    });
+  }
+
+  // ---------- changes, counts, export ----------
   function changeLines() {
     const out = [];
     LAYERS.forEach(L => state.keys[L].forEach((k, pos) => {
       if (!isChanged(L, pos)) return;
-      const was = label(orig(L, pos));
       let line = NAMES[L] + ', Position ' + pos + ' (' + where(pos) + '): ';
-      if (k.id !== L + ':' + pos) {
-        const [fl, fp] = k.id.split(':');
-        line += was + ' → ' + label(k) + ' (von ' + NAMES[fl] + ', Position ' + fp + ')';
-      } else line += label(k) + ' bleibt';
+      if (k.id !== L + ':' + pos) { const [fl, fp] = k.id.split(':'); line += label(orig(L, pos)) + ' → ' + label(k) + ' (von ' + NAMES[fl] + ', Position ' + fp + ')'; }
+      else line += label(k) + ' bleibt';
       if (k.note) line += '. Wunsch: ' + k.note;
-      out.push({ L, text: line });
+      out.push(line);
     }));
     return out;
   }
-  function renderChanges() {
-    const ul = document.getElementById('changes');
+  function fillList(ul, items, emptyText) {
     ul.innerHTML = '';
-    const lines = changeLines();
-    if (!lines.length) { const li = document.createElement('li'); li.style.borderColor = 'var(--key-edge)'; li.textContent = 'Noch keine Änderungen.'; ul.appendChild(li); return; }
-    lines.forEach(c => { const li = document.createElement('li'); li.textContent = c.text; ul.appendChild(li); });
+    if (!items.length) { const li = document.createElement('li'); li.className = 'empty'; li.textContent = emptyText; ul.appendChild(li); return; }
+    items.forEach(x => { const li = document.createElement('li'); li.textContent = x; ul.appendChild(li); });
   }
-  const pl = document.getElementById('planned');
-  if (!(DATA.planned || []).length) { const li = document.createElement('li'); li.style.borderColor = 'var(--key-edge)'; li.textContent = 'Nichts. Alles Besprochene ist in der Firmware.'; pl.appendChild(li); }
-  (DATA.planned || []).forEach(x => { const li = document.createElement('li'); li.style.borderColor = 'var(--sym)'; li.textContent = x; pl.appendChild(li); });
-  function renderAll() { renderTabs(); renderBoard(); renderSel(); renderChanges(); }
+  function renderCounts() {
+    const n = changeLines().length, m = (DATA.planned || []).length;
+    $('count').innerHTML = '<b>' + n + '</b> ' + (n === 1 ? 'Änderung' : 'Änderungen') + (m ? ' · ' + m + ' vorgemerkt' : '');
+    fillList($('changes'), changeLines(), 'Noch keine Änderungen.');
+    fillList($('planned'), DATA.planned || [], 'Nichts. Alles Besprochene ist in der Firmware.');
+  }
+  function exportText() {
+    let s = 'Totem-Planer: Änderungswünsche\n(Positionen wie in totem.keymap, macOS-Sicht; Windows-Zwillinge bitte mitziehen)\nAusgangsbasis: Keymap-Stand __STAND__\n';
+    if ((DATA.planned || []).length) s += '\nBereits vorgemerkt:\n' + DATA.planned.map(x => '- ' + x).join('\n') + '\n';
+    const lines = changeLines();
+    s += '\nNeue Änderungen:\n' + (lines.length ? lines.map(x => '- ' + x).join('\n') : '- keine') + '\n';
+    if ((state.wishes || '').trim()) s += '\nWeitere Wünsche:\n' + state.wishes.trim() + '\n';
+    return s;
+  }
+  const status = m => { $('status').textContent = m; };
 
   // ---------- actions ----------
   function swap(a, b) {
     if (a.layer === b.layer && a.pos === b.pos) return;
-    const A = state.keys[a.layer], B = state.keys[b.layer];
-    const t = A[a.pos]; A[a.pos] = B[b.pos]; B[b.pos] = t;
-    save();
-    status('Getauscht: ' + NAMES[a.layer] + ' ' + a.pos + ' ↔ ' + NAMES[b.layer] + ' ' + b.pos);
+    const A = state.keys[a.layer], B = state.keys[b.layer], t = A[a.pos]; A[a.pos] = B[b.pos]; B[b.pos] = t;
+    save(); status('Getauscht: ' + NAMES[a.layer] + ' ' + a.pos + ' ↔ ' + NAMES[b.layer] + ' ' + b.pos);
   }
-  function status(msg) { document.getElementById('status').textContent = msg; }
   function clickKey(pos) {
     if (sel && !(sel.layer === cur && sel.pos === pos)) { swap(sel, { layer: cur, pos }); sel = null; }
-    else if (sel) sel = null;
-    else sel = { layer: cur, pos };
-    renderAll();
+    else if (sel) sel = null; else sel = { layer: cur, pos };
+    renderLayers(); renderCounts();
+  }
+  function flash(L, pos) {
+    sel = null; view = 'layers'; cur = L; renderViews();
+    const el = $('board').querySelector('.key[data-pos="' + pos + '"]');
+    if (el) { el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); el.scrollIntoView({ block: 'nearest', inline: 'center' }); }
   }
 
-  // pointer drag (mouse, pen and touch)
+  // drag (mouse, pen, touch) on the main board
+  const board = $('board');
   let drag = null;
   board.addEventListener('pointerdown', e => {
     const el = e.target.closest('.key'); if (!el || e.button > 0) return;
-    drag = { pos: +el.dataset.pos, layer: cur, x: e.clientX, y: e.clientY, active: false, el, ghost: null, tabTimer: null, overTab: null };
+    drag = { pos: +el.dataset.pos, layer: cur, x: e.clientX, y: e.clientY, active: false, el, ghost: null, timer: null, over: null };
   });
   window.addEventListener('pointermove', e => {
     if (!drag) return;
     if (!drag.active && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 6) {
-      drag.active = true;
-      const k = state.keys[drag.layer][drag.pos];
+      drag.active = true; hideTip();
       const g = document.createElement('div'); g.className = 'ghost';
-      const tx = keyText(k, drag.pos);
-      g.innerHTML = '<span></span><small></small>'; g.firstChild.textContent = tx.t || '·'; g.lastChild.textContent = tx.h || '';
-      document.body.appendChild(g); drag.ghost = g;
-      drag.el.classList.add('dragging-src');
+      g.textContent = parts(state.keys[drag.layer][drag.pos], drag.pos).t || '·';
+      document.body.appendChild(g); drag.ghost = g; drag.el.classList.add('dragging-src');
     }
     if (!drag.active) return;
     e.preventDefault();
     drag.ghost.style.left = e.clientX + 'px'; drag.ghost.style.top = e.clientY + 'px';
     const under = document.elementFromPoint(e.clientX, e.clientY);
     document.querySelectorAll('.drop-target,.drop-hover').forEach(n => n.classList.remove('drop-target', 'drop-hover'));
-    const k = under && under.closest('.key'); if (k) k.classList.add('drop-target');
-    const tab = under && under.closest('.tab');
-    if (tab) {
-      tab.classList.add('drop-hover');
-      if (drag.overTab !== tab.dataset.layer) {
-        clearTimeout(drag.tabTimer); drag.overTab = tab.dataset.layer;
-        drag.tabTimer = setTimeout(() => { if (drag && drag.overTab && drag.overTab !== cur) { cur = drag.overTab; renderTabs(); renderBoard(); } }, 450);
+    const k = under && under.closest('#board .key'); if (k) k.classList.add('drop-target');
+    const li = under && under.closest('.layer-item');
+    if (li) {
+      li.classList.add('drop-hover');
+      if (drag.over !== li.dataset.layer) {
+        clearTimeout(drag.timer); drag.over = li.dataset.layer;
+        drag.timer = setTimeout(() => { if (drag && drag.over && drag.over !== cur) { cur = drag.over; renderLayerList(); $('stage').style.setProperty('--lc', COLOR[cur]); $('layerTitle').textContent = NAMES[cur]; $('layerHint').textContent = HINT(cur); drawBoard(board, cur, true); } }, 450);
       }
-    } else { clearTimeout(drag && drag.tabTimer); if (drag) drag.overTab = null; }
+    } else if (drag) { clearTimeout(drag.timer); drag.over = null; }
   }, { passive: false });
   window.addEventListener('pointerup', e => {
     if (!drag) return;
-    const d = drag; drag = null; clearTimeout(d.tabTimer);
+    const d = drag; drag = null; clearTimeout(d.timer);
     if (d.ghost) d.ghost.remove();
     document.querySelectorAll('.drop-target,.drop-hover,.dragging-src').forEach(n => n.classList.remove('drop-target', 'drop-hover', 'dragging-src'));
     if (!d.active) { clickKey(d.pos); return; }
-    const under = document.elementFromPoint(e.clientX, e.clientY);
-    const k = under && under.closest('.key');
+    const under = document.elementFromPoint(e.clientX, e.clientY), k = under && under.closest('#board .key');
     if (k) { swap({ layer: d.layer, pos: d.pos }, { layer: cur, pos: +k.dataset.pos }); sel = null; }
-    renderAll();
+    renderLayers(); renderCounts();
   });
-  window.addEventListener('pointercancel', () => { if (drag && drag.ghost) drag.ghost.remove(); drag = null; renderBoard(); });
+  window.addEventListener('pointercancel', () => { if (drag && drag.ghost) drag.ghost.remove(); drag = null; renderLayers(); });
   board.addEventListener('keydown', e => { const el = e.target.closest('.key'); if (el && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); clickKey(+el.dataset.pos); } });
 
-  const wishes = document.getElementById('wishes');
-  wishes.value = state.wishes || '';
-  wishes.addEventListener('input', () => { state.wishes = wishes.value; save(); });
+  // tooltip
+  const tip = $('tip');
+  function hideTip() { tip.hidden = true; }
+  document.addEventListener('pointerover', e => {
+    const el = e.target.closest('.key'); if (!el || drag || e.pointerType === 'touch') return;
+    const L = el.dataset.layer, pos = +el.dataset.pos, k = state.keys[L][pos];
+    tip.innerHTML = '<b></b><span></span>';
+    tip.firstChild.textContent = NAMES[L] + ' · ' + pos + ' · ' + where(pos);
+    tip.lastChild.textContent = describe(k, pos);
+    tip.hidden = false;
+    const r = el.getBoundingClientRect();
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    let x = r.left + r.width / 2 - tw / 2, y = r.top - th - 8;
+    if (y < 8) y = r.bottom + 8;
+    x = Math.max(8, Math.min(x, window.innerWidth - tw - 8));
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  });
+  document.addEventListener('pointerout', e => { if (e.target.closest && e.target.closest('.key')) hideTip(); });
+  window.addEventListener('scroll', hideTip, { passive: true });
 
-  function exportText() {
-    const lines = changeLines();
-    let s = 'Totem-Planer: Änderungswünsche\n(Positionen wie in totem.keymap, macOS-Sicht; Windows-Zwillinge bitte mitziehen)\nAusgangsbasis: Keymap-Stand __STAND__\n' + ((DATA.planned || []).length ? '\nBereits vorgemerkt:\n' + DATA.planned.map(x => '- ' + x).join('\n') + '\n' : '') + '\nNeue Änderungen:\n';
-    if (!lines.length) s += '- keine Tasten-Änderungen\n';
-    lines.forEach(c => { s += '- ' + c.text + '\n'; });
-    if ((state.wishes || '').trim()) s += '\nWeitere Wünsche:\n' + state.wishes.trim() + '\n';
-    return s;
+  // search
+  const search = $('search'), results = $('results');
+  function runSearch() {
+    const q = search.value.trim().toLowerCase();
+    results.innerHTML = '';
+    if (!q) { results.hidden = true; return; }
+    const hits = [];
+    LAYERS.forEach(L => state.keys[L].forEach((k, pos) => {
+      if (k.trans || k.none) return;
+      const p = parts(k, pos), fields = [p.t, p.s, p.h].map(x => (x || '').toLowerCase());
+      let score = fields[0] === q ? 0 : fields[1] === q ? 1 : fields.some(f => f && f.includes(q)) ? 2 : describe(k, pos).toLowerCase().includes(q) ? 3 : -1;
+      if (score >= 0) hits.push({ L, pos, score, p });
+    }));
+    DATA.combos.forEach(c => { if (c.label.toLowerCase().includes(q)) hits.push({ combo: c, score: 1.5 }); });
+    hits.sort((a, b) => a.score - b.score);
+    hits.slice(0, 8).forEach(h => {
+      const li = document.createElement('li'), b = document.createElement('button'); b.type = 'button';
+      if (h.combo) {
+        b.innerHTML = '<span class="ch"></span><span class="wh"></span>';
+        b.firstChild.textContent = h.combo.label;
+        b.lastChild.textContent = 'Kombo: ' + h.combo.pos.map(p => (state.keys.BASE[p] && state.keys.BASE[p].t) || p).join(' + ');
+        b.addEventListener('click', () => { results.hidden = true; view = 'combos'; comboFilter = 'ALL'; renderViews(); });
+      } else {
+        b.innerHTML = '<span class="ch"></span><span class="wh"></span>';
+        b.firstChild.textContent = h.p.s && h.p.s.toLowerCase() === search.value.trim().toLowerCase() ? '⇧ ' + h.p.s : h.p.t;
+        b.lastChild.textContent = NAMES[h.L] + ' · ' + where(h.pos);
+        b.addEventListener('click', () => { results.hidden = true; flash(h.L, h.pos); });
+      }
+      li.appendChild(b); results.appendChild(li);
+    });
+    if (!hits.length) { const li = document.createElement('li'); li.style.padding = '6px 8px'; li.style.color = 'var(--muted)'; li.textContent = 'Nichts gefunden.'; results.appendChild(li); }
+    results.hidden = false;
   }
-  document.getElementById('copyBtn').addEventListener('click', () => {
-    const txt = exportText();
-    const box = document.getElementById('exportBox');
-    box.value = txt;
-    const fallback = () => { box.hidden = false; box.focus(); box.select(); status('Kopieren nicht erlaubt. Text ist markiert, bitte mit Cmd+C kopieren.'); };
-    try {
-      navigator.clipboard.writeText(txt).then(() => { box.hidden = true; status('Kopiert. Füge den Text im Chat mit Claude ein.'); }, fallback);
-    } catch (e) { fallback(); }
+  search.addEventListener('input', runSearch);
+  search.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { const b = results.querySelector('button'); if (b) b.click(); }
+    if (e.key === 'Escape') { results.hidden = true; search.blur(); }
   });
-  const resetBtn = document.getElementById('resetBtn');
+  document.addEventListener('click', e => { if (!e.target.closest('.search')) results.hidden = true; });
+
+  // views, help, drawer, copy, reset
+  document.querySelectorAll('.views button').forEach(b => b.addEventListener('click', () => { view = b.dataset.view; renderViews(); }));
+  $('helpBtn').addEventListener('click', () => { $('help').hidden = false; $('helpClose').focus(); });
+  $('helpClose').addEventListener('click', () => { $('help').hidden = true; });
+  $('help').addEventListener('click', e => { if (e.target.id === 'help') $('help').hidden = true; });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { $('help').hidden = true; if (!$('drawer').hidden) toggleDrawer(false); } });
+  function toggleDrawer(open) { $('drawer').hidden = !open; $('drawerBtn').setAttribute('aria-expanded', open ? 'true' : 'false'); $('drawerBtn').textContent = open ? 'Liste schließen' : 'Liste'; }
+  $('drawerBtn').addEventListener('click', () => toggleDrawer($('drawer').hidden));
+  const wishes = $('wishes'); wishes.value = state.wishes || '';
+  wishes.addEventListener('input', () => { state.wishes = wishes.value; save(); });
+  $('copyBtn').addEventListener('click', () => {
+    const txt = exportText(), box = $('exportBox'); box.value = txt;
+    const fallback = () => { toggleDrawer(true); box.hidden = false; box.focus(); box.select(); status('Kopieren nicht erlaubt. Der Text ist in der Liste markiert, bitte mit Cmd+C kopieren.'); };
+    try { navigator.clipboard.writeText(txt).then(() => { box.hidden = true; status('Kopiert. Füge den Text im Chat mit Claude ein.'); }, fallback); } catch (e) { fallback(); }
+  });
   let armed = false;
-  resetBtn.addEventListener('click', () => {
-    if (!armed) { armed = true; resetBtn.textContent = 'Wirklich zurücksetzen?'; setTimeout(() => { armed = false; resetBtn.textContent = 'Alles zurücksetzen'; }, 4000); return; }
-    armed = false; resetBtn.textContent = 'Alles zurücksetzen';
-    state = freshState(); sel = null; wishes.value = ''; save(); renderAll();
-    status('Zurückgesetzt auf die Ausgangsbasis.');
+  $('resetBtn').addEventListener('click', () => {
+    const b = $('resetBtn');
+    if (!armed) { armed = true; b.textContent = 'Wirklich zurücksetzen?'; setTimeout(() => { armed = false; b.textContent = 'Zurücksetzen'; }, 4000); return; }
+    armed = false; b.textContent = 'Zurücksetzen';
+    state = fresh(); sel = null; wishes.value = ''; save(); renderViews(); renderCounts(); status('Zurückgesetzt auf den Keymap-Stand.');
   });
 
-  new ResizeObserver(sizeBoard).observe(board);
-  sizeBoard(); renderAll();
+  ro.observe(board); sizeBoard(board);
+  renderViews(); renderCounts();
 })();
 </script>

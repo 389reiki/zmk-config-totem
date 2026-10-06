@@ -329,8 +329,10 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 <text x="0" y="0" class="key trig-NAV tap">␣</text>
 <text x="0" y="24" class="key trig-NAV hold">Nav</text>
 </g>
-<g transform="translate(563, 236)" class="key keypos-37">
-<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
+<g transform="translate(563, 236)" class="key trig-SYS keypos-37">
+<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key trig-SYS"/>
+<text x="0" y="0" class="key trig-SYS tap">Sys</text>
+<text x="0" y="24" class="key trig-SYS hold"><tspan style="font-size: 83%">halten</tspan></text>
 </g>
 <g class="combo combo combopos-0">
 <rect rx="6" ry="6" x="87" y="76" width="36" height="22" class="combo combo"/>

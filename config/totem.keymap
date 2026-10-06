@@ -54,8 +54,8 @@
 #define SYM_WIN   5   // conditional: SYM + WIN
 #define NUM       6
 #define NUM_WIN   7   // conditional: NUM + WIN (empty, only keeps the Windows combos active)
-#define SYS       8   // conditional: NAV + NUM
-#define SYS_WIN   9   // conditional: NAV + NUM + WIN
+#define SYS       8   // hold base pos 37
+#define SYS_WIN   9   // conditional: SYS + WIN
 #define MOUSE     10
 #define MOUSE_WIN 11  // conditional: MOUSE + WIN
 
@@ -190,11 +190,6 @@
 / {
     conditional_layers {
         compatible = "zmk,conditional-layers";
-        // Hold Space (NAV) + hold Num (NUM) = system layer (F-keys, Bluetooth, media)
-        sys_layer {
-            if-layers = <NAV NUM>;
-            then-layer = <SYS>;
-        };
         // Windows variants: active only while the Windows overlay is on
         nav_win {
             if-layers = <NAV WIN>;
@@ -209,7 +204,7 @@
             then-layer = <NUM_WIN>;
         };
         sys_win {
-            if-layers = <NAV NUM WIN>;
+            if-layers = <SYS WIN>;
             then-layer = <SYS_WIN>;
         };
         mouse_win {
@@ -324,7 +319,7 @@
 
         // BASE – letters. Home-row mods by function, same finger on both systems:
         //   pinky = Ctrl (macOS) / Win (Windows), ring = Option / Alt, middle = Cmd / Ctrl.
-        //   Thumbs: left Backspace | Shift | Sym, right Num | Space/Nav | (free). Shift and Space on the middle keys.
+        //   Thumbs: left Backspace | Shift | Sym, right Num | Space/Nav | Sys (hold). Shift and Space on the middle keys.
         //   Backspace: tap = Backspace (with Shift: Delete), hold = delete word, tap+hold = repeat.
         //   Combos (see "combos" above): Enter = t+r+n (the only Enter besides NUM pos 32), mouse = d+c,
         //   Esc/Tab, clipboard.
@@ -334,7 +329,7 @@
             &kp DE_Q        &kp DE_A_UMLAUT  &kp DE_O          &kp DE_U        &kp DE_Y         &kp DE_V        &kp DE_D        &kp DE_C          &kp DE_L          &kp DE_X
             &hml LCTRL DE_H &hml LALT DE_A   &hml LGUI DE_E    &kp DE_I        &kp DE_COMMA     &kp DE_G        &kp DE_T        &hmr LGUI DE_R    &hmr LALT DE_N    &hmr LCTRL DE_S
 &kp DE_U_UMLAUT  &kp DE_K       &kp DE_Z         &sqt_dqt          &kp DE_DOT      &kp DE_O_UMLAUT  &kp DE_B        &kp DE_P        &kp DE_M          &kp DE_W          &kp DE_F          &kp DE_J
-                                                 &bsw LA(BSPC) 0   &sk LSHFT             &sym_key SYM SYM               &num_key NUM NUM   &lt_spc NAV SPACE   &none
+                                                 &bsw LA(BSPC) 0   &sk LSHFT             &sym_key SYM SYM               &num_key NUM NUM   &lt_spc NAV SPACE   &mo SYS
             >;
         };
 
@@ -350,15 +345,16 @@
         };
 
         // NAV – hold Space (right thumb, middle key). Arrows on the left hand, mods on the right home row.
-        //   Pos 5 = swapper (tap repeatedly to walk through apps), pos 6 = back one app, pos 20 = smart-mouse.
+        //   Pos 5 = swapper (tap repeatedly to walk through apps), pos 6 = back one app.
+        //   Left thumb: Delete (32, repeats when held), browser tab back/forward (33/34).
         //   macOS keystrokes here; the Windows equivalents are in nav_win_layer.
         nav_layer {
             display-name = "NAV";
             bindings = <
-            &kp PG_UP     &kp LA(LEFT)  &kp UP        &kp LA(RIGHT)  &kp PG_DN      &swapper_mac &kp LS(TAB)      &kp LC(LS(TAB))  &kp LC(TAB)  &none
+            &kp PG_UP     &kp LA(LEFT)  &kp UP        &kp LA(RIGHT)  &kp PG_DN      &swapper_mac &kp LS(TAB)      &none            &none        &none
             &kp LG(LEFT)  &kp LEFT      &kp DOWN      &kp RIGHT      &kp LG(RIGHT)  &none        &kp LSHFT        &kp LGUI     &kp LALT  &kp LCTRL
-&smart_mouse &kp LG(LEFT) &kp LG(RIGHT) &kp LA(BSPC)  &kp DEL        &none           &none        &none            &none        &none     &none     &none
-                                        &trans        &trans         &trans         &trans       &trans           &trans
+&none       &kp LG(LEFT)  &kp LG(RIGHT) &none         &none          &none           &none        &none            &none        &none     &none     &none
+                                        &kp DEL       &kp LC(LS(TAB)) &kp LC(TAB)   &trans       &trans           &trans
             >;
         };
 
@@ -367,7 +363,7 @@
             bindings = <
             &trans        &kp LC(LEFT)  &trans        &kp LC(RIGHT)  &trans         &swapper_win &trans           &trans       &trans    &trans
             &kp HOME      &trans        &trans        &trans         &kp END        &trans       &trans           &kp LCTRL    &trans    &kp LGUI
-&trans      &kp LA(LEFT)  &kp LA(RIGHT) &kp LC(BSPC)  &trans         &trans         &trans       &trans           &trans       &trans    &trans    &trans
+&trans      &kp LA(LEFT)  &kp LA(RIGHT) &trans        &trans         &trans         &trans       &trans           &trans       &trans    &trans    &trans
                                         &trans        &trans         &trans         &trans       &trans           &trans
             >;
         };
@@ -402,8 +398,8 @@
             bindings = <
             &kp DE_STAR   &kp DE_N7  &kp DE_N8  &kp DE_N9  &kp DE_PLUS    &trans  &trans  &trans  &trans  &trans
             &kp DE_SLASH  &kp DE_N4  &kp DE_N5  &kp DE_N6  &kp DE_MINUS   &trans  &trans  &trans  &trans  &trans
-&kp BSPC    &kp DE_DOT    &kp DE_N1  &kp DE_N2  &kp DE_N3  &kp DE_EQUAL   &trans  &trans  &trans  &trans  &trans  &trans
-                                     &kp RET    &kp DE_N0  &kp DE_COMMA   &trans  &trans  &trans
+&kp RET     &kp DE_DOT    &kp DE_N1  &kp DE_N2  &kp DE_N3  &kp DE_EQUAL   &trans  &trans  &trans  &trans  &trans  &trans
+                                     &kp BSPC   &kp DE_N0  &kp DE_COMMA   &trans  &trans  &trans
             >;
         };
 
@@ -418,13 +414,13 @@
             >;
         };
 
-        // SYS – hold Nav (Space, pos 36) + Num (pos 35), both right thumb. F-keys mirror the numpad; host keys Mac/Win, Bluetooth, media.
+        // SYS – hold pos 37 (right thumb, tucked). F-keys mirror the numpad; host keys Mac/Win, Bluetooth, media.
         sys_layer {
             display-name = "SYS";
             bindings = <
-            &kp F12  &kp F7   &kp F8  &kp F9  &kp LG(LS(DE_N5))  &host_mac     &host_win     &bt BT_SEL 2  &bt BT_SEL 3  &bootloader
+            &kp F10  &kp F7   &kp F8  &kp F9  &kp LG(LS(DE_N5))  &host_mac     &host_win     &bt BT_SEL 2  &bt BT_SEL 3  &bootloader
             &kp F11  &kp F4   &kp F5  &kp F6  &none              &kp C_PREV    &kp C_VOL_DN  &kp C_VOL_UP  &kp C_NEXT    &kp C_PP
-&none       &kp F10  &kp F1   &kp F2  &kp F3  &gif_mac           &none         &kp RA(F18)   &kp RA(F19)   &out OUT_TOG  &bt BT_CLR    &sys_reset
+&none       &kp F12  &kp F1   &kp F2  &kp F3  &gif_mac           &none         &kp RA(F18)   &kp RA(F19)   &out OUT_TOG  &bt BT_CLR    &sys_reset
                               &trans  &trans  &trans             &trans        &trans        &trans
             >;
         };
@@ -441,13 +437,14 @@
 
         // MOUSE – smart-mouse: on with d+c (or NAV pos 20), off with any non-mouse key.
         //   Clicks with the left hand while the right thumb moves the ball. No combos here.
+        //   Right half empty: those keys only turn the mouse layer off.
         //   Back/Forward: macOS Cmd+[ / Cmd+], Windows Alt+Left / Alt+Right.
         mouse_layer {
             display-name = "MOUSE";
             bindings = <
-            &none       &kp LG(DE_LBKT) &mkp MCLK       &kp LG(DE_RBKT)  &none        &trans  &trans  &trans  &trans  &trans
-            &kp LGUI    &mkp RCLK       &msc SCRL_UP    &mkp LCLK        &kp LSHFT    &trans  &trans  &trans  &trans  &trans
-&none       &none       &msc SCRL_LEFT  &msc SCRL_DOWN  &msc SCRL_RIGHT  &none        &trans  &trans  &trans  &trans  &trans  &trans
+            &none       &kp LG(DE_LBKT) &mkp MCLK       &kp LG(DE_RBKT)  &none        &none   &none   &none   &none   &none
+            &kp LGUI    &mkp RCLK       &msc SCRL_UP    &mkp LCLK        &kp LSHFT    &none   &none   &none   &none   &none
+&none       &none       &msc SCRL_LEFT  &msc SCRL_DOWN  &msc SCRL_RIGHT  &none        &none   &none   &none   &none   &none   &none
                                         &trans          &trans           &trans       &trans  &trans  &trans
             >;
         };
