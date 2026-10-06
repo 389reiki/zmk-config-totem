@@ -38,7 +38,7 @@ MOD_FN = {"LG": "Cmd", "LA": "Opt", "LC": "Ctrl", "LS": "Shift", "RA": "Opt"}
 KEY_NAME = {"PG_UP": "PgUp", "PG_DN": "PgDn", "RET": "↵", "BSPC": "⌫", "DEL": "Del", "ESC": "Esc",
             "TAB": "Tab", "HOME": "Home", "END": "End", "PSCRN": "PrtSc"}
 GERMAN = {"Word ←": "Wort ←", "Word →": "Wort →", "Del word": "Wort ⌫", "Back": "Zurück", "Fwd": "Vor",
-          "Shot": "Screenshot", "Mouse": "Maus an/aus", "Maus": "Maus an", "BT clear": "BT löschen",
+          "Shot": "Screenshot", "Mouse": "Maus an/aus", "Maus": "Maus-Ebene an", "BT clear": "BT löschen",
           "Click L": "Klick L", "Click R": "Klick R", "Click M": "Klick M", "App ⇄": "App ⇢"}
 # small second label: "⇧ x" = with Shift, otherwise = when held
 SECOND = {"&bspc_del": "⇧ Del", "&sqt_dqt": '⇧ "', "&kp LG(DE_LBKT)": "Cmd+[", "&kp LG(DE_RBKT)": "Cmd+]"}
