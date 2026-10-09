@@ -106,7 +106,7 @@ RAW = {
 # Shift variants shown on the base layer (they are not on SYM)
 BASE_SHIFTED = {"&kp DE_COMMA": ";", "&kp DE_DOT": ":"}
 AMBIGUOUS = {"&kp LG(LEFT)", "&kp LG(RIGHT)"}
-BY_WIN_TWIN = {"&kp HOME": "Line ⇤", "&kp END": "Line ⇥", "&kp LA(LEFT)": "Back", "&kp LA(RIGHT)": "Fwd"}
+BY_WIN_TWIN = {"&kp HOME": "Home", "&kp END": "End", "&kp LA(LEFT)": "Back", "&kp LA(RIGHT)": "Fwd"}
 
 
 def layer_keys(km):

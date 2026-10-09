@@ -211,9 +211,7 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 </g>
 <g transform="translate(83, 168) rotate(-10.0)" class="key lay keypos-10">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">
-<tspan x="0" dy="-0.6em">Line</tspan><tspan x="0" dy="1.2em">⇤</tspan>
-</text>
+<text x="0" y="0" class="key lay tap">Home</text>
 </g>
 <g transform="translate(140, 117) rotate(-4.0)" class="key lay keypos-11">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
@@ -229,9 +227,7 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 </g>
 <g transform="translate(312, 121)" class="key lay keypos-14">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">
-<tspan x="0" dy="-0.6em">Line</tspan><tspan x="0" dy="1.2em">⇥</tspan>
-</text>
+<text x="0" y="0" class="key lay tap">End</text>
 </g>
 <g transform="translate(492, 121)" class="key keypos-15">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
