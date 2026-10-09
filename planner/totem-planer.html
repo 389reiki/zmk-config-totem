@@ -183,7 +183,7 @@ textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(-
 
 <div class="app">
   <header class="top">
-    <div class="brand"><h1>Totem-Planer</h1><span class="stand">Keymap-Stand 06.10.2026 07:08 · macOS-Sicht</span></div>
+    <div class="brand"><h1>Totem-Planer</h1><span class="stand">Keymap-Stand 09.10.2026 14:38 · macOS-Sicht</span></div>
     <div class="views" role="group" aria-label="Ansicht">
       <button type="button" data-view="layers">Ebenen</button>
       <button type="button" data-view="overview">Übersicht</button>
@@ -547,7 +547,7 @@ textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(-
     fillList($('planned'), DATA.planned || [], 'Nichts. Alles Besprochene ist in der Firmware.');
   }
   function exportText() {
-    let s = 'Totem-Planer: Änderungswünsche\n(Positionen wie in totem.keymap, macOS-Sicht; Windows-Zwillinge bitte mitziehen)\nAusgangsbasis: Keymap-Stand 06.10.2026 07:08\n';
+    let s = 'Totem-Planer: Änderungswünsche\n(Positionen wie in totem.keymap, macOS-Sicht; Windows-Zwillinge bitte mitziehen)\nAusgangsbasis: Keymap-Stand 09.10.2026 14:38\n';
     if ((DATA.planned || []).length) s += '\nBereits vorgemerkt:\n' + DATA.planned.map(x => '- ' + x).join('\n') + '\n';
     const lines = changeLines();
     s += '\nNeue Änderungen:\n' + (lines.length ? lines.map(x => '- ' + x).join('\n') : '- keine') + '\n';
