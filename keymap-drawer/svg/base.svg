@@ -305,8 +305,10 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 </g>
 <g transform="translate(303, 245) rotate(15.0)" class="key keypos-33">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
-<text x="0" y="0" class="key tap">Shift</text>
-<text x="0" y="-24" class="key shifted">1×</text>
+<text x="0" y="0" class="key tap">
+<tspan x="0" dy="-1.2em">Shift</tspan><tspan x="0" dy="1.2em">1×</tspan>
+</text>
+<text x="0" y="24" class="key hold">Shift</text>
 </g>
 <g transform="translate(360, 270) rotate(30.0)" class="key trig-SYM keypos-34">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key trig-SYM"/>
@@ -328,7 +330,7 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 <g transform="translate(563, 236)" class="key trig-SYS keypos-37">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key trig-SYS"/>
 <text x="0" y="0" class="key trig-SYS tap">Sys</text>
-<text x="0" y="24" class="key trig-SYS hold"><tspan style="font-size: 83%">halten</tspan></text>
+<text x="0" y="24" class="key trig-SYS hold">Sys</text>
 </g>
 <g class="combo combo combopos-0">
 <rect rx="6" ry="6" x="87" y="76" width="36" height="22" class="combo combo"/>

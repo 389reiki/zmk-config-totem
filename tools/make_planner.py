@@ -69,7 +69,7 @@ def label(b):
         else:
             out = {"t": GERMAN.get(r.get("t", ""), r.get("t", ""))}
             if r.get("h"):
-                out["h"] = "halten: " + r["h"] if b.startswith("&bsw") else r["h"]
+                out["h"] = r["h"]
             elif r.get("s"):
                 out["h"] = r["s"]
     else:
@@ -86,8 +86,6 @@ def label(b):
             out = {"t": b}
     if b in SECOND:
         out["h"] = SECOND[b]
-    if b.startswith("&bsw"):
-        out["h"] = "halten: Wort"
     return out
 
 
