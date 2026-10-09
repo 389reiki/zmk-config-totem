@@ -23,6 +23,7 @@ from keymap_lib import ROOT, read_keymap  # noqa: E402
 TEMPLATE = ROOT / "planner" / "template.html"
 OUT = ROOT / "planner" / "totem-planer.html"
 GEOMETRY = ROOT / "keymap-drawer" / "totem_layout.json"
+IDEAS = ROOT / "docs" / "ideen.md"
 LAYERS = ["BASE", "NAV", "SYM", "NUM", "SYS", "MOUSE"]
 
 # labels from the diagram script (DE_* characters and special bindings)
@@ -85,6 +86,39 @@ def label(b):
     return out
 
 
+def md_to_html(md):
+    """Tiny Markdown subset for docs/ideen.md: headings, bullet lists, paragraphs, **bold**, *italic*, `code`."""
+    import html as h
+
+    def inline(s):
+        s = h.escape(s, quote=False)
+        s = re.sub(r"`([^`]+)`", r"<code>\1</code>", s)
+        s = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", s)
+        s = re.sub(r"(?<![*\w])\*([^*]+)\*(?!\*)", r"<em>\1</em>", s)
+        return s
+
+    out, in_list = [], False
+    for line in md.splitlines():
+        if line.startswith("- "):
+            if not in_list:
+                out.append("<ul>")
+                in_list = True
+            out.append("<li>" + inline(line[2:]) + "</li>")
+            continue
+        if in_list:
+            out.append("</ul>")
+            in_list = False
+        if line.startswith("## "):
+            out.append("<h3>" + inline(line[3:]) + "</h3>")
+        elif line.startswith("# "):
+            continue  # page title is the tab itself
+        elif line.strip():
+            out.append("<p>" + inline(line) + "</p>")
+    if in_list:
+        out.append("</ul>")
+    return "\n".join(out)
+
+
 def stand():
     try:
         return subprocess.run(["git", "log", "-1", "--format=%cd", "--date=format:%d.%m.%Y %H:%M",
@@ -126,6 +160,8 @@ def main():
     html = TEMPLATE.read_text(encoding="utf-8")
     html = html.replace("__DATA__", payload.replace("</", "<\\/"))
     html = html.replace("__STAMP__", stamp).replace("__STAND__", stand())
+    ideas = IDEAS.read_text(encoding="utf-8") if IDEAS.exists() else "Noch keine Ideen."
+    html = html.replace("__IDEAS__", md_to_html(ideas))
     OUT.write_text(html, encoding="utf-8")
     print(f"wrote {OUT.relative_to(ROOT)} ({len(data['layers'])} layers, {len(data['combos'])} combos)")
 

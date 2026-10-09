@@ -141,6 +141,15 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px
 .sheet p { margin: 0; color: var(--fg); font-size: .92rem; }
 .sheet .k { font-family: var(--font-mono); font-size: .85em; background: var(--bg); border: 1px solid var(--line); border-radius: 5px; padding: 0 4px; }
 
+/* ideas */
+.ideas { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px; max-width: 820px; }
+.ideas h3 { margin: 18px 0 4px; font-size: 1.05rem; }
+.ideas h3:first-child { margin-top: 0; }
+.ideas p { margin: 4px 0; }
+.ideas ul { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 5px; }
+.ideas code { font-family: var(--font-mono); font-size: .88em; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 0 3px; }
+.ideas .ideas-src { margin-top: 16px; color: var(--muted); font-size: .85rem; }
+
 /* bottom bar + drawer */
 .bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--surface); border-top: 1px solid var(--line);
   padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); }
@@ -177,6 +186,7 @@ textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(-
       <button type="button" data-view="overview">Übersicht</button>
       <button type="button" data-view="combos">Kombos</button>
       <button type="button" data-view="sheet">Spickzettel</button>
+      <button type="button" data-view="ideas">Ideen</button>
     </div>
     <div class="search">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
@@ -202,6 +212,11 @@ textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(-
     <div class="filters" id="comboFilters" style="margin-bottom:12px"></div>
     <div class="combo-grid" id="comboGrid"></div>
   </section>
+
+  <article class="ideas" id="viewIdeas" hidden>
+__IDEAS__
+    <p class="ideas-src">Quelle: <code>docs/ideen.md</code> im Repo. Neue Ideen sammelt Claude dort.</p>
+  </article>
 
   <div class="sheet" id="viewSheet" hidden>
     <section><h3>Backspace</h3><p>Antippen: ⌫, mit Shift davor Entf. Halten: Wort löschen, Wort für Wort. Antippen und sofort halten: ⌫ wiederholt.</p></section>
@@ -398,6 +413,7 @@ textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(-
     $('viewOverview').hidden = view !== 'overview';
     $('viewCombos').hidden = view !== 'combos';
     $('viewSheet').hidden = view !== 'sheet';
+    $('viewIdeas').hidden = view !== 'ideas';
     if (view === 'layers') renderLayers();
     if (view === 'overview') renderOverview();
     if (view === 'combos') renderCombos();
