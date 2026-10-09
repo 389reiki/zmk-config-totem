@@ -183,7 +183,7 @@ textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(-
 
 <div class="app">
   <header class="top">
-    <div class="brand"><h1>Totem-Planer</h1><span class="stand">Keymap-Stand 09.10.2026 15:02 · macOS-Sicht</span></div>
+    <div class="brand"><h1>Totem-Planer</h1><span class="stand">Keymap-Stand 06.10.2026 07:08 · macOS-Sicht</span></div>
     <div class="views" role="group" aria-label="Ansicht">
       <button type="button" data-view="layers">Ebenen</button>
       <button type="button" data-view="overview">Übersicht</button>
@@ -354,6 +354,49 @@ textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(-
     if (k.trans) { const b = state.keys.BASE[pos]; return 'Durchlässig: wirkt wie die Basis-Taste' + (b && b.t ? ' (' + b.t + ')' : '') + '.'; }
     const raw = k.raw || '', p = parts(k, pos);
     const lay = opensLayer(k);
+    // Nav: what each key does, with the keystroke on macOS / Windows and the Shift trick for selecting
+    const SEL = ' Mit Shift gehalten: markieren.';
+    const NAV = {
+      '&kp UP': 'Cursor eine Zeile nach oben.' + SEL,
+      '&kp DOWN': 'Cursor eine Zeile nach unten.' + SEL,
+      '&kp LEFT': 'Cursor ein Zeichen nach links.' + SEL,
+      '&kp RIGHT': 'Cursor ein Zeichen nach rechts.' + SEL,
+      '&kp LA(LEFT)': 'Ein Wort nach links (Mac Opt+←, Windows Ctrl+←).' + SEL,
+      '&kp LA(RIGHT)': 'Ein Wort nach rechts (Mac Opt+→, Windows Ctrl+→).' + SEL,
+      '&kp PG_UP': 'Eine Bildschirmseite nach oben.' + SEL,
+      '&kp PG_DN': 'Eine Bildschirmseite nach unten.' + SEL,
+      '&kp LS(TAB)': 'Beim App-Wechsel (Taste daneben) eine App zurück. Sonst Shift+Tab: ein Eingabefeld zurück.',
+      '&kp LC(LS(TAB))': 'Browser-Tab nach links (Ctrl+Shift+Tab, auf Mac und Windows gleich). Geht auch in vielen anderen Apps mit Tabs.',
+      '&kp LC(TAB)': 'Browser-Tab nach rechts (Ctrl+Tab, auf Mac und Windows gleich).',
+      '&kp DEL': 'Entfernen: löscht das Zeichen rechts vom Cursor. Gedrückt halten löscht weiter.',
+      '&kp LSHFT': 'Shift halten, z. B. zusammen mit den Pfeilen links zum Markieren oder für Shift-Klick.',
+      '&kp LGUI': 'Cmd halten (Windows: Ctrl), z. B. für Cmd-Klick oder Tastenkürzel.',
+      '&kp LALT': 'Opt halten (Windows: Alt).',
+      '&kp LCTRL': 'Ctrl halten (Windows: Win-Taste).',
+      '&kp LG(DE_LBKT)': 'Zurück im Browser oder Finder (Mac Cmd+[, Windows Alt+←).',
+      '&kp LG(DE_RBKT)': 'Vor im Browser oder Finder (Mac Cmd+], Windows Alt+→).',
+      '&kp LG(LS(DE_N4))': 'Bildschirmausschnitt aufnehmen: Mac Cmd+Shift+4 (Bereich aufziehen), Windows Win+Shift+S.',
+      '&kp LG(LS(DE_N5))': 'Bildschirmfoto-Werkzeug: Mac Cmd+Shift+5, Windows Druck-Taste.',
+      '&mmv MOVE_UP': 'Mauszeiger nach oben. Halten bewegt weiter und wird schneller.',
+      '&mmv MOVE_DOWN': 'Mauszeiger nach unten. Halten bewegt weiter und wird schneller.',
+      '&mmv MOVE_LEFT': 'Mauszeiger nach links. Halten bewegt weiter und wird schneller.',
+      '&mmv MOVE_RIGHT': 'Mauszeiger nach rechts. Halten bewegt weiter und wird schneller.',
+      '&msc SCRL_UP': 'Nach oben scrollen. Halten scrollt weiter.',
+      '&msc SCRL_DOWN': 'Nach unten scrollen. Halten scrollt weiter.',
+      '&msc SCRL_LEFT': 'Nach links scrollen. Halten scrollt weiter.',
+      '&msc SCRL_RIGHT': 'Nach rechts scrollen. Halten scrollt weiter.',
+      '&mkp LCLK': 'Linksklick. Zweimal tippen = Doppelklick. Halten und Zeiger bewegen = ziehen.',
+      '&mkp RCLK': 'Rechtsklick (Kontextmenü).',
+      '&mkp MCLK': 'Mittelklick, z. B. Link im neuen Tab öffnen.',
+      '&mkp MB4': 'Maustaste 4: Zurück, in Programmen, die sie unterstützen.',
+      '&mkp MB5': 'Maustaste 5: Vor, in Programmen, die sie unterstützen.',
+    };
+    if (raw === '&kp LG(LEFT)' || raw === '&kp LG(RIGHT)') {
+      const r = raw.includes('RIGHT');
+      if (/Zeile/.test(k.t || '')) return (r ? 'Zum Zeilenende (Mac Cmd+→, Windows Ende).' : 'Zum Zeilenanfang (Mac Cmd+←, Windows Pos1).') + SEL;
+      return r ? 'Vor im Browser oder Finder (Mac Cmd+→, Windows Alt+→). In Textfeldern springt Cmd+→ am Mac ans Zeilenende.' : 'Zurück im Browser oder Finder (Mac Cmd+←, Windows Alt+←). In Textfeldern springt Cmd+← am Mac an den Zeilenanfang.';
+    }
+    if (NAV[raw]) return NAV[raw];
     if (raw.startsWith('&bsw')) return 'Tippen: ⌫ (mit Shift: Entf). Halten: Wort löschen, Wort für Wort. Tippen und sofort halten: ⌫ wiederholt.';
     if (raw.startsWith('&lt_spc')) return 'Tippen: Leertaste. Halten: Nav-Ebene.';
     if (raw.startsWith('&sym_key')) return 'Tippen: genau ein Zeichen von Sym. Halten: Sym-Ebene.';
@@ -361,7 +404,7 @@ textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(-
     if (raw.startsWith('&mo ') && lay) return 'Halten: ' + NAMES[lay] + '-Ebene.';
     if (raw === '&sk LSHFT') return 'Tippen: nächster Buchstabe groß. Halten: Shift.';
     if (raw.startsWith('&hml') || raw.startsWith('&hmr')) return 'Tippen: ' + p.t + '. Halten: ' + p.h + ' (nur zusammen mit einer Taste der anderen Hand).';
-    if (raw === '&swapper_mac') return 'App-Wechsel: mehrmals tippen geht App für App weiter, Cmd bleibt gehalten, bis du Nav loslässt.';
+    if (raw === '&swapper_mac') return 'App-Wechsel vorwärts (Mac Cmd+Tab, Windows Alt+Tab): mehrmals tippen geht App für App weiter, Cmd/Alt bleibt gehalten. Nav loslassen wählt die App. Die Taste daneben geht zurück.';
     if (raw === '&kp LS(TAB)') return 'Beim App-Wechsel eine App zurück.';
     if (raw === '&smart_mouse') return 'Maus-Ebene an. Jede Taste, die nicht zur Maus gehört, schaltet sie wieder aus.';
     const MEDIA = { 'C_PP': 'Medien: Wiedergabe starten oder pausieren.', 'C_PREV': 'Medien: vorheriger Titel.', 'C_NEXT': 'Medien: nächster Titel.', 'C_VOL_UP': 'Medien: lauter.', 'C_VOL_DN': 'Medien: leiser.' };
@@ -547,7 +590,7 @@ textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(-
     fillList($('planned'), DATA.planned || [], 'Nichts. Alles Besprochene ist in der Firmware.');
   }
   function exportText() {
-    let s = 'Totem-Planer: Änderungswünsche\n(Positionen wie in totem.keymap, macOS-Sicht; Windows-Zwillinge bitte mitziehen)\nAusgangsbasis: Keymap-Stand 09.10.2026 15:02\n';
+    let s = 'Totem-Planer: Änderungswünsche\n(Positionen wie in totem.keymap, macOS-Sicht; Windows-Zwillinge bitte mitziehen)\nAusgangsbasis: Keymap-Stand 06.10.2026 07:08\n';
     if ((DATA.planned || []).length) s += '\nBereits vorgemerkt:\n' + DATA.planned.map(x => '- ' + x).join('\n') + '\n';
     const lines = changeLines();
     s += '\nNeue Änderungen:\n' + (lines.length ? lines.map(x => '- ' + x).join('\n') : '- keine') + '\n';
