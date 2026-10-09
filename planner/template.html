@@ -1,4 +1,4 @@
-<title>Totem-Planer</title>
+<title>Totem Planer Okt 2026</title>
 <style>
 /* Layout: header with search and views; layer list left, large keyboard right; fixed action bar at the bottom. Light theme only.
    Keycaps follow the keymap editor (nickcoutsos.github.io/keymap-editor): flat grey caps without outline, regular-weight system font. */
@@ -15,6 +15,7 @@
   --focus: #2c5bd6;
   --base: #5b6178; --nav: #378ADD; --sym: #1D9E75; --num: #BA7517; --sys: #7d7c78; --mouse: #D4537E;
   --combo: #7F77DD;
+  --mod: #6d7894;
   --media: #e9e1f5;
   --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -82,8 +83,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px
   background: var(--cap); border: 0; padding: 0; cursor: grab; display: block; color: var(--cap-text); }
 .board.small .key { cursor: pointer; }
 .key .t { position: absolute; left: 4%; right: 4%; top: 50%; transform: translateY(-58%); text-align: center; font-weight: 400; font-size: calc(var(--u) * .3); line-height: 1.05; white-space: nowrap; }
-.key .t.long { font-size: calc(var(--u) * .19); }
-.key .t.xlong { font-size: calc(var(--u) * .155); white-space: normal; }
+.key .t.word { font-size: calc(var(--u) * .175); }
+.key.mod, .key.hrm { box-shadow: inset 0 calc(var(--u) * .06) 0 var(--mod); }
+.key.hrm .h { color: var(--mod); font-weight: 600; }
 .key .h { position: absolute; left: 0; right: 0; bottom: 7%; text-align: center; font-size: calc(var(--u) * .155); color: var(--muted); white-space: nowrap; }
 .key .s { position: absolute; right: 8%; top: 4%; font-size: calc(var(--u) * .24); line-height: 1; color: #4b5062; }
 .key .p { position: absolute; left: 8%; top: 5%; font-family: var(--font-mono); font-size: calc(var(--u) * .13); color: var(--faint); }
@@ -183,7 +185,7 @@ textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(-
 
 <div class="app">
   <header class="top">
-    <div class="brand"><h1>Totem-Planer</h1><span class="stand">Keymap-Stand __STAND__ · macOS-Sicht</span></div>
+    <div class="brand"><h1>Totem Planer Okt 2026</h1><span class="stand">Keymap-Stand __STAND__ · macOS-Sicht</span></div>
     <div class="views" role="group" aria-label="Ansicht">
       <button type="button" data-view="layers">Ebenen</button>
       <button type="button" data-view="overview">Übersicht</button>
@@ -224,11 +226,13 @@ __IDEAS__
   <div class="sheet" id="viewSheet" hidden>
     <section><h3>Backspace</h3><p>Antippen: ⌫, mit Shift davor Entf. Halten: Wort löschen, Wort für Wort. Antippen und sofort halten: ⌫ wiederholt.</p></section>
     <section><h3>Entf in Serie</h3><p>Space halten (Nav), dann mit dem linken Daumen Position 32 tippen oder halten.</p></section>
-    <section><h3>Sys-Ebene</h3><p>Position 37 halten (rechter Daumen, eingezogen). Dort: F-Tasten, Medien, Mac/Win, Bluetooth, Bootloader.</p></section>
-    <section><h3>Enter</h3><p><span class="k">t</span> + <span class="k">r</span> + <span class="k">n</span> gleichzeitig. Nach dem letzten Zeichen kurz absetzen (ca. 0,1 s), sonst kommen die Buchstaben. Auf Num zusätzlich Position 20.</p></section>
-    <section><h3>Maus</h3><p><span class="k">d</span> + <span class="k">c</span> gleichzeitig: Maus-Ebene an. Klicken und scrollen mit links. Jede andere Taste schaltet sie aus.</p></section>
-    <section><h3>App wechseln</h3><p>Space halten (Nav), Position 5 mehrmals tippen: jede Runde eine App weiter. Position 6 geht zurück. Nav loslassen wählt die App.</p></section>
-    <section><h3>Browser-Tabs</h3><p>Space halten (Nav), dann mit dem linken Daumen: Position 33 = Tab zurück, 34 = Tab vor.</p></section>
+    <section><h3>Sys-Ebene</h3><p>Position 37 halten (rechter Daumen, eingezogen). Nur System: Mac/Win, BT 2/3, USB/BT, BT löschen, Boot und Reset je Hälfte. F-Tasten liegen auf Num rechts.</p></section>
+    <section><h3>Enter</h3><p><span class="k">t</span> + <span class="k">r</span> + <span class="k">n</span> gleichzeitig. Nach dem letzten Zeichen kurz absetzen (ca. 0,1 s), sonst kommen die Buchstaben. Gilt auf Basis, Nav und Num. Auf Num zusätzlich Position 20.</p></section>
+    <section><h3>Maus</h3><p>Auf Nav rechts: Zeiger auf der Grundreihe, Scrollen darunter. Klicks mit dem linken Daumen: 33 rechts, 34 links. Klick M auf 36 nur mit „Nav fest“.</p></section>
+    <section><h3>Nav fest</h3><p>Space halten, Position 37 tippen, Space loslassen: Nav bleibt an. Position 37 nochmal: Nav aus.</p></section>
+    <section><h3>Medien</h3><p>Auf Basis und Nav: <span class="k">v</span>+<span class="k">d</span> Titel zurück, <span class="k">l</span>+<span class="k">x</span> Titel vor, <span class="k">ü</span>+<span class="k">k</span> leiser, <span class="k">f</span>+<span class="k">j</span> lauter.</p></section>
+    <section><h3>App wechseln</h3><p>Space halten (Nav), Position 6 mehrmals tippen: jede Runde eine App weiter. Position 5 geht zurück. Nav loslassen wählt die App.</p></section>
+    <section><h3>Browser-Tabs</h3><p>Space halten (Nav), dann Position 22 = Tab zurück, 24 = Tab vor (untere Reihe links).</p></section>
     <section><h3>Mac / Windows</h3><p>Auf Sys "Mac" oder "Win" tippen. Nach dem Ausschalten startet die Tastatur im Mac-Modus.</p></section>
     <section><h3>Shift-Varianten</h3><p><span class="k">'</span> mit Shift gibt <span class="k">"</span>, <span class="k">,</span> gibt <span class="k">;</span>, <span class="k">.</span> gibt <span class="k">:</span>. Sie stehen klein oben rechts auf der Taste.</p></section>
   </div>
@@ -280,7 +284,7 @@ __IDEAS__
   const NAMES = { BASE: 'Basis', NAV: 'Nav', SYM: 'Sym', NUM: 'Num', SYS: 'Sys', MOUSE: 'Maus' };
   const COLOR = { BASE: 'var(--base)', NAV: 'var(--nav)', SYM: 'var(--sym)', NUM: 'var(--num)', SYS: 'var(--sys)', MOUSE: 'var(--mouse)' };
   const LAYERS = DATA.layers.map(l => l.name);
-  const STORE = 'totem-planer-__STAMP__';
+  const STORE = 'okt26-__STAMP__';
   const PREF = 'totem-planer-prefs';
 
   // ---------- state ----------
@@ -320,7 +324,7 @@ __IDEAS__
     const left = col < 5;
     return (left ? 'links' : 'rechts') + ', ' + row + ', ' + (left ? FL[col] : FL[9 - col]);
   }
-  const opensLayer = k => { const p = (k.raw || '').split(/\s+/); if (p[0] === '&tog') return null; for (const L of ['NAV', 'SYM', 'NUM', 'SYS']) if (p.slice(1).includes(L)) return L; return null; };
+  const opensLayer = k => { const p = (k.raw || '').split(/\s+/); if (p[0] === '&tog') return null; for (const L of ['NAV', 'SYM', 'NUM', 'SYS']) if (p.slice(1).map(x => x.replace(/_HOLD$/, '')).includes(L)) return L; return null; };
   // second label: "⇧ x" = with Shift (shown top right), anything else = when held (shown bottom)
   function parts(k, pos) {
     if (k.trans) { const b = state.keys.BASE[pos]; return { t: b && !b.trans ? b.t : '', h: '', s: '' }; }
@@ -334,6 +338,11 @@ __IDEAS__
     return k.t + (k.h ? ' / ' + k.h : '');
   }
   function describe(k, pos) {
+    const vk = Object.keys(DATA.diff || {}).find(x => x.endsWith(':' + pos) && DATA.layers.some(l => l.name === x.split(':')[0] && state.keys[l.name][pos] === k));
+    const was = vk ? ' (vorher: ' + DATA.diff[vk] + ')' : '';
+    return describe0(k, pos) + was;
+  }
+  function describe0(k, pos) {
     const extra = mouseCombo && mouseCombo.pos.includes(pos) ? ' Zusammen mit ' + mouseCombo.pos.filter(p => p !== pos).map(p => (state.keys.BASE[p] && state.keys.BASE[p].t) || p).join(' + ') + ' gedrückt: Maus-Ebene an.' : '';
     return describeKey(k, pos) + (k.none || k.trans ? '' : extra);
   }
@@ -381,7 +390,7 @@ __IDEAS__
     };
     if (raw === '&kp LG(LEFT)' || raw === '&kp LG(RIGHT)') {
       const r = raw.includes('RIGHT');
-      if (/Zeile/.test(k.t || '')) return (r ? 'Zum Zeilenende (Mac Cmd+→, Windows Ende).' : 'Zum Zeilenanfang (Mac Cmd+←, Windows Pos1).') + SEL;
+      if (/Zeile|Home|End/.test(k.t || '')) return (r ? 'End: zum Zeilenende. Am Mac sendet die Taste Cmd+→, weil die Mac-Taste End meist ans Dokumentende springt. Windows: End.' : 'Home: zum Zeilenanfang. Am Mac sendet die Taste Cmd+←, weil die Mac-Taste Home meist an den Dokumentanfang springt. Windows: Home (Pos1).') + SEL;
       return r ? 'Vor im Browser oder Finder (Mac Cmd+→, Windows Alt+→). In Textfeldern springt Cmd+→ am Mac ans Zeilenende.' : 'Zurück im Browser oder Finder (Mac Cmd+←, Windows Alt+←). In Textfeldern springt Cmd+← am Mac an den Zeilenanfang.';
     }
     if (NAV[raw]) return NAV[raw];
@@ -394,7 +403,9 @@ __IDEAS__
     if (raw.startsWith('&hml') || raw.startsWith('&hmr')) return 'Tippen: ' + p.t + '. Halten: ' + p.h + ' (nur zusammen mit einer Taste der anderen Hand).';
     if (raw === '&swapper_mac') return 'App-Wechsel vorwärts (Mac Cmd+Tab, Windows Alt+Tab): mehrmals tippen geht App für App weiter, Cmd/Alt bleibt gehalten. Nav loslassen wählt die App. Die Taste daneben geht zurück.';
     if (raw === '&kp LS(TAB)') return 'Beim App-Wechsel eine App zurück.';
-    if (raw === '&smart_mouse') return 'Maus-Ebene an. Jede Taste, die nicht zur Maus gehört, schaltet sie wieder aus.';
+    if (raw === '&tog NAV_LOCK') return 'Nav bleibt an, auch wenn du Space loslässt. Nochmal tippen: Nav aus. Dann ist auch Klick M (36) erreichbar.';
+    if (raw.startsWith('&mmv ')) return 'Mauszeiger bewegen, solange gehalten.';
+    if (raw.startsWith('&msc ')) return 'Scrollen, solange gehalten.';
     const MEDIA = { 'C_PP': 'Medien: Wiedergabe starten oder pausieren.', 'C_PREV': 'Medien: vorheriger Titel.', 'C_NEXT': 'Medien: nächster Titel.', 'C_VOL_UP': 'Medien: lauter.', 'C_VOL_DN': 'Medien: leiser.' };
     const mk = raw.replace(/^&kp /, ''); if (MEDIA[mk]) return MEDIA[mk];
     if (raw === '&host_mac') return 'Auf den Mac umschalten (Bluetooth-Profil 0).';
@@ -415,7 +426,7 @@ __IDEAS__
   }
   const HINT = L => {
     const held = heldFor(L).map(i => (parts(state.keys.BASE[i], i).t || i)).join(' + ');
-    return { BASE: 'Klein unten: beim Halten. Oben rechts: mit Shift.' + (mouseCombo ? ' Rosa Strich: ' + mouseKeys() + ' zusammen = Maus-Ebene an.' : ''), MOUSE: 'An mit ' + mouseKeys() + ' gleichzeitig, aus mit jeder anderen Taste.' }[L]
+    return { BASE: 'Groß: antippen. Klein unten: halten. Oben rechts: mit Shift. Grauer Balken oben: Modifier (auch beim Halten).', MOUSE: 'An mit ' + mouseKeys() + ' gleichzeitig, aus mit jeder anderen Taste.' }[L]
       || (held ? 'Erreichbar durch Halten von ' + held + '.' : '');
   };
 
@@ -434,18 +445,22 @@ __IDEAS__
       const p = parts(k, pos);
       if (k.trans) el.classList.add('trans'); else if (k.none) el.classList.add('none');
       if (/^&kp C_/.test(k.raw || '')) el.classList.add('media');
+      if (/^(&kp (LSHFT|LGUI|LALT|LCTRL)|&sk LSHFT)$/.test(k.raw || '')) el.classList.add('mod');
+      if (/^&hm[lr] /.test(k.raw || '')) el.classList.add('hrm');
       const op = opensLayer(k);
       if (op && L === 'BASE') { el.classList.add('opens'); el.style.setProperty('--oc', COLOR[op]); }
       const isHeld = held.includes(pos) && L !== 'BASE';
       if (isHeld) { el.classList.add('held'); el.style.setProperty('--hc', COLOR[L]); }
       if (mouseCombo && mouseCombo.pos.includes(pos) && (mouseCombo.layers || []).includes(L)) el.classList.add('mc');
-      if (interactive && isChanged(L, pos)) el.classList.add('changed');
+      if ((DATA.diff || {})[L + ':' + pos] !== undefined || (interactive && isChanged(L, pos))) el.classList.add('changed');
       if (interactive && sel && sel.layer === L && sel.pos === pos) el.classList.add('selected');
-      const t = isHeld ? 'halten' : p.t;
-      el.innerHTML = '<span class="t"></span>' + (p.h && !isHeld ? '<span class="h"></span>' : '') + (p.s ? '<span class="s"></span>' : '') + (prefs.nums && interactive ? '<span class="p"></span>' : '');
+      // the key held to reach this layer shows the layer name, bottom label = hold function
+      const t = isHeld && (k.trans || !p.t) ? NAMES[L] : p.t;
+      const hb = isHeld ? NAMES[L] : p.h;
+      el.innerHTML = '<span class="t"></span>' + (hb ? '<span class="h"></span>' : '') + (p.s ? '<span class="s"></span>' : '') + (prefs.nums && interactive ? '<span class="p"></span>' : '');
       const te = el.querySelector('.t'); te.textContent = t;
-      if (t.length > 8) te.classList.add('xlong'); else if (t.length > 3) te.classList.add('long');
-      if (p.h && !isHeld) el.querySelector('.h').textContent = p.h;
+      if (Array.from(t.replace(/[\ufe0e\ufe0f]/g, '')).length > 1) te.classList.add('word');
+      if (hb) el.querySelector('.h').textContent = hb;
       if (p.s) el.querySelector('.s').textContent = p.s;
       if (prefs.nums && interactive) el.querySelector('.p').textContent = pos;
       el.setAttribute('aria-label', NAMES[L] + ', Position ' + pos + ': ' + describe(k, pos));
@@ -533,7 +548,7 @@ __IDEAS__
     DATA.combos.filter(c => comboFilter === 'ALL' || (c.layers || []).includes(comboFilter)).forEach(c => {
       const card = document.createElement('div'); card.className = 'combo-card';
       const head = document.createElement('div'); head.className = 'combo-head';
-      const nm = document.createElement('span'); nm.className = 'combo-name'; nm.textContent = c.label;
+      const nm = document.createElement('span'); nm.className = 'combo-name'; nm.textContent = c.label + (c.new ? ' · neu' : c.changed ? ' · geändert' : '');
       const ks = document.createElement('span'); ks.className = 'combo-keys';
       ks.textContent = c.pos.map(p => (state.keys.BASE[p] && state.keys.BASE[p].t) || p).join(' + ');
       head.append(nm, ks);

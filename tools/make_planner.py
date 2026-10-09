@@ -25,7 +25,7 @@ OUT = ROOT / "planner" / "totem-planer.html"
 GEOMETRY = ROOT / "keymap-drawer" / "totem_layout.json"
 IDEAS = ROOT / "docs" / "ideen.md"
 PLANNED = ROOT / "docs" / "vorgemerkt.md"
-LAYERS = ["BASE", "NAV", "SYM", "NUM", "SYS", "MOUSE"]
+LAYERS = ["BASE", "NAV", "SYM", "NUM", "SYS"]
 
 # labels from the diagram script (DE_* characters and special bindings)
 _spec = importlib.util.spec_from_file_location("draw", ROOT / "keymap-drawer" / "draw.py")
@@ -40,7 +40,7 @@ MOD_FN = {"LG": "Cmd", "LA": "Opt", "LC": "Ctrl", "LS": "Shift", "RA": "Opt"}
 KEY_NAME = {"PG_UP": "PgUp", "PG_DN": "PgDn", "RET": "↵", "BSPC": "⌫", "DEL": "Del", "ESC": "Esc",
             "TAB": "Tab", "HOME": "Home", "END": "End", "PSCRN": "PrtSc"}
 GERMAN = {"Word ←": "Wort ←", "Word →": "Wort →", "Del word": "Wort ⌫", "Back": "Zurück", "Fwd": "Vor",
-          "Shot": "Screenshot", "Mouse": "Maus an/aus", "Maus": "Maus-Ebene an", "BT clear": "BT löschen",
+          "BT clear": "BT lösch",
           "Click L": "Klick L", "Click R": "Klick R", "Click M": "Klick M", "App ⇄": "App ⇢"}
 # small second label: "⇧ x" = with Shift, otherwise = when held
 SECOND = {"&bspc_del": "⇧ Del", "&sqt_dqt": '⇧ "', "&kp LG(DE_LBKT)": "Cmd+[", "&kp LG(DE_RBKT)": "Cmd+]"}
@@ -48,6 +48,10 @@ SECOND = {"&bspc_del": "⇧ Del", "&sqt_dqt": '⇧ "', "&kp LG(DE_LBKT)": "Cmd+[
 BASE_SHIFTED = {"&kp DE_COMMA": "⇧ ;", "&kp DE_DOT": "⇧ :"}
 # keys whose macOS keystroke is ambiguous: named after their Windows twin (as in the diagrams)
 BY_WIN_TWIN = {"&kp HOME": "Home", "&kp END": "End", "&kp LA(LEFT)": "Zurück", "&kp LA(RIGHT)": "Vor"}
+
+
+COMBO_NAME = {"&kp RET": "Enter ↵", "&kp C_PREV": "Titel zurück", "&kp C_NEXT": "Titel vor"}
+LEFT = {0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 20, 21, 22, 23, 24, 25, 32, 33, 34}
 
 
 def key_name(k):
@@ -146,6 +150,8 @@ def main():
             twin = layers.get(name + " WIN", [None] * len(layers[name]))[pos]
             if b in ("&kp LG(LEFT)", "&kp LG(RIGHT)") and twin in BY_WIN_TWIN:
                 k["t"] = BY_WIN_TWIN[twin]
+            if b in ("&bootloader", "&sys_reset"):   # works on the half where it is pressed
+                k["t"] += " L" if pos in LEFT else " R"
             keys.append(k)
         data["layers"].append({"name": name, "keys": keys})
 
@@ -155,8 +161,8 @@ def main():
         if not on or tuple(c["positions"]) in seen:
             continue  # Windows-only copy of a Mac combo
         seen.add(tuple(c["positions"]))
-        t = label(c["binding"])["t"]
-        data["combos"].append({"pos": c["positions"], "label": "Enter ↵" if t == "↵" else t, "layers": on})
+        t = COMBO_NAME.get(c["binding"]) or label(c["binding"])["t"]
+        data["combos"].append({"pos": c["positions"], "label": t, "layers": on})
 
     payload = json.dumps(data, ensure_ascii=False)
     stamp = hashlib.sha1(payload.encode()).hexdigest()[:10]

@@ -48,18 +48,18 @@
 // counterpart and only overrides the keys that differ on Windows (everything else is &trans).
 #define BASE      0
 #define WIN       1   // Windows overlay for BASE (home-row mods), on via the Windows host key
-#define NAV       2
-#define NAV_WIN   3   // conditional: NAV + WIN
-#define SYM       4
-#define SYM_WIN   5   // conditional: SYM + WIN
-#define NUM       6
-#define NUM_WIN   7   // conditional: NUM + WIN (empty, only keeps the Windows combos active)
-#define SYS       8   // hold base pos 37
-#define SYS_WIN   9   // conditional: SYS + WIN
-#define MOUSE     10
-#define MOUSE_WIN 11  // conditional: MOUSE + WIN
+#define NAV_HOLD  2   // flag (all &trans): on while Space is held
+#define NAV_LOCK  3   // flag (all &trans): toggled by Nav pos 37 ("Nav fixed")
+#define NAV       4   // conditional: on while NAV_HOLD or NAV_LOCK is on
+#define NAV_WIN   5   // conditional: NAV + WIN
+#define SYM       6
+#define SYM_WIN   7   // conditional: SYM + WIN
+#define NUM       8
+#define NUM_WIN   9   // conditional: NUM + WIN (empty, only keeps the Windows combos active)
+#define SYS       10  // hold base pos 37
+#define SYS_WIN   11  // conditional: SYS + WIN (empty, only keeps the Windows combos active)
 
-// Combos are active on these layers (not on MOUSE: its scroll keys sit on the clipboard combo keys)
+// Combos are active on these layers
 #define MAC_LAYERS BASE NAV SYM NUM SYS
 #define WIN_LAYERS WIN NAV_WIN SYM_WIN NUM_WIN SYS_WIN
 
@@ -137,30 +137,19 @@
         };
 
         // Swapper (Callum/urob, tri-state module): first tap holds Cmd (Windows: Alt) and taps Tab,
-        // further taps send Tab. Pos 6 (Shift+Tab) goes back; Shift and the arrows keep it open; releasing Nav or any
-        // other key releases Cmd/Alt and selects the app.
+        // further taps send Tab. Pos 5 (Shift+Tab) goes back; Shift (31) and the arrows keep it open;
+        // releasing Nav or any other key releases Cmd/Alt and selects the app.
         swapper_mac: swapper_mac {
             compatible = "zmk,behavior-tri-state";
             #binding-cells = <0>;
             bindings = <&kt LGUI>, <&kp TAB>, <&kt LGUI>;
-            ignored-key-positions = <2 6 11 12 13 16>;
+            ignored-key-positions = <2 5 11 12 13 31>;
         };
         swapper_win: swapper_win {
             compatible = "zmk,behavior-tri-state";
             #binding-cells = <0>;
             bindings = <&kt LALT>, <&kp TAB>, <&kt LALT>;
-            ignored-key-positions = <2 6 11 12 13 16>;
-        };
-
-        // Smart-mouse (urob, tri-state module): turns MOUSE on; pressing any key that is not a
-        // mouse key turns it off again. Activated by the d+c combo or from NAV (pos 20).
-        smart_mouse: smart_mouse {
-            compatible = "zmk,behavior-tri-state";
-            #binding-cells = <0>;
-            bindings = <&tog MOUSE>, <&none>, <&tog MOUSE>;
-            // the mouse keys: Back/Fwd, scroll, clicks, Cmd/Ctrl and Shift for modified clicks
-            ignored-key-positions = <1 2 3 10 11 12 13 14 22 23 24>;
-            ignored-layers = <MOUSE MOUSE_WIN NAV NAV_WIN>;
+            ignored-key-positions = <2 5 11 12 13 31>;
         };
 
         // Backspace: plain = Backspace, with Shift (incl. one-shot Shift) = forward Delete.
@@ -190,6 +179,17 @@
 / {
     conditional_layers {
         compatible = "zmk,conditional-layers";
+        // NAV is on while Space is held (NAV_HOLD) OR Nav is fixed (NAV_LOCK, toggled by Nav pos 37).
+        // NAV must only be switched through these two flags: ZMK turns a conditional layer off
+        // whenever none of its conditions is met.
+        nav_hold {
+            if-layers = <NAV_HOLD>;
+            then-layer = <NAV>;
+        };
+        nav_lock {
+            if-layers = <NAV_LOCK>;
+            then-layer = <NAV>;
+        };
         // Windows variants: active only while the Windows overlay is on
         nav_win {
             if-layers = <NAV WIN>;
@@ -207,17 +207,13 @@
             if-layers = <SYS WIN>;
             then-layer = <SYS_WIN>;
         };
-        mouse_win {
-            if-layers = <MOUSE WIN>;
-            then-layer = <MOUSE_WIN>;
-        };
     };
 
     combos {
         compatible = "zmk,combos";
 
         // Horizontal 2-key combos. require-prior-idle-ms: combos do not fire while you are typing fast.
-        // Esc and Tab are identical on both systems. No combos on MOUSE.
+        // Esc and Tab are identical on both systems.
         combo_esc {
             timeout-ms = <30>;
             require-prior-idle-ms = <150>;
@@ -234,23 +230,21 @@
         };
 
         // Enter: t + r + n (right home row) together. 3-key combo, blocked for 100 ms after the
-        // last key press so it cannot fire inside words ("Kontrolle", "control"). Base and Nav only.
+        // last key press so it cannot fire inside words ("Kontrolle", "control"). Base, Nav and Num.
         combo_enter {
             timeout-ms = <40>;
             require-prior-idle-ms = <100>;
             key-positions = <16 17 18>;
-            layers = <BASE WIN NAV NAV_WIN>;
+            layers = <BASE WIN NAV NAV_WIN NUM NUM_WIN>;
             bindings = <&kp RET>;
         };
 
-        // Smart-mouse on: d + c (right top row). Base and Nav only.
-        combo_mouse {
-            timeout-ms = <30>;
-            require-prior-idle-ms = <150>;
-            key-positions = <6 7>;
-            layers = <BASE WIN NAV NAV_WIN>;
-            bindings = <&smart_mouse>;
-        };
+        // Media (same keycodes on both systems), Base and Nav only:
+        // v+d previous track, l+x next track, ü+k quieter (left outer), f+j louder (right outer).
+        combo_prev  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <5 6>;   layers = <BASE WIN NAV NAV_WIN>; bindings = <&kp C_PREV>; };
+        combo_next  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <8 9>;   layers = <BASE WIN NAV NAV_WIN>; bindings = <&kp C_NEXT>; };
+        combo_voldn { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <20 21>; layers = <BASE WIN NAV NAV_WIN>; bindings = <&kp C_VOL_DN>; };
+        combo_volup { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <30 31>; layers = <BASE WIN NAV NAV_WIN>; bindings = <&kp C_VOL_UP>; };
 
         // Clipboard on the left bottom row in QWERTZ order (k+z Undo, z+' Cut, '+. Copy, .+ö Paste),
         // Redo mirrored on the right bottom row (w+f). macOS: Cmd+key, Windows: Ctrl+key.
@@ -300,18 +294,6 @@
             #binding-cells = <0>;
             bindings = <&macro_tap &kp DEW_CARET &kp SPACE>;
         };
-
-        // types @gif (from the original keymap; now with the German @)
-        gif_mac: gif_mac {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            bindings = <&macro_tap &kp DE_AT &kp DE_G &kp DE_I &kp DE_F>;
-        };
-        gif_win: gif_win {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            bindings = <&macro_tap &kp DEW_AT &kp DEW_G &kp DEW_I &kp DEW_F>;
-        };
     };
 
     keymap {
@@ -321,15 +303,14 @@
         //   pinky = Ctrl (macOS) / Win (Windows), ring = Option / Alt, middle = Cmd / Ctrl.
         //   Thumbs: left Backspace | Shift | Sym, right Num | Space/Nav | Sys (hold). Shift and Space on the middle keys.
         //   Backspace: tap = Backspace (with Shift: Delete), hold = delete word, tap+hold = repeat.
-        //   Combos (see "combos" above): Enter = t+r+n (the only Enter besides NUM pos 32), mouse = d+c,
-        //   Esc/Tab, clipboard.
+        //   Combos (see "combos" above): Enter = t+r+n (besides NUM pos 20), Esc/Tab, clipboard, media.
         base_layer {
             display-name = "BASE";
             bindings = <
             &kp DE_Q        &kp DE_A_UMLAUT  &kp DE_O          &kp DE_U        &kp DE_Y         &kp DE_V        &kp DE_D        &kp DE_C          &kp DE_L          &kp DE_X
             &hml LCTRL DE_H &hml LALT DE_A   &hml LGUI DE_E    &kp DE_I        &kp DE_COMMA     &kp DE_G        &kp DE_T        &hmr LGUI DE_R    &hmr LALT DE_N    &hmr LCTRL DE_S
 &kp DE_U_UMLAUT  &kp DE_K       &kp DE_Z         &sqt_dqt          &kp DE_DOT      &kp DE_O_UMLAUT  &kp DE_B        &kp DE_P        &kp DE_M          &kp DE_W          &kp DE_F          &kp DE_J
-                                                 &bsw LA(BSPC) 0   &sk LSHFT             &sym_key SYM SYM               &num_key NUM NUM   &lt_spc NAV SPACE   &mo SYS
+                                                 &bsw LA(BSPC) 0   &sk LSHFT             &sym_key SYM SYM               &num_key NUM NUM   &lt_spc NAV_HOLD SPACE   &mo SYS
             >;
         };
 
@@ -344,27 +325,50 @@
             >;
         };
 
-        // NAV – hold Space (right thumb, middle key). Arrows on the left hand, mods on the right home row.
-        //   Pos 5 = swapper (tap repeatedly to walk through apps), pos 6 = back one app.
-        //   Left thumb: Delete (32, repeats when held), browser tab back/forward (33/34).
+        // NAV HOLD / NAV LOCK – flag layers, never seen (all &trans). Either one switches NAV on.
+        nav_hold_layer {
+            display-name = "NAV HOLD";
+            bindings = <
+            &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+            &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+&trans      &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
+                            &trans  &trans  &trans    &trans  &trans  &trans
+            >;
+        };
+        nav_lock_layer {
+            display-name = "NAV LOCK";
+            bindings = <
+            &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+            &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+&trans      &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
+                            &trans  &trans  &trans    &trans  &trans  &trans
+            >;
+        };
+
+        // NAV – hold Space (right thumb, middle key), or press Nav pos 37 to keep it on (again = off).
+        //   Left: arrows, word left/right, Home/End (0/4), PgUp/PgDn (14/25), Cmd (20), screenshot (23),
+        //         app back (5) / app swapper (6). Left thumb: Delete, mouse clicks right (33) / left (34).
+        //   Right: mouse pointer on the home row (15-18), scrolling below (26-29), browser back/forward
+        //          (9/30), Shift (31), middle click (36, usable when Nav is fixed).
+        //   Browser tabs back/forward on 22/24.
         //   macOS keystrokes here; the Windows equivalents are in nav_win_layer.
         nav_layer {
             display-name = "NAV";
             bindings = <
-            &kp PG_UP     &kp LA(LEFT)  &kp UP        &kp LA(RIGHT)  &kp PG_DN      &swapper_mac &kp LS(TAB)      &none            &none        &none
-            &kp LG(LEFT)  &kp LEFT      &kp DOWN      &kp RIGHT      &kp LG(RIGHT)  &none        &kp LSHFT        &kp LGUI     &kp LALT  &kp LCTRL
-&none       &kp LG(LEFT)  &kp LG(RIGHT) &none         &none          &none           &none        &none            &none        &none     &none     &none
-                                        &kp DEL       &kp LC(LS(TAB)) &kp LC(TAB)   &trans       &trans           &trans
+            &kp LG(LEFT)  &kp LA(LEFT)  &kp UP           &kp LA(RIGHT)      &kp LG(RIGHT)  &kp LS(TAB)     &swapper_mac    &none            &none            &kp LG(DE_LBKT)
+            &none         &kp LEFT      &kp DOWN         &kp RIGHT          &kp PG_UP      &mmv MOVE_LEFT  &mmv MOVE_UP    &mmv MOVE_DOWN   &mmv MOVE_RIGHT  &none
+&kp LGUI    &none         &kp LC(LS(TAB)) &kp LG(LS(DE_N4)) &kp LC(TAB)     &kp PG_DN      &msc SCRL_LEFT  &msc SCRL_UP    &msc SCRL_DOWN   &msc SCRL_RIGHT  &kp LG(DE_RBKT)  &kp LSHFT
+                                        &kp DEL          &mkp RCLK          &mkp LCLK      &none           &mkp MCLK       &tog NAV_LOCK
             >;
         };
 
         nav_win_layer {
             display-name = "NAV WIN";
             bindings = <
-            &trans        &kp LC(LEFT)  &trans        &kp LC(RIGHT)  &trans         &swapper_win &trans           &trans       &trans    &trans
-            &kp HOME      &trans        &trans        &trans         &kp END        &trans       &trans           &kp LCTRL    &trans    &kp LGUI
-&trans      &kp LA(LEFT)  &kp LA(RIGHT) &trans        &trans         &trans         &trans       &trans           &trans       &trans    &trans    &trans
-                                        &trans        &trans         &trans         &trans       &trans           &trans
+            &kp HOME      &kp LC(LEFT)  &trans           &kp LC(RIGHT)      &kp END        &trans          &swapper_win    &trans           &trans           &kp LA(LEFT)
+            &trans        &trans        &trans           &trans             &trans         &trans          &trans          &trans           &trans           &trans
+&kp LCTRL   &trans        &trans          &kp LG(LS(DEW_S))  &trans          &trans         &trans          &trans          &trans           &trans           &kp LA(RIGHT)    &trans
+                                        &trans           &trans             &trans         &trans          &trans          &trans
             >;
         };
 
@@ -391,14 +395,15 @@
             >;
         };
 
-        // NUM – tap the Num key for num-word, hold it for the layer. Numpad on the left hand.
+        // NUM – tap the Num key for num-word, hold it for the layer. Numpad on the left hand,
+        //   F-keys in the same pattern on the right (F7-F9 top, F4-F6 home, F1-F3 bottom, F10-F12 outer).
         //   Identical keycodes on macOS and Windows.
         num_layer {
             display-name = "NUM";
             bindings = <
-            &kp DE_STAR   &kp DE_N7  &kp DE_N8  &kp DE_N9  &kp DE_PLUS    &trans  &trans  &trans  &trans  &trans
-            &kp DE_SLASH  &kp DE_N4  &kp DE_N5  &kp DE_N6  &kp DE_MINUS   &trans  &trans  &trans  &trans  &trans
-&kp RET     &kp DE_DOT    &kp DE_N1  &kp DE_N2  &kp DE_N3  &kp DE_EQUAL   &trans  &trans  &trans  &trans  &trans  &trans
+            &kp DE_STAR   &kp DE_N7  &kp DE_N8  &kp DE_N9  &kp DE_PLUS    &none   &kp F7  &kp F8  &kp F9  &kp F10
+            &kp DE_SLASH  &kp DE_N4  &kp DE_N5  &kp DE_N6  &kp DE_MINUS   &none   &kp F4  &kp F5  &kp F6  &kp F11
+&kp RET     &kp DE_DOT    &kp DE_N1  &kp DE_N2  &kp DE_N3  &kp DE_EQUAL   &none   &kp F1  &kp F2  &kp F3  &kp F12  &none
                                      &kp BSPC   &kp DE_N0  &kp DE_COMMA   &trans  &trans  &trans
             >;
         };
@@ -414,48 +419,26 @@
             >;
         };
 
-        // SYS – hold pos 37 (right thumb, tucked). F-keys mirror the numpad; host keys Mac/Win, Bluetooth, media.
+        // SYS – hold pos 37 (right thumb, tucked). System only: host keys Mac/Win, Bluetooth, USB/BT.
+        //   Boot (bootloader) and Reset work on the half where they are pressed: left 0/20, right 9/31.
         sys_layer {
             display-name = "SYS";
             bindings = <
-            &kp F10  &kp F7   &kp F8  &kp F9  &kp LG(LS(DE_N5))  &host_mac     &host_win     &bt BT_SEL 2  &bt BT_SEL 3  &bootloader
-            &kp F11  &kp F4   &kp F5  &kp F6  &none              &kp C_PREV    &kp C_VOL_DN  &kp C_VOL_UP  &kp C_NEXT    &kp C_PP
-&none       &kp F12  &kp F1   &kp F2  &kp F3  &gif_mac           &none         &kp RA(F18)   &kp RA(F19)   &out OUT_TOG  &bt BT_CLR    &sys_reset
-                              &trans  &trans  &trans             &trans        &trans        &trans
+            &bootloader  &none  &none  &none  &none    &host_mac  &host_win  &bt BT_SEL 2  &bt BT_SEL 3  &bootloader
+            &none        &none  &none  &none  &none    &none      &none      &none         &none         &none
+&sys_reset  &none        &none  &none  &none  &none    &none      &none      &none         &out OUT_TOG  &bt BT_CLR    &sys_reset
+                                &trans &trans &trans   &trans     &trans     &trans
             >;
         };
 
+        // SYS WIN – empty; exists so the Windows combos stay active while SYS is held
         sys_win_layer {
             display-name = "SYS WIN";
             bindings = <
-            &trans   &trans   &trans  &trans  &kp PSCRN          &trans        &trans        &trans        &trans        &trans
-            &trans   &trans   &trans  &trans  &trans             &trans        &trans        &trans        &trans        &trans
-&trans      &trans   &trans   &trans  &trans  &gif_win           &trans        &trans        &trans        &trans        &trans        &trans
-                              &trans  &trans  &trans             &trans        &trans        &trans
-            >;
-        };
-
-        // MOUSE – smart-mouse: on with d+c (or NAV pos 20), off with any non-mouse key.
-        //   Clicks with the left hand while the right thumb moves the ball. No combos here.
-        //   Right half empty: those keys only turn the mouse layer off.
-        //   Back/Forward: macOS Cmd+[ / Cmd+], Windows Alt+Left / Alt+Right.
-        mouse_layer {
-            display-name = "MOUSE";
-            bindings = <
-            &none       &kp LG(DE_LBKT) &mkp MCLK       &kp LG(DE_RBKT)  &none        &none   &none   &none   &none   &none
-            &kp LGUI    &mkp RCLK       &msc SCRL_UP    &mkp LCLK        &kp LSHFT    &none   &none   &none   &none   &none
-&none       &none       &msc SCRL_LEFT  &msc SCRL_DOWN  &msc SCRL_RIGHT  &none        &none   &none   &none   &none   &none   &none
-                                        &trans          &trans           &trans       &trans  &trans  &trans
-            >;
-        };
-
-        mouse_win_layer {
-            display-name = "MOUSE WIN";
-            bindings = <
-            &trans      &kp LA(LEFT)    &trans          &kp LA(RIGHT)           &trans       &trans  &trans  &trans  &trans  &trans
-            &kp LCTRL   &trans          &trans          &trans           &trans       &trans  &trans  &trans  &trans  &trans
-&trans      &trans      &trans          &trans          &trans           &trans       &trans  &trans  &trans  &trans  &trans  &trans
-                                        &trans          &trans           &trans       &trans  &trans  &trans
+            &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+            &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans
+&trans      &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
+                            &trans  &trans  &trans    &trans  &trans  &trans
             >;
         };
     };

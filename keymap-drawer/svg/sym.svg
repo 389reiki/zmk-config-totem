@@ -153,10 +153,6 @@ rect.key.held.trig-SYM { stroke-width: 4; }
 rect.key.trig-NUM { fill: #BA7517; fill-opacity: .45; stroke: #BA7517; }
 rect.key.held.trig-NUM { stroke-width: 4; }
 
-.layer-MOUSE rect.key.lay { fill: #D4537E; fill-opacity: .22; stroke: #D4537E; }
-rect.key.trig-MOUSE { fill: #D4537E; fill-opacity: .45; stroke: #D4537E; }
-rect.key.held.trig-MOUSE { stroke-width: 4; }
-
 .layer-SYS rect.key.lay { fill: #888780; fill-opacity: .22; stroke: #888780; }
 rect.key.trig-SYS { fill: #888780; fill-opacity: .45; stroke: #888780; }
 rect.key.held.trig-SYS { stroke-width: 4; }

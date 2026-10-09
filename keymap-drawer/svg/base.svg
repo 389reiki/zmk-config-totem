@@ -153,10 +153,6 @@ rect.key.held.trig-SYM { stroke-width: 4; }
 rect.key.trig-NUM { fill: #BA7517; fill-opacity: .45; stroke: #BA7517; }
 rect.key.held.trig-NUM { stroke-width: 4; }
 
-.layer-MOUSE rect.key.lay { fill: #D4537E; fill-opacity: .22; stroke: #D4537E; }
-rect.key.trig-MOUSE { fill: #D4537E; fill-opacity: .45; stroke: #D4537E; }
-rect.key.held.trig-MOUSE { stroke-width: 4; }
-
 .layer-SYS rect.key.lay { fill: #888780; fill-opacity: .22; stroke: #888780; }
 rect.key.trig-SYS { fill: #888780; fill-opacity: .45; stroke: #888780; }
 rect.key.held.trig-SYS { stroke-width: 4; }
@@ -349,26 +345,42 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 <text x="605" y="104" class="combo combo tap">↵</text>
 </g>
 <g class="combo combo combopos-3">
-<rect rx="6" ry="6" x="558" y="31" width="36" height="22" class="combo combo"/>
-<text x="576" y="42" class="combo combo tap">Maus</text>
+<rect rx="6" ry="6" x="502" y="49" width="36" height="22" class="combo combo"/>
+<text x="520" y="60" class="combo combo tap">⏮︎</text>
+<text x="520" y="69" class="combo combo hold"><tspan style="font-size: 62%">Titel z…</tspan></text>
 </g>
 <g class="combo combo combopos-4">
+<rect rx="6" ry="6" x="681" y="76" width="36" height="22" class="combo combo"/>
+<text x="699" y="87" class="combo combo tap">⏭︎</text>
+<text x="699" y="96" class="combo combo hold"><tspan style="font-size: 62%">Titel v…</tspan></text>
+</g>
+<g class="combo combo combopos-5">
+<rect rx="6" ry="6" x="44" y="205" width="36" height="22" class="combo combo"/>
+<text x="62" y="216" class="combo combo tap"><tspan style="font-size: 83%">Leiser</tspan></text>
+<text x="62" y="225" class="combo combo hold"><tspan style="font-size: 62%">Lautstä…</tspan></text>
+</g>
+<g class="combo combo combopos-6">
+<rect rx="6" ry="6" x="724" y="205" width="36" height="22" class="combo combo"/>
+<text x="742" y="216" class="combo combo tap"><tspan style="font-size: 83%">Lauter</tspan></text>
+<text x="742" y="225" class="combo combo hold"><tspan style="font-size: 62%">Lautstä…</tspan></text>
+</g>
+<g class="combo combo combopos-7">
 <rect rx="6" ry="6" x="100" y="187" width="36" height="22" class="combo combo"/>
 <text x="118" y="198" class="combo combo tap">Undo</text>
 </g>
-<g class="combo combo combopos-5">
+<g class="combo combo combopos-8">
 <rect rx="6" ry="6" x="154" y="146" width="36" height="22" class="combo combo"/>
 <text x="172" y="157" class="combo combo tap">Cut</text>
 </g>
-<g class="combo combo combopos-6">
+<g class="combo combo combopos-9">
 <rect rx="6" ry="6" x="210" y="143" width="36" height="22" class="combo combo"/>
 <text x="228" y="154" class="combo combo tap">Copy</text>
 </g>
-<g class="combo combo combopos-7">
+<g class="combo combo combopos-10">
 <rect rx="6" ry="6" x="266" y="161" width="36" height="22" class="combo combo"/>
 <text x="284" y="172" class="combo combo tap">Paste</text>
 </g>
-<g class="combo combo combopos-8">
+<g class="combo combo combopos-11">
 <rect rx="6" ry="6" x="668" y="187" width="36" height="22" class="combo combo"/>
 <text x="686" y="198" class="combo combo tap">Redo</text>
 </g>

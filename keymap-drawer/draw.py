@@ -13,7 +13,7 @@ What it does:
      Modifier labels read "Mac/Windows", e.g. Cmd/Ctrl. Which key opens which layer is read from
      the keymap itself, so moving keys needs no change in this file.
   4. Draws with the real TOTEM geometry (totem_layout.json, from docs/images/TOTEM_layout.svg)
-     and the layer colours: Nav blue, Sym green, Num amber, Mouse pink, Sys grey, combos purple.
+     and the layer colours: Nav blue, Sym green, Num amber, Sys grey, combos purple.
 """
 import re
 import subprocess
@@ -30,36 +30,32 @@ HERE = ROOT / "keymap-drawer"
 OUT = HERE / "svg"
 TMP = HERE / ".tmp"
 
-MAC_LAYERS = ["BASE", "NAV", "SYM", "NUM", "SYS", "MOUSE"]
-COLOR = {"NAV": "#378ADD", "SYM": "#1D9E75", "NUM": "#BA7517", "MOUSE": "#D4537E", "SYS": "#888780"}
+MAC_LAYERS = ["BASE", "NAV", "SYM", "NUM", "SYS"]
+COLOR = {"NAV": "#378ADD", "SYM": "#1D9E75", "NUM": "#BA7517", "SYS": "#888780"}
+# flag layers that switch a visible layer on (Space holds NAV_HOLD, which turns NAV on)
+ALIAS = {"NAV_HOLD": "NAV"}
 COMBO = "#7F77DD"
 
 # Mac/Windows modifier names
 MODS = {"LGUI": "Cmd/Ctrl", "LALT": "Opt/Alt", "LCTRL": "Ctrl/Win", "LSHFT": "Shift"}
-# On the MOUSE layer the left modifier is "add to selection": Cmd+click / Ctrl+click
-MOUSE_MOD = "Cmd/Ctrl"
 
 # Labels for bindings whose keystroke alone does not say what they do (macOS keystrokes)
 RAW = {
     "&bspc_del": {"t": "⌫", "s": "Del"},
     "&bsw LA(BSPC) 0": {"t": "⌫", "s": "⇧ Del", "h": "Wort ⌫"},
     "&swapper_mac": "App ⇄",
-    "&smart_mouse": "Maus",
     "&sqt_dqt": {"t": "'", "s": '"'},
     "&tilde_mac": "~",
     "&caret_mac": "^",
-    "&gif_mac": "@gif",
     "&host_mac": {"t": "Mac", "s": "BT 0"},
     "&host_win": {"t": "Win", "s": "BT 1"},
     "&sk LSHFT": {"t": "Shift", "s": "1×"},
     "&sym_key SYM SYM": {"t": "Sym 1×", "h": "Sym"},
     "&num_key NUM NUM": {"t": "NumWord", "h": "Num"},
-    "&lt_spc NAV SPACE": {"t": "␣", "h": "Nav"},
-    "&tog MOUSE": "Mouse",
+    "&lt_spc NAV_HOLD SPACE": {"t": "␣", "h": "Nav"},
+    "&tog NAV_LOCK": {"t": "Nav fest", "h": "an/aus"},
     "&mo SYS": {"t": "Sys", "h": "halten"},
-    "&kp LG(LS(DE_N5))": "Shot",
-    "&kp RA(F18)": "Mail 1",
-    "&kp RA(F19)": "Mail 2",
+    "&kp LG(LS(DE_N4))": "Scrnsht",
     "&kp LG(TAB)": "App ⇄",
     "&kp LC(LS(TAB))": "Tab ←",
     "&kp LC(TAB)": "Tab →",
@@ -91,6 +87,10 @@ RAW = {
     "&kp LG(DE_RBKT)": "Vor",
     "&kp LS(TAB)": "App ⇠",
     "&mkp MB5": "Fwd",
+    "&mmv MOVE_LEFT": "Maus ←",
+    "&mmv MOVE_UP": "Maus ↑",
+    "&mmv MOVE_DOWN": "Maus ↓",
+    "&mmv MOVE_RIGHT": "Maus →",
     "&msc SCRL_UP": "Scroll ↑",
     "&msc SCRL_DOWN": "Scroll ↓",
     "&msc SCRL_LEFT": "Scroll ←",
@@ -119,8 +119,9 @@ def layer_keys(km):
             parts = b.split()
             if parts[0] in ("&host_mac", "&host_win"):
                 continue
+            args = [ALIAS.get(a, a) for a in parts[1:]]
             for target in COLOR:
-                if target in parts[1:]:
+                if target in args:
                     trig[(lay, pos)] = target
     held = {}
     for target in COLOR:
@@ -216,8 +217,6 @@ def main():
                 k["t"] = BY_WIN_TWIN[twin]
             if name == "BASE" and raw in BASE_SHIFTED:   # show the Shift variant of , . on the base layer
                 k["s"] = BASE_SHIFTED[raw]
-            if name == "MOUSE" and k.get("t") == MODS["LGUI"]:
-                k["t"] = MOUSE_MOD
             types = set(str(k.get("type", "")).split())
             if name != "BASE" and "trans" not in types and k.get("t") not in ("", None):
                 types.add("lay")

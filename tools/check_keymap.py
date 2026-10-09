@@ -28,18 +28,19 @@ EQUIVALENT = {
     "&kp LG(RIGHT)": {"&kp END", "&kp LA(RIGHT)"},       # line end / browser forward
     "&kp LG(TAB)": {"&kp LA(TAB)"},                      # switch app
     "&kp LA(BSPC)": {"&kp LC(BSPC)"},                    # delete word
-    "&kp LG(LS(⟨5⟩))": {"&kp PSCRN"},                    # screenshot
+    "&kp LG(LS(⟨4⟩))": {"&kp LG(LS(⟨s⟩))"},             # screenshot of an area (Win+Shift+S)
     "&kp LG(LS(⟨z⟩))": {"&kp LC(⟨y⟩)", "&kp LC(LS(⟨z⟩))"},  # redo
-    "&gif_mac": {"&gif_win"},
     "&tilde_mac": {"&kp ⟨~⟩"},
     "&caret_mac": {"&caret_win"},
     "&bsw LA(BSPC) 0": {"&bsw LC(BSPC) 0"},              # Backspace key, hold = delete word
     "&swapper_mac": {"&swapper_win"},                    # Cmd-Tab / Alt-Tab swapper
-    "&kp LG(⟨[⟩)": {"&kp LA(LEFT)"},                    # back (mouse layer)
-    "&kp LG(⟨]⟩)": {"&kp LA(RIGHT)"},                   # forward (mouse layer)
+    "&kp LG(⟨[⟩)": {"&kp LA(LEFT)"},                    # browser back
+    "&kp LG(⟨]⟩)": {"&kp LA(RIGHT)"},                   # browser forward
 }
 # Keys that do the same on both systems even though their name ends in _mac
-NEUTRAL = {"&host_mac", "&host_win", "&smart_mouse"}
+NEUTRAL = {"&host_mac", "&host_win"}
+# Flag layers (all &trans, only switch other layers on): no Windows twin needed
+FLAG_LAYERS = {"NAV HOLD", "NAV LOCK"}
 SWAP_MODS = {"LGUI": "LCTRL", "LCTRL": "LGUI", "RGUI": "RCTRL", "RCTRL": "RGUI"}
 
 
@@ -85,7 +86,8 @@ def main():
     if errors:
         return report(errors)
 
-    pairs = [("BASE", "WIN")] + [(n, n + " WIN") for n in layers if not n.endswith("WIN") and n != "BASE"]
+    pairs = [("BASE", "WIN")] + [(n, n + " WIN") for n in layers
+                                 if not n.endswith("WIN") and n != "BASE" and n not in FLAG_LAYERS]
     for mac, win in pairs:
         if win not in layers:
             errors.append(f"Layer {mac} has no Windows twin '{win}'.")

@@ -20,9 +20,11 @@ TOTEM is a 38 key column-staggered split keyboard running [ZMK](https://zmk.dev/
 ## Diese Konfiguration (Kurzfassung)
 
 - Firmware: ZMK **v0.3** (fest eingestellt in `config/west.yml` und `.github/workflows/build.yml`), Modul urob/zmk-auto-layer v0.3 für Num-Word.
-- Belegung: `config/totem.keymap` (anymak:END-Variante, Home-Row-Mods, Combos, Ebenen BASE/NAV/SYM/NUM/SYS/MOUSE).
+- Belegung: `config/totem.keymap` (anymak:END-Variante, Home-Row-Mods, Combos, Ebenen BASE/NAV/SYM/NUM/SYS).
 - **Daumen:** links Backspace | Shift | Sym, rechts Num | Leertaste/Nav | Sys (halten). Enter nur noch als Kombo t + r + n (und auf Num). Backspace: antippen = ⌫ (mit Shift: Entf), halten = Wort löschen, antippen und dann halten = ⌫ wiederholt.
-- **Kombos:** Enter = t + r + n, Maus-Ebene an = d + c, Esc = q + ä, Tab = ä + o, Zwischenablage auf der unteren Reihe links. Auf der Maus-Ebene gelten keine Kombos.
+- **Kombos:** Enter = t + r + n (Basis, Nav, Num), Esc = q + ä, Tab = ä + o, Zwischenablage auf der unteren Reihe links. Medien (Basis und Nav): v + d Titel zurück, l + x Titel vor, ü + k leiser, f + j lauter.
+- **Nav:** Pfeile, Home/End, PgUp/PgDn links; Maus rechts (Zeiger auf der Grundreihe, Scrollen darunter), Klicks mit dem linken Daumen (33 rechts, 34 links). **Nav fest:** Space halten, Position 37 tippen; nochmal 37 = aus. Klick M (36) nur dann.
+- **Num:** Ziffernblock links, F-Tasten im gleichen Muster rechts. **Sys:** nur Mac/Win, Bluetooth, USB/BT, Boot/Reset je Hälfte.
 - **Zwei Rechner, eine Belegung:** macOS ist Standard (Bluetooth-Profil 0), Windows ist ein Overlay (Profil 1). Jede Funktion liegt auf beiden Systemen auf derselben Taste.
   - Umschalten: rechte äußere Daumentaste halten (SYS-Ebene), dann **Mac** (rechte Hand, obere Reihe, innen) oder **Win** (daneben).
   - Nach dem Ausschalten startet die Tastatur im Mac-Modus.
@@ -31,12 +33,12 @@ TOTEM is a 38 key column-staggered split keyboard running [ZMK](https://zmk.dev/
 
 ## Belegung
 
-Die Bilder werden bei jedem Hochladen automatisch neu gezeichnet (`keymap-drawer/draw.py`). Beschriftung von Modifiern: Mac/Windows, z. B. `Cmd/Ctrl`. Farben: Nav blau, Sym grün, Num gelb, Mouse rosa, Sys grau, Combos lila; ein dicker Rand zeigt die Taste, die die Ebene öffnet.
+Die Bilder werden bei jedem Hochladen automatisch neu gezeichnet (`keymap-drawer/draw.py`). Beschriftung von Modifiern: Mac/Windows, z. B. `Cmd/Ctrl`. Farben: Nav blau, Sym grün, Num gelb, Sys grau, Combos lila; ein dicker Rand zeigt die Taste, die die Ebene öffnet.
 
 ### Base
 ![Base](keymap-drawer/svg/base.svg)
 
-### Nav (Leertaste halten)
+### Nav (Leertaste halten, oder fest mit Position 37)
 ![Nav](keymap-drawer/svg/nav.svg)
 
 ### Sym
@@ -47,9 +49,6 @@ Die Bilder werden bei jedem Hochladen automatisch neu gezeichnet (`keymap-drawer
 
 ### Sys (rechte äußere Daumentaste halten)
 ![Sys](keymap-drawer/svg/sys.svg)
-
-### Mouse (d + c gleichzeitig; jede andere Taste schaltet sie wieder aus)
-![Mouse](keymap-drawer/svg/mouse.svg)
 
 ## Planer (Tasten per Drag & Drop umplanen)
 
