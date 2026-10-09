@@ -47,7 +47,7 @@ SECOND = {"&bspc_del": "⇧ Del", "&sqt_dqt": '⇧ "', "&kp LG(DE_LBKT)": "Cmd+[
 # Shift variants shown on the base layer only (they are not on SYM)
 BASE_SHIFTED = {"&kp DE_COMMA": "⇧ ;", "&kp DE_DOT": "⇧ :"}
 # keys whose macOS keystroke is ambiguous: named after their Windows twin (as in the diagrams)
-BY_WIN_TWIN = {"&kp HOME": "Zeile ⇤", "&kp END": "Zeile ⇥", "&kp LA(LEFT)": "Zurück", "&kp LA(RIGHT)": "Vor"}
+BY_WIN_TWIN = {"&kp HOME": "Home", "&kp END": "End", "&kp LA(LEFT)": "Zurück", "&kp LA(RIGHT)": "Vor"}
 
 
 def key_name(k):
