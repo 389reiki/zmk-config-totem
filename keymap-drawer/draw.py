@@ -95,11 +95,11 @@ RAW = {
     "&msc SCRL_DOWN": "Scroll ↓",
     "&msc SCRL_LEFT": "Scroll ←",
     "&msc SCRL_RIGHT": "Scroll →",
-    "&kp C_PP": "Play",
-    "&kp C_PREV": "Prev",
-    "&kp C_NEXT": "Next",
-    "&kp C_VOL_UP": "Vol +",
-    "&kp C_VOL_DN": "Vol −",
+    "&kp C_PP": {"t": "⏯\ufe0e", "h": "Play/Pause"},
+    "&kp C_PREV": {"t": "⏮\ufe0e", "h": "Titel zurück"},
+    "&kp C_NEXT": {"t": "⏭\ufe0e", "h": "Titel vor"},
+    "&kp C_VOL_UP": {"t": "Lauter", "h": "Lautstärke"},
+    "&kp C_VOL_DN": {"t": "Leiser", "h": "Lautstärke"},
     "&sys_reset": "Reset",
 }
 # Same keystroke on the Mac, different job: named after the Windows twin key (nav_win_layer)

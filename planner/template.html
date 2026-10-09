@@ -15,6 +15,7 @@
   --focus: #2c5bd6;
   --base: #5b6178; --nav: #378ADD; --sym: #1D9E75; --num: #BA7517; --sys: #7d7c78; --mouse: #D4537E;
   --combo: #7F77DD;
+  --media: #e9e1f5;
   --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --cap: #e2e3e7;
@@ -91,6 +92,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px
 .key.none { background: #f0f1f4; }
 .key.opens { background: var(--oc); }
 .key.opens .t, .key.opens .h, .key.opens .s { color: #fff; }
+.key.media { background: var(--media); }
+.key.media .h { color: #6b5a86; }
 .key.mc { box-shadow: inset 0 calc(var(--u) * -.07) 0 var(--mouse); }
 .key.held { background: var(--hc); }
 .key.held .t, .key.held .h { color: #fff; }
@@ -349,6 +352,8 @@ __IDEAS__
     if (raw === '&swapper_mac') return 'App-Wechsel: mehrmals tippen geht App für App weiter, Cmd bleibt gehalten, bis du Nav loslässt.';
     if (raw === '&kp LS(TAB)') return 'Beim App-Wechsel eine App zurück.';
     if (raw === '&smart_mouse') return 'Maus-Ebene an. Jede Taste, die nicht zur Maus gehört, schaltet sie wieder aus.';
+    const MEDIA = { 'C_PP': 'Medien: Wiedergabe starten oder pausieren.', 'C_PREV': 'Medien: vorheriger Titel.', 'C_NEXT': 'Medien: nächster Titel.', 'C_VOL_UP': 'Medien: lauter.', 'C_VOL_DN': 'Medien: leiser.' };
+    const mk = raw.replace(/^&kp /, ''); if (MEDIA[mk]) return MEDIA[mk];
     if (raw === '&host_mac') return 'Auf den Mac umschalten (Bluetooth-Profil 0).';
     if (raw === '&host_win') return 'Auf Windows umschalten (Bluetooth-Profil 1).';
     let s = 'Tippen: ' + (p.t || label(k));
@@ -385,6 +390,7 @@ __IDEAS__
       if (g.r) el.style.transform = 'rotate(' + g.r + 'deg)';
       const p = parts(k, pos);
       if (k.trans) el.classList.add('trans'); else if (k.none) el.classList.add('none');
+      if (/^&kp C_/.test(k.raw || '')) el.classList.add('media');
       const op = opensLayer(k);
       if (op && L === 'BASE') { el.classList.add('opens'); el.style.setProperty('--oc', COLOR[op]); }
       const isHeld = held.includes(pos) && L !== 'BASE';

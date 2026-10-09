@@ -919,27 +919,28 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 </g>
 <g transform="translate(492, 121)" class="key lay keypos-15">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">Prev</text>
+<text x="0" y="0" class="key lay tap">⏮︎</text>
+<text x="0" y="24" class="key lay hold"><tspan style="font-size: 62%">Titel z…</tspan></text>
 </g>
 <g transform="translate(548, 112)" class="key lay keypos-16">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">
-<tspan x="0" dy="-0.6em">Vol</tspan><tspan x="0" dy="1.2em">−</tspan>
-</text>
+<text x="0" y="0" class="key lay tap"><tspan style="font-size: 83%">Leiser</tspan></text>
+<text x="0" y="24" class="key lay hold"><tspan style="font-size: 62%">Lautstä…</tspan></text>
 </g>
 <g transform="translate(604, 84)" class="key lay keypos-17">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">
-<tspan x="0" dy="-0.6em">Vol</tspan><tspan x="0" dy="1.2em">+</tspan>
-</text>
+<text x="0" y="0" class="key lay tap"><tspan style="font-size: 83%">Lauter</tspan></text>
+<text x="0" y="24" class="key lay hold"><tspan style="font-size: 62%">Lautstä…</tspan></text>
 </g>
 <g transform="translate(664, 117) rotate(4.0)" class="key lay keypos-18">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">Next</text>
+<text x="0" y="0" class="key lay tap">⏭︎</text>
+<text x="0" y="24" class="key lay hold"><tspan style="font-size: 62%">Titel v…</tspan></text>
 </g>
 <g transform="translate(722, 168) rotate(10.0)" class="key lay keypos-19">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">Play</text>
+<text x="0" y="0" class="key lay tap">⏯︎</text>
+<text x="0" y="24" class="key lay hold"><tspan style="font-size: 62%">Play/Pa…</tspan></text>
 </g>
 <g transform="translate(32, 209) rotate(-10.0)" class="key keypos-20">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>

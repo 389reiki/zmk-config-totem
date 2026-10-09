@@ -24,6 +24,7 @@ TEMPLATE = ROOT / "planner" / "template.html"
 OUT = ROOT / "planner" / "totem-planer.html"
 GEOMETRY = ROOT / "keymap-drawer" / "totem_layout.json"
 IDEAS = ROOT / "docs" / "ideen.md"
+PLANNED = ROOT / "docs" / "vorgemerkt.md"
 LAYERS = ["BASE", "NAV", "SYM", "NUM", "SYS", "MOUSE"]
 
 # labels from the diagram script (DE_* characters and special bindings)
@@ -132,7 +133,9 @@ def main():
     km = read_keymap()
     layers = {l[1]: l[2] for l in km["layers"]}
     data = {"geometry": json.loads(GEOMETRY.read_text(encoding="utf-8"))["layouts"]["LAYOUT"]["layout"],
-            "layers": [], "combos": [], "planned": []}
+            "layers": [], "combos": [],
+            "planned": [l[2:].strip() for l in PLANNED.read_text(encoding="utf-8").splitlines()
+                        if l.startswith("- ")] if PLANNED.exists() else []}
     for name in LAYERS:
         keys = []
         for pos, b in enumerate(layers[name]):
