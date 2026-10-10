@@ -185,7 +185,7 @@ textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(-
 
 <div class="app">
   <header class="top">
-    <div class="brand"><h1>Totem Planer Okt 2026</h1><span class="stand">Keymap-Stand 09.10.2026 18:52 · macOS-Sicht</span></div>
+    <div class="brand"><h1>Totem Planer Okt 2026</h1><span class="stand">Keymap-Stand 09.10.2026 15:45 · macOS-Sicht</span></div>
     <div class="views" role="group" aria-label="Ansicht">
       <button type="button" data-view="layers">Ebenen</button>
       <button type="button" data-view="overview">Übersicht</button>
@@ -231,6 +231,16 @@ textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(-
 <li><strong>Kosten:</strong> ß erscheint erst nach der Haltezeit (ca. 0,2 s). Wer beim langsamen Tippen auf der Taste liegen bleibt, bekommt ß statt des Buchstabens.</li>
 <li><strong>Heute:</strong> ß über Sym halten + Position 19 (unter <code>s</code>). Das bliebe auch mit der neuen Lösung erhalten.</li>
 <li><strong>Technik in ZMK:</strong> Hold-Tap mit <code>flavor = "tap-preferred"</code>, <code>tapping-term-ms</code> um 200, Bindings <code>&lt;&amp;kp&gt;, &lt;&amp;kp&gt;</code>, z. B. <code>&amp;ht DE_SZ DE_Z</code> (Mac) bzw. <code>DEW_SZ DEW_Z</code> (Windows-Zwilling).</li>
+</ul>
+<h3>Eigene Tastennutzung messen, bevor Sym umgebaut wird</h3>
+<p><em>Notiert am 10.10.2026 · Quelle: [Justin Lam, "Optimizing my symbols layer"](https://www.justinmklam.com/posts/2025/07/optimizing-symbols-layer/)</em></p>
+<ul>
+<li><strong>Idee:</strong> Eine Woche lang auf dem Mac zählen, wie oft jedes Zeichen und jede Taste gedrückt wird. Danach die häufigsten Symbole auf die Grundreihe von Sym legen, seltene nach unten oder außen.</li>
+<li><strong>Warum:</strong> Sym ist bisher nach Gefühl und Klammerpaaren sortiert, nicht nach eigenen Daten.</li>
+<li><strong>Technik:</strong> kleines Python-Skript mit <code>pynput</code>, das nur Zähler pro Taste speichert (JSON), keine Reihenfolge. So landen keine Passwörter oder Texte in der Datei.</li>
+<li><strong>Voraussetzung:</strong> macOS-Freigabe unter Datenschutz &amp; Sicherheit → Bedienungshilfen bzw. Eingabeüberwachung für das Terminal. Auf dem Windows-Firmen-Laptop nicht möglich (keine Admin-Rechte).</li>
+<li><strong>Grenze:</strong> Die Zählung sieht die gesendeten Zeichen, nicht die Ebene. Kombos und Halte-Tasten muss man beim Auswerten selbst zuordnen.</li>
+<li><strong>Nicht übernommen aus dem Artikel:</strong> getrennte Tasten für ' und " (bei dir Shift+'), Klammern als Kombos auf Basis (konkurrieren mit den Zwischenablage-Kombos), seine konkrete Belegung (US-Layout, vim, Python).</li>
 </ul>
     <p class="ideas-src">Quelle: <code>docs/ideen.md</code> im Repo. Neue Ideen sammelt Claude dort.</p>
   </article>
@@ -605,7 +615,7 @@ textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(-
     fillList($('planned'), DATA.planned || [], 'Nichts. Alles Besprochene ist in der Firmware.');
   }
   function exportText() {
-    let s = 'Totem-Planer: Änderungswünsche\n(Positionen wie in totem.keymap, macOS-Sicht; Windows-Zwillinge bitte mitziehen)\nAusgangsbasis: Keymap-Stand 09.10.2026 18:52\n';
+    let s = 'Totem-Planer: Änderungswünsche\n(Positionen wie in totem.keymap, macOS-Sicht; Windows-Zwillinge bitte mitziehen)\nAusgangsbasis: Keymap-Stand 09.10.2026 15:45\n';
     if ((DATA.planned || []).length) s += '\nBereits vorgemerkt:\n' + DATA.planned.map(x => '- ' + x).join('\n') + '\n';
     const lines = changeLines();
     s += '\nNeue Änderungen:\n' + (lines.length ? lines.map(x => '- ' + x).join('\n') : '- keine') + '\n';
