@@ -23,3 +23,26 @@ Diese Datei ist die Quelle; der Planer zeigt sie im Reiter "Ideen".
 - **Voraussetzung:** macOS-Freigabe unter Datenschutz & Sicherheit → Bedienungshilfen bzw. Eingabeüberwachung für das Terminal. Auf dem Windows-Firmen-Laptop nicht möglich (keine Admin-Rechte).
 - **Grenze:** Die Zählung sieht die gesendeten Zeichen, nicht die Ebene. Kombos und Halte-Tasten muss man beim Auswerten selbst zuordnen.
 - **Nicht übernommen aus dem Artikel:** getrennte Tasten für ' und " (bei dir Shift+'), Klammern als Kombos auf Basis (konkurrieren mit den Zwischenablage-Kombos), seine konkrete Belegung (US-Layout, vim, Python).
+
+## Enter auf die Sys-Taste (Antippen)
+*Notiert am 10.10.2026 · aus dem Keymap-Audit*
+
+- **Idee:** Position 37 (rechter Daumen, eingezogen): antippen = Enter, halten = Sys. Heute passiert beim Antippen nichts.
+- **Warum:** Enter gibt es sonst nur als Kombo t+r+n (mit kurzer Pause davor) und auf Num 20. Enter ist eine der häufigsten Tasten.
+- **Risiko:** 37 kurz halten und ohne weitere Taste loslassen sendet Enter, z. B. eine Chat-Nachricht. Gegenmittel: hold-preferred, dann kommt nach Ablauf der Haltezeit gar nichts.
+- **Technik:** Hold-Tap `<&mo>, <&kp>` mit `flavor = "hold-preferred"`, z. B. `&lt_ret SYS RET`. Kein Windows-Zwilling nötig.
+
+## Schreibtische wechseln (Mac Spaces / Windows virtuelle Desktops)
+*Notiert am 10.10.2026 · aus dem Keymap-Audit*
+
+- **Was:** Beide Systeme können mehrere Bildschirm-Arbeitsflächen nebeneinander halten, z. B. Mails auf der einen, Teams auf der anderen. Man wischt per Tastenkürzel hin und her.
+- **Mac (Spaces):** Ctrl+← / Ctrl+→ wechselt, Ctrl+↑ zeigt Mission Control.
+- **Windows (virtuelle Desktops):** Win+Ctrl+← / Win+Ctrl+→ wechselt, Win+Ctrl+D legt einen neuen an, Win+Tab zeigt die Übersicht.
+- **Auf dem TOTEM:** Auf Nav ist Ctrl nicht erreichbar (Nav überdeckt die Home-Row-Mods). Zwei Tasten auf Nav würden reichen, z. B. auf freien Plätzen (10, 19, 21, 35).
+
+## Space-Nav beim schnellen Tippen beobachten
+*Notiert am 10.10.2026 · aus dem Keymap-Audit*
+
+- **Symptom, auf das zu achten ist:** Beim schnellen Rollen über Space in den nächsten Buchstaben kommt ein Pfeil oder eine Nav-Funktion statt Leerzeichen + Buchstabe.
+- **Ursache:** Space ist Hold-Tap `balanced`: wird während des Haltens eine andere Taste gedrückt und losgelassen, gilt Space als gehalten (Nav).
+- **Mögliche Abhilfe, erst wenn es passiert:** `hold-trigger-key-positions` auf die linke Hand (Nav-Tasten liegen links) und `hold-trigger-on-release`, oder längere Haltezeit.
