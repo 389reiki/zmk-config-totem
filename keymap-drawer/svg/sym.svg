@@ -162,15 +162,15 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 <g transform="translate(0, 56)">
 <g transform="translate(73, 113) rotate(-10.0)" class="key lay keypos-0">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">!</text>
+<text x="0" y="0" class="key lay tap">{</text>
 </g>
 <g transform="translate(136, 62) rotate(-4.0)" class="key lay keypos-1">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">@</text>
+<text x="0" y="0" class="key lay tap">&amp;</text>
 </g>
 <g transform="translate(200, 28)" class="key lay keypos-2">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">?</text>
+<text x="0" y="0" class="key lay tap">\</text>
 </g>
 <g transform="translate(256, 56)" class="key lay keypos-3">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
@@ -182,7 +182,7 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 </g>
 <g transform="translate(492, 65)" class="key lay keypos-5">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">_</text>
+<text x="0" y="0" class="key lay tap">~</text>
 </g>
 <g transform="translate(548, 56)" class="key lay keypos-6">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
@@ -194,11 +194,11 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 </g>
 <g transform="translate(668, 62) rotate(4.0)" class="key lay keypos-8">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">*</text>
+<text x="0" y="0" class="key lay tap">_</text>
 </g>
 <g transform="translate(731, 113) rotate(10.0)" class="key lay keypos-9">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">~</text>
+<text x="0" y="0" class="key lay tap">}</text>
 </g>
 <g transform="translate(83, 168) rotate(-10.0)" class="key lay keypos-10">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
@@ -206,7 +206,7 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 </g>
 <g transform="translate(140, 117) rotate(-4.0)" class="key lay keypos-11">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">&amp;</text>
+<text x="0" y="0" class="key lay tap">@</text>
 </g>
 <g transform="translate(200, 84)" class="key lay keypos-12">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
@@ -214,7 +214,7 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 </g>
 <g transform="translate(256, 112)" class="key lay keypos-13">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">{</text>
+<text x="0" y="0" class="key lay tap">!</text>
 </g>
 <g transform="translate(312, 121)" class="key lay keypos-14">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
@@ -226,7 +226,7 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 </g>
 <g transform="translate(548, 112)" class="key lay keypos-16">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">}</text>
+<text x="0" y="0" class="key lay tap">?</text>
 </g>
 <g transform="translate(604, 84)" class="key lay keypos-17">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
@@ -234,7 +234,7 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 </g>
 <g transform="translate(664, 117) rotate(4.0)" class="key lay keypos-18">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">|</text>
+<text x="0" y="0" class="key lay tap">*</text>
 </g>
 <g transform="translate(722, 168) rotate(10.0)" class="key lay keypos-19">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
@@ -247,12 +247,13 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
 <text x="0" y="0" class="key lay tap">°</text>
 </g>
-<g transform="translate(144, 173) rotate(-4.0)" class="key keypos-22">
-<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
+<g transform="translate(144, 173) rotate(-4.0)" class="key lay keypos-22">
+<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
+<text x="0" y="0" class="key lay tap">§</text>
 </g>
 <g transform="translate(200, 140)" class="key lay keypos-23">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">/</text>
+<text x="0" y="0" class="key lay tap">|</text>
 </g>
 <g transform="translate(256, 168)" class="key lay keypos-24">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
@@ -272,10 +273,11 @@ rect.key.held.trig-SYS { stroke-width: 4; }
 </g>
 <g transform="translate(604, 140)" class="key lay keypos-28">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
-<text x="0" y="0" class="key lay tap">\</text>
+<text x="0" y="0" class="key lay tap">/</text>
 </g>
-<g transform="translate(660, 173) rotate(4.0)" class="key keypos-29">
-<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
+<g transform="translate(660, 173) rotate(4.0)" class="key lay keypos-29">
+<rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>
+<text x="0" y="0" class="key lay tap">`</text>
 </g>
 <g transform="translate(712, 223) rotate(10.0)" class="key lay keypos-30">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key lay"/>

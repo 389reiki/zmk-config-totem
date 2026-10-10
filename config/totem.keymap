@@ -55,13 +55,9 @@
 #define SYM       6
 #define SYM_WIN   7   // conditional: SYM + WIN
 #define NUM       8
-#define NUM_WIN   9   // conditional: NUM + WIN (empty, only keeps the Windows combos active)
+#define NUM_WIN   9   // conditional: NUM + WIN (empty: NUM is identical on both systems)
 #define SYS       10  // hold base pos 37
-#define SYS_WIN   11  // conditional: SYS + WIN (empty, only keeps the Windows combos active)
-
-// Combos are active on these layers
-#define MAC_LAYERS BASE NAV SYM NUM SYS
-#define WIN_LAYERS WIN NAV_WIN SYM_WIN NUM_WIN SYS_WIN
+#define SYS_WIN   11  // conditional: SYS + WIN (empty: SYS is identical on both systems)
 
 // Key groups for the timeless home-row mods (a mod only fires if the NEXT key is on the other hand)
 #define KEYS_L 0 1 2 3 4 10 11 12 13 14 20 21 22 23 24 25
@@ -137,19 +133,19 @@
         };
 
         // Swapper (Callum/urob, tri-state module): first tap holds Cmd (Windows: Alt) and taps Tab,
-        // further taps send Tab. Pos 5 (Shift+Tab) goes back; Shift (31) and the arrows keep it open;
-        // releasing Nav or any other key releases Cmd/Alt and selects the app.
+        // further taps send Tab. Pos 22 (Shift+Tab) goes back; Shift (31) and the arrows (10-13) keep it
+        // open; releasing Nav or any other key releases Cmd/Alt and selects the app.
         swapper_mac: swapper_mac {
             compatible = "zmk,behavior-tri-state";
             #binding-cells = <0>;
             bindings = <&kt LGUI>, <&kp TAB>, <&kt LGUI>;
-            ignored-key-positions = <2 5 11 12 13 31>;
+            ignored-key-positions = <10 11 12 13 22 31>;
         };
         swapper_win: swapper_win {
             compatible = "zmk,behavior-tri-state";
             #binding-cells = <0>;
             bindings = <&kt LALT>, <&kp TAB>, <&kt LALT>;
-            ignored-key-positions = <2 5 11 12 13 31>;
+            ignored-key-positions = <10 11 12 13 22 31>;
         };
 
         // Backspace: plain = Backspace, with Shift (incl. one-shot Shift) = forward Delete.
@@ -174,6 +170,7 @@
 &num_word {
     // keys that keep num-word alive (identical keycodes on macOS and Windows)
     continue-list = <BSPC DEL DE_COMMA DE_DOT DE_MINUS DE_PLUS DE_STAR DE_SLASH DE_EQUAL>;
+    ignore-modifiers;   // Shift does not end num-word: Shift+. = :  Shift+, = ;  (the dot/comma stay in the list)
 };
 
 / {
@@ -212,53 +209,54 @@
     combos {
         compatible = "zmk,combos";
 
-        // Horizontal 2-key combos. require-prior-idle-ms: combos do not fire while you are typing fast.
-        // Esc and Tab are identical on both systems.
+        // All combos work on the base layer only (BASE, and WIN when the Windows overlay is on).
+        // On the other layers these positions are digits, app/tab keys etc. and must not trigger.
+        // require-prior-idle-ms: combos do not fire while you are typing fast.
+        // Esc, Tab, Enter and media are identical on both systems.
         combo_esc {
             timeout-ms = <30>;
             require-prior-idle-ms = <150>;
             key-positions = <0 1>;          // top-left: q + ä
-            layers = <MAC_LAYERS WIN_LAYERS>;
+            layers = <BASE WIN>;
             bindings = <&kp ESC>;
         };
         combo_tab {
             timeout-ms = <30>;
             require-prior-idle-ms = <150>;
             key-positions = <1 2>;          // ä + o
-            layers = <MAC_LAYERS WIN_LAYERS>;
+            layers = <BASE WIN>;
             bindings = <&kp TAB>;
         };
 
         // Enter: t + r + n (right home row) together. 3-key combo, blocked for 100 ms after the
-        // last key press so it cannot fire inside words ("Kontrolle", "control"). Base, Nav and Num.
+        // last key press so it cannot fire inside words ("Kontrolle", "control").
         combo_enter {
             timeout-ms = <40>;
             require-prior-idle-ms = <100>;
             key-positions = <16 17 18>;
-            layers = <BASE WIN NAV NAV_WIN NUM NUM_WIN>;
+            layers = <BASE WIN>;
             bindings = <&kp RET>;
         };
 
-        // Media (same keycodes on both systems), Base and Nav only:
-        // v+d previous track, l+x next track, ü+k quieter (left outer), f+j louder (right outer).
-        combo_prev  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <5 6>;   layers = <BASE WIN NAV NAV_WIN>; bindings = <&kp C_PREV>; };
-        combo_next  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <8 9>;   layers = <BASE WIN NAV NAV_WIN>; bindings = <&kp C_NEXT>; };
-        combo_voldn { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <20 21>; layers = <BASE WIN NAV NAV_WIN>; bindings = <&kp C_VOL_DN>; };
-        combo_volup { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <30 31>; layers = <BASE WIN NAV NAV_WIN>; bindings = <&kp C_VOL_UP>; };
+        // Media: v+d previous track, l+x next track, ü+k quieter (left outer), f+j louder (right outer).
+        combo_prev  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <5 6>;   layers = <BASE WIN>; bindings = <&kp C_PREV>; };
+        combo_next  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <8 9>;   layers = <BASE WIN>; bindings = <&kp C_NEXT>; };
+        combo_voldn { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <20 21>; layers = <BASE WIN>; bindings = <&kp C_VOL_DN>; };
+        combo_volup { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <30 31>; layers = <BASE WIN>; bindings = <&kp C_VOL_UP>; };
 
         // Clipboard on the left bottom row in QWERTZ order (k+z Undo, z+' Cut, '+. Copy, .+ö Paste),
         // Redo mirrored on the right bottom row (w+f). macOS: Cmd+key, Windows: Ctrl+key.
-        undo_mac  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <21 22>; layers = <MAC_LAYERS>; bindings = <&kp LG(DE_Z)>; };
-        cut_mac   { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <22 23>; layers = <MAC_LAYERS>; bindings = <&kp LG(DE_X)>; };
-        copy_mac  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <23 24>; layers = <MAC_LAYERS>; bindings = <&kp LG(DE_C)>; };
-        paste_mac { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <24 25>; layers = <MAC_LAYERS>; bindings = <&kp LG(DE_V)>; };
-        redo_mac  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <29 30>; layers = <MAC_LAYERS>; bindings = <&kp LG(LS(DE_Z))>; };
+        undo_mac  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <21 22>; layers = <BASE>; bindings = <&kp LG(DE_Z)>; };
+        cut_mac   { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <22 23>; layers = <BASE>; bindings = <&kp LG(DE_X)>; };
+        copy_mac  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <23 24>; layers = <BASE>; bindings = <&kp LG(DE_C)>; };
+        paste_mac { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <24 25>; layers = <BASE>; bindings = <&kp LG(DE_V)>; };
+        redo_mac  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <29 30>; layers = <BASE>; bindings = <&kp LG(LS(DE_Z))>; };
 
-        undo_win  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <21 22>; layers = <WIN_LAYERS>; bindings = <&kp LC(DEW_Z)>; };
-        cut_win   { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <22 23>; layers = <WIN_LAYERS>; bindings = <&kp LC(DEW_X)>; };
-        copy_win  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <23 24>; layers = <WIN_LAYERS>; bindings = <&kp LC(DEW_C)>; };
-        paste_win { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <24 25>; layers = <WIN_LAYERS>; bindings = <&kp LC(DEW_V)>; };
-        redo_win  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <29 30>; layers = <WIN_LAYERS>; bindings = <&kp LC(DEW_Y)>; };
+        undo_win  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <21 22>; layers = <WIN>; bindings = <&kp LC(DEW_Z)>; };
+        cut_win   { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <22 23>; layers = <WIN>; bindings = <&kp LC(DEW_X)>; };
+        copy_win  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <23 24>; layers = <WIN>; bindings = <&kp LC(DEW_C)>; };
+        paste_win { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <24 25>; layers = <WIN>; bindings = <&kp LC(DEW_V)>; };
+        redo_win  { timeout-ms = <30>; require-prior-idle-ms = <150>; key-positions = <29 30>; layers = <WIN>; bindings = <&kp LC(DEW_Y)>; };
     };
 
     macros {
@@ -294,6 +292,18 @@
             #binding-cells = <0>;
             bindings = <&macro_tap &kp DEW_CARET &kp SPACE>;
         };
+
+        // ` (backtick) is a dead key on both systems (Shift + the key right of ß); add Space.
+        grave_mac: grave_mac {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&macro_tap &kp DE_GRAVE &kp SPACE>;
+        };
+        grave_win: grave_win {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&macro_tap &kp DEW_GRAVE &kp SPACE>;
+        };
     };
 
     keymap {
@@ -303,7 +313,7 @@
         //   pinky = Ctrl (macOS) / Win (Windows), ring = Option / Alt, middle = Cmd / Ctrl.
         //   Thumbs: left Backspace | Shift | Sym, right Num | Space/Nav | Sys (hold). Shift and Space on the middle keys.
         //   Backspace: tap = Backspace (with Shift: Delete), hold = delete word, tap+hold = repeat.
-        //   Combos (see "combos" above): Enter = t+r+n (besides NUM pos 20), Esc/Tab, clipboard, media.
+        //   Combos (see "combos" above, base layer only): Enter = t+r+n, Esc/Tab, clipboard, media.
         base_layer {
             display-name = "BASE";
             bindings = <
@@ -346,41 +356,42 @@
         };
 
         // NAV – hold Space (right thumb, middle key), or press Nav pos 37 to keep it on (again = off).
-        //   Left: arrows, word left/right, Home/End (0/4), PgUp/PgDn (14/25), Cmd (20), screenshot (23),
-        //         app back (5) / app swapper (6). Left thumb: Delete, mouse clicks right (33) / left (34).
-        //   Right: mouse pointer on the home row (15-18), scrolling below (26-29), browser back/forward
-        //          (9/30), Shift (31), middle click (36, usable when Nav is fixed).
-        //   Browser tabs back/forward on 22/24.
+        //   Left: arrows in a row on the home row (10-13), word left/right (0/3), screenshot (2),
+        //         Cmd (20), browser tabs (21/24), app back (22) / app swapper (23), PgUp (25).
+        //   Middle: browser back/forward (4/5), Home/End (14/15), PgDn (26).
+        //   Right: mute (7), Teams microphone (8), mouse pointer on the home row (16-19),
+        //          scrolling below (27-30), Shift (31).
+        //   Thumbs: Delete (32), clicks left/right (33/34), middle click (35), Nav fixed (37).
         //   macOS keystrokes here; the Windows equivalents are in nav_win_layer.
         nav_layer {
             display-name = "NAV";
             bindings = <
-            &kp LG(LEFT)  &kp LA(LEFT)  &kp UP           &kp LA(RIGHT)      &kp LG(RIGHT)  &kp LS(TAB)     &swapper_mac    &none            &none            &kp LG(DE_LBKT)
-            &none         &kp LEFT      &kp DOWN         &kp RIGHT          &kp PG_UP      &mmv MOVE_LEFT  &mmv MOVE_UP    &mmv MOVE_DOWN   &mmv MOVE_RIGHT  &none
-&kp LGUI    &none         &kp LC(LS(TAB)) &kp LG(LS(DE_N4)) &kp LC(TAB)     &kp PG_DN      &msc SCRL_LEFT  &msc SCRL_UP    &msc SCRL_DOWN   &msc SCRL_RIGHT  &kp LG(DE_RBKT)  &kp LSHFT
-                                        &kp DEL          &mkp RCLK          &mkp LCLK      &none           &mkp MCLK       &tog NAV_LOCK
+            &kp LA(LEFT)   &none            &kp LG(LS(DE_N4))  &kp LA(RIGHT)  &kp LG(DE_LBKT)  &kp LG(DE_RBKT)  &none            &kp C_MUTE       &kp LG(LS(DE_M))  &none
+            &kp LEFT       &kp UP           &kp DOWN           &kp RIGHT      &kp LG(LEFT)     &kp LG(RIGHT)    &mmv MOVE_LEFT   &mmv MOVE_UP     &mmv MOVE_DOWN    &mmv MOVE_RIGHT
+&kp LGUI   &kp LC(LS(TAB))  &kp LS(TAB)      &swapper_mac       &kp LC(TAB)    &kp PG_UP        &kp PG_DN        &msc SCRL_LEFT   &msc SCRL_UP     &msc SCRL_DOWN    &msc SCRL_RIGHT  &kp LSHFT
+                                              &kp DEL            &mkp LCLK      &mkp RCLK        &mkp MCLK        &none            &tog NAV_LOCK
             >;
         };
 
         nav_win_layer {
             display-name = "NAV WIN";
             bindings = <
-            &kp HOME      &kp LC(LEFT)  &trans           &kp LC(RIGHT)      &kp END        &trans          &swapper_win    &trans           &trans           &kp LA(LEFT)
-            &trans        &trans        &trans           &trans             &trans         &trans          &trans          &trans           &trans           &trans
-&kp LCTRL   &trans        &trans          &kp LG(LS(DEW_S))  &trans          &trans         &trans          &trans          &trans           &trans           &kp LA(RIGHT)    &trans
-                                        &trans           &trans             &trans         &trans          &trans          &trans
+            &kp LC(LEFT)   &trans           &kp LG(LS(DEW_S))  &kp LC(RIGHT)  &kp LA(LEFT)     &kp LA(RIGHT)    &trans           &trans           &kp LC(LS(DEW_M)) &trans
+            &trans         &trans           &trans             &trans         &kp HOME         &kp END          &trans           &trans           &trans            &trans
+&kp LCTRL  &trans           &trans           &swapper_win       &trans         &trans           &trans           &trans           &trans           &trans            &trans           &trans
+                                              &trans             &trans         &trans           &trans           &trans           &trans
             >;
         };
 
-        // SYM – tap the Sym key for ONE symbol, hold it for several. ~ and ^ are typed directly.
-        //   Bracket pairs mirrored: ( ) inner home row, { } next to them, [ ] and < > bottom row.
+        // SYM – tap the Sym key for ONE symbol, hold it for several. ~ ^ ` are typed directly.
+        //   Sorted by how often they are used: ! @ ? * on the home row, { } [ ] | ~ ^ ` outside.
         //   ' " : ; are not here: they are Shift on the base layer (' → ", , → ;, . → :).
         sym_layer {
             display-name = "SYM";
             bindings = <
-            &kp DE_EXCL   &kp DE_AT     &kp DE_QMARK  &kp DE_EQUAL  &kp DE_PRCNT    &kp DE_UNDER  &kp DE_DLLR   &kp DE_PLUS   &kp DE_STAR   &tilde_mac
-            &kp DE_HASH   &kp DE_AMPS   &kp DE_EURO   &kp DE_LBRC   &kp DE_LPAR     &kp DE_RPAR   &kp DE_RBRC   &kp DE_MINUS  &kp DE_PIPE   &kp DE_SZ
-&none       &kp DE_DEG    &none         &kp DE_SLASH  &kp DE_LT     &kp DE_LBKT     &kp DE_RBKT   &kp DE_GT     &kp DE_BSLH   &none         &caret_mac    &none
+            &kp DE_LBRC   &kp DE_AMPS   &kp DE_BSLH   &kp DE_EQUAL  &kp DE_PRCNT    &tilde_mac    &kp DE_DLLR   &kp DE_PLUS   &kp DE_UNDER  &kp DE_RBRC
+            &kp DE_HASH   &kp DE_AT     &kp DE_EURO   &kp DE_EXCL   &kp DE_LPAR     &kp DE_RPAR   &kp DE_QMARK  &kp DE_MINUS  &kp DE_STAR   &kp DE_SZ
+&none       &kp DE_DEG    &kp DE_SECT   &kp DE_PIPE   &kp DE_LT     &kp DE_LBKT     &kp DE_RBKT   &kp DE_GT     &kp DE_SLASH  &grave_mac    &caret_mac    &none
                                         &trans        &trans        &trans          &trans        &trans        &trans
             >;
         };
@@ -388,23 +399,25 @@
         sym_win_layer {
             display-name = "SYM WIN";
             bindings = <
-            &kp DEW_EXCL   &kp DEW_AT     &kp DEW_QMARK  &kp DEW_EQUAL  &kp DEW_PRCNT    &kp DEW_UNDER  &kp DEW_DLLR   &kp DEW_PLUS   &kp DEW_STAR   &kp DEW_TILDE
-            &kp DEW_HASH   &kp DEW_AMPS   &kp DEW_EURO   &kp DEW_LBRC   &kp DEW_LPAR     &kp DEW_RPAR   &kp DEW_RBRC   &kp DEW_MINUS  &kp DEW_PIPE   &kp DEW_SZ
-&none       &kp DEW_DEG    &none         &kp DEW_SLASH  &kp DEW_LT     &kp DEW_LBKT     &kp DEW_RBKT   &kp DEW_GT     &kp DEW_BSLH   &none         &caret_win    &none
+            &kp DEW_LBRC   &kp DEW_AMPS   &kp DEW_BSLH   &kp DEW_EQUAL  &kp DEW_PRCNT    &kp DEW_TILDE  &kp DEW_DLLR   &kp DEW_PLUS   &kp DEW_UNDER  &kp DEW_RBRC
+            &kp DEW_HASH   &kp DEW_AT     &kp DEW_EURO   &kp DEW_EXCL   &kp DEW_LPAR     &kp DEW_RPAR   &kp DEW_QMARK  &kp DEW_MINUS  &kp DEW_STAR   &kp DEW_SZ
+&none       &kp DEW_DEG    &kp DEW_SECT   &kp DEW_PIPE   &kp DEW_LT     &kp DEW_LBKT     &kp DEW_RBKT   &kp DEW_GT     &kp DEW_SLASH  &grave_win     &caret_win    &none
                                         &trans        &trans        &trans          &trans        &trans        &trans
             >;
         };
 
-        // NUM – tap the Num key for num-word, hold it for the layer. Numpad on the left hand,
-        //   F-keys in the same pattern on the right (F7-F9 top, F4-F6 home, F1-F3 bottom, F10-F12 outer).
-        //   Identical keycodes on macOS and Windows.
+        // NUM – tap the Num key for num-word, hold it for the layer. Numpad on the RIGHT hand like on a
+        //   full-size keyboard (0 on the right thumb where the Num key is, . on the tucked thumb),
+        //   F-keys in the same pattern on the left (F7-F9 top, F4-F6 home, F1-F3 bottom, F10-F12 outer).
+        //   Left thumbs stay as on the base layer (Backspace, Shift, Sym): Shift+. = :  Shift+, = ;
+        //   Num-word ends with Space or any letter. Identical keycodes on macOS and Windows.
         num_layer {
             display-name = "NUM";
             bindings = <
-            &kp DE_STAR   &kp DE_N7  &kp DE_N8  &kp DE_N9  &kp DE_PLUS    &none   &kp F7  &kp F8  &kp F9  &kp F10
-            &kp DE_SLASH  &kp DE_N4  &kp DE_N5  &kp DE_N6  &kp DE_MINUS   &none   &kp F4  &kp F5  &kp F6  &kp F11
-&kp RET     &kp DE_DOT    &kp DE_N1  &kp DE_N2  &kp DE_N3  &kp DE_EQUAL   &none   &kp F1  &kp F2  &kp F3  &kp F12  &none
-                                     &kp BSPC   &kp DE_N0  &kp DE_COMMA   &trans  &trans  &trans
+            &kp F10   &kp F7   &kp F8   &kp F9   &none      &kp DE_PLUS    &kp DE_N7  &kp DE_N8  &kp DE_N9  &kp DE_STAR
+            &kp F11   &kp F4   &kp F5   &kp F6   &none      &kp DE_MINUS   &kp DE_N4  &kp DE_N5  &kp DE_N6  &kp DE_SLASH
+&none       &kp F12   &kp F1   &kp F2   &kp F3   &none      &kp DE_COMMA   &kp DE_N1  &kp DE_N2  &kp DE_N3  &kp DE_EQUAL   &kp RET
+                               &trans   &trans   &trans     &kp DE_N0      &trans     &kp DE_DOT
             >;
         };
 

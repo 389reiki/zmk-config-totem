@@ -368,6 +368,7 @@ __IDEAS__
       '&kp LGUI': 'Cmd halten (Windows: Ctrl), z. B. für Cmd-Klick oder Tastenkürzel.',
       '&kp LALT': 'Opt halten (Windows: Alt).',
       '&kp LCTRL': 'Ctrl halten (Windows: Win-Taste).',
+      '&kp LG(LS(DE_M))': 'Teams: Mikrofon an/aus (Mac Cmd+Shift+M, Windows Ctrl+Shift+M). Wirkt, wenn Teams im Vordergrund ist.',
       '&kp LG(DE_LBKT)': 'Zurück im Browser oder Finder (Mac Cmd+[, Windows Alt+←).',
       '&kp LG(DE_RBKT)': 'Vor im Browser oder Finder (Mac Cmd+], Windows Alt+→).',
       '&kp LG(LS(DE_N4))': 'Bildschirmausschnitt aufnehmen: Mac Cmd+Shift+4 (Bereich aufziehen), Windows Win+Shift+S.',
@@ -404,7 +405,7 @@ __IDEAS__
     if (raw === '&tog NAV_LOCK') return 'Nav bleibt an, auch wenn du Space loslässt. Nochmal tippen: Nav aus. Dann ist auch Klick M (36) erreichbar.';
     if (raw.startsWith('&mmv ')) return 'Mauszeiger bewegen, solange gehalten.';
     if (raw.startsWith('&msc ')) return 'Scrollen, solange gehalten.';
-    const MEDIA = { 'C_PP': 'Medien: Wiedergabe starten oder pausieren.', 'C_PREV': 'Medien: vorheriger Titel.', 'C_NEXT': 'Medien: nächster Titel.', 'C_VOL_UP': 'Medien: lauter.', 'C_VOL_DN': 'Medien: leiser.' };
+    const MEDIA = { 'C_MUTE': 'Ton aus bzw. wieder an (Lautsprecher, auf Mac und Windows gleich).', 'C_PP': 'Medien: Wiedergabe starten oder pausieren.', 'C_PREV': 'Medien: vorheriger Titel.', 'C_NEXT': 'Medien: nächster Titel.', 'C_VOL_UP': 'Medien: lauter.', 'C_VOL_DN': 'Medien: leiser.' };
     const mk = raw.replace(/^&kp /, ''); if (MEDIA[mk]) return MEDIA[mk];
     if (raw === '&host_mac') return 'Auf den Mac umschalten (Bluetooth-Profil 0). Nach dem Ausschalten startet die Tastatur im Mac-Modus.';
     if (raw === '&host_win') return 'Auf Windows umschalten (Bluetooth-Profil 1).';
