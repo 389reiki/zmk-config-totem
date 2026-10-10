@@ -46,10 +46,11 @@ GERMAN = {"Word ←": "Wort ←", "Word →": "Wort →", "Del word": "Wort ⌫"
 SECOND = {"&bspc_del": "⇧ Del", "&sqt_dqt": '⇧ "', "&kp LG(DE_LBKT)": "Cmd+[", "&kp LG(DE_RBKT)": "Cmd+]"}
 # Shift variants shown on the base layer only (they are not on SYM)
 BASE_SHIFTED = {"&kp DE_COMMA": "⇧ ;", "&kp DE_DOT": "⇧ :"}
-# Shift variants on NUM that matter for numbers (German layout, same on macOS and Windows);
+# Shift variants on NUM (German layout, same on macOS and Windows);
 # shown only while Shift is reachable on NUM (base Shift thumb not covered)
-NUM_SHIFTED = {"&kp DE_N4": "⇧ $", "&kp DE_N5": "⇧ %", "&kp DE_N8": "⇧ (", "&kp DE_N9": "⇧ )",
-               "&kp DE_DOT": "⇧ :", "&kp DE_COMMA": "⇧ ;"}
+NUM_SHIFTED = {"&kp DE_N1": "⇧ !", "&kp DE_N2": '⇧ "', "&kp DE_N3": "⇧ §", "&kp DE_N4": "⇧ $", "&kp DE_N5": "⇧ %",
+               "&kp DE_N6": "⇧ &", "&kp DE_N7": "⇧ /", "&kp DE_N8": "⇧ (", "&kp DE_N9": "⇧ )", "&kp DE_N0": "⇧ =",
+               "&kp DE_DOT": "⇧ :", "&kp DE_COMMA": "⇧ ;", "&kp DE_MINUS": "⇧ _", "&kp DE_PLUS": "⇧ *"}
 # keys whose macOS keystroke is ambiguous: named after their Windows twin (as in the diagrams)
 BY_WIN_TWIN = {"&kp HOME": "Home", "&kp END": "End", "&kp LA(LEFT)": "Zurück", "&kp LA(RIGHT)": "Vor"}
 
