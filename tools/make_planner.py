@@ -26,7 +26,7 @@ GEOMETRY = ROOT / "keymap-drawer" / "totem_layout.json"
 IDEAS = ROOT / "docs" / "ideen.md"
 PLANNED = ROOT / "docs" / "vorgemerkt.md"
 ICONS = ROOT / "planner" / "icons.json"
-LAYERS = ["BASE", "NAV", "SYM", "NUM", "SYS"]
+LAYERS = ["BASE", "SYM", "NUM", "NAV", "SYS"]   # order in the planner
 
 # labels from the diagram script (DE_* characters and special bindings)
 _spec = importlib.util.spec_from_file_location("draw", ROOT / "keymap-drawer" / "draw.py")
@@ -64,7 +64,8 @@ ICON = {"&kp C_MUTE": ("volume-x", ""), "&kp LG(LS(DE_M))": ("mic-off", "Teams")
         "&kp LG(DE_LBKT)": ("circle-arrow-left", "Zurück"), "&kp LG(DE_RBKT)": ("circle-arrow-right", "Vor"),
         "&bootloader": ("hard-drive-download", None), "&sys_reset": ("rotate-ccw", None),
         "&bt BT_SEL 2": ("bluetooth", "2"), "&bt BT_SEL 3": ("bluetooth", "3"),
-        "&out OUT_TOG": ("usb", "USB/BT"), "&bt BT_CLR": ("bluetooth-off", "löschen")}
+        "&out OUT_TOG": ("usb", "USB/BT"), "&bt BT_CLR": ("bluetooth-off", "löschen"),
+        "&host_mac": ("bluetooth", "Mac"), "&host_win": ("bluetooth", "Win")}
 # combos: icon (or a plain symbol) plus German name
 COMBO_ICON = {"&kp ESC": ("⎋", "Esc"), "&kp TAB": ("⇥", "Tab"), "&kp RET": ("↵", "Enter"),
               "&kp LG(DE_Z)": ("undo-2", "Rückgängig"), "&kp LG(DE_X)": ("scissors", "Ausschneiden"),
@@ -72,6 +73,12 @@ COMBO_ICON = {"&kp ESC": ("⎋", "Esc"), "&kp TAB": ("⇥", "Tab"), "&kp RET": (
               "&kp LG(LS(DE_Z))": ("redo-2", "Wiederholen"), "&kp C_PREV": ("skip-back", "Titel zurück"),
               "&kp C_NEXT": ("skip-forward", "Titel vor"), "&kp C_VOL_DN": ("volume-1", "Leiser"),
               "&kp C_VOL_UP": ("volume-2", "Lauter")}
+# combos are drawn together per group in the planner
+COMBO_GROUP = {"&kp ESC": "Esc, Tab, Enter", "&kp TAB": "Esc, Tab, Enter", "&kp RET": "Esc, Tab, Enter",
+               "&kp LG(DE_Z)": "Bearbeiten", "&kp LG(DE_X)": "Bearbeiten", "&kp LG(DE_C)": "Bearbeiten",
+               "&kp LG(DE_V)": "Bearbeiten", "&kp LG(LS(DE_Z))": "Bearbeiten",
+               "&kp C_PREV": "Medien", "&kp C_NEXT": "Medien", "&kp C_VOL_DN": "Medien", "&kp C_VOL_UP": "Medien"}
+COMBO_NOTE = {"&kp RET": "Enter: nach dem letzten Buchstaben kurz absetzen (ca. 0,1 s), sonst kommen die Buchstaben."}
 
 
 def decorate(k):
@@ -195,6 +202,10 @@ def main():
         entry = {"pos": c["positions"], "label": t, "layers": on}
         if icon:
             entry["icon"] = icon
+        if c["binding"] in COMBO_GROUP:
+            entry["group"] = COMBO_GROUP[c["binding"]]
+        if c["binding"] in COMBO_NOTE:
+            entry["note"] = COMBO_NOTE[c["binding"]]
         data["combos"].append(entry)
 
     data["icons"] = {k: v for k, v in json.loads(ICONS.read_text(encoding="utf-8")).items() if not k.startswith("_")}

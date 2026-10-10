@@ -52,7 +52,7 @@ Die Bilder werden bei jedem Hochladen automatisch neu gezeichnet (`keymap-drawer
 
 ## Planer (Tasten per Drag & Drop umplanen)
 
-`planner/totem-planer.html` herunterladen (auf GitHub: Datei öffnen → Download) und im Browser öffnen. Es zeigt die aktuelle Belegung auf der echten TOTEM-Geometrie, dazu einen Reiter mit allen Kombos und einen Spickzettel.
+`planner/totem-planer.html` herunterladen (auf GitHub: Datei öffnen → Download) und im Browser öffnen. Es zeigt die aktuelle Belegung auf der echten TOTEM-Geometrie, dazu einen Reiter mit allen Kombos (nach Gruppen) und die Ideenliste. Fährst du über eine Taste, steht dort, was sie tut.
 
 - Tasten ziehen oder nacheinander antippen: Sie werden getauscht, auch zwischen Ebenen. Für Neues einen Wunsch eintragen.
 - **"Änderungen kopieren"** und den Text Claude schicken, der die Keymap samt Windows-Zwillingen anpasst.
