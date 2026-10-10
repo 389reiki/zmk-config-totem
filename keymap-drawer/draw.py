@@ -52,7 +52,7 @@ RAW = {
     "&sk LSHFT": {"t": "Shift 1×", "h": "Shift"},
     "&sym_key SYM SYM": {"t": "Sym 1×", "h": "Sym"},
     "&num_key NUM NUM": {"t": "NumWord", "h": "Num"},
-    "&lt_spc NAV_HOLD SPACE": {"t": "␣", "h": "Nav"},
+    "&lt_spc NAV_HOLD SPACE": {"t": "Space", "h": "Nav"},
     "&tog NAV_LOCK": {"t": "Nav fest", "h": "an/aus"},
     "&mo SYS": {"t": "Sys", "h": "Sys"},
     "&kp LG(LS(DE_N4))": "Scrnsht",

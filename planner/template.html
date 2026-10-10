@@ -13,7 +13,7 @@
   --faint: #a3a8b8;
   --changed: #c2410c;
   --focus: #2c5bd6;
-  --base: #5b6178; --nav: #378ADD; --sym: #1D9E75; --num: #BA7517; --sys: #7d7c78; --mouse: #D4537E;
+  --base: #5b6178; --nav: #378ADD; --sym: #1D9E75; --num: #BA7517; --sys: #7d7c78; --mouse: #D4537E; --mouse-bg: #f7e4ec;
   --combo: #7F77DD;
   --mod: #6d7894;
   --media: #e9e1f5;
@@ -97,6 +97,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px
 .key.media { background: var(--media); }
 .key.media .h { color: #6b5a86; }
 .key.mc { box-shadow: inset 0 calc(var(--u) * -.07) 0 var(--mouse); }
+.key.mouse { background: var(--mouse-bg); }
+.key .t.ic { display: flex; flex-direction: column; align-items: center; gap: calc(var(--u) * .03); white-space: normal; }
+.key .t.ic svg { width: calc(var(--u) * .34); height: calc(var(--u) * .34); fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.key .t.ic .cap { font-size: calc(var(--u) * .135); color: var(--muted); line-height: 1; white-space: nowrap; }
+.combo-ic { display: inline-flex; vertical-align: -3px; margin-right: 6px; font-size: 1.1rem; }
+.combo-ic svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .key.held { background: var(--hc); }
 .key.held .t, .key.held .h, .key.held .s { color: #fff; }
 .key.changed::after { content: ""; position: absolute; top: 7%; left: 7%; width: calc(var(--u) * .11); height: calc(var(--u) * .11); border-radius: 50%; background: var(--changed); }
@@ -445,6 +451,7 @@ __IDEAS__
       const p = parts(k, pos);
       if (k.trans) el.classList.add('trans'); else if (k.none) el.classList.add('none');
       if (/^&kp C_/.test(k.raw || '')) el.classList.add('media');
+      if (/^&(mmv|msc|mkp) /.test(k.raw || '')) el.classList.add('mouse');
       if (/^(&kp (LSHFT|LGUI|LALT|LCTRL)|&sk LSHFT)$/.test(k.raw || '')) el.classList.add('mod');
       if (/^&hm[lr] /.test(k.raw || '')) el.classList.add('hrm');
       const op = opensLayer(k);
@@ -458,8 +465,16 @@ __IDEAS__
       const t = isHeld && (k.trans || !p.t) ? NAMES[L] : p.t;
       const hb = isHeld ? NAMES[L] : p.h;
       el.innerHTML = '<span class="t"></span>' + (hb ? '<span class="h"></span>' : '') + (p.s ? '<span class="s"></span>' : '') + (prefs.nums && interactive ? '<span class="p"></span>' : '');
-      const te = el.querySelector('.t'); te.textContent = t;
-      if (Array.from(t.replace(/[\ufe0e\ufe0f]/g, '')).length > 1) te.classList.add('word');
+      const te = el.querySelector('.t');
+      const ICON = k.i && (DATA.icons || {})[k.i] && !(isHeld && k.trans);
+      if (ICON) {
+        te.classList.add('ic');
+        te.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + DATA.icons[k.i] + '</svg>' + (k.c ? '<span class="cap"></span>' : '');
+        if (k.c) te.querySelector('.cap').textContent = k.c;
+      } else {
+        te.textContent = t;
+        if (Array.from(t.replace(/[\ufe0e\ufe0f]/g, '')).length > 1) te.classList.add('word');
+      }
       if (hb) el.querySelector('.h').textContent = hb;
       if (p.s) el.querySelector('.s').textContent = p.s;
       if (prefs.nums && interactive) el.querySelector('.p').textContent = pos;
@@ -549,6 +564,9 @@ __IDEAS__
       const card = document.createElement('div'); card.className = 'combo-card';
       const head = document.createElement('div'); head.className = 'combo-head';
       const nm = document.createElement('span'); nm.className = 'combo-name'; nm.textContent = c.label + (c.new ? ' · neu' : c.changed ? ' · geändert' : '');
+      if (c.icon) { const ic = document.createElement('span'); ic.className = 'combo-ic';
+        if ((DATA.icons || {})[c.icon]) ic.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + DATA.icons[c.icon] + '</svg>'; else ic.textContent = c.icon;
+        nm.prepend(ic); }
       const ks = document.createElement('span'); ks.className = 'combo-keys';
       ks.textContent = c.pos.map(p => (state.keys.BASE[p] && state.keys.BASE[p].t) || p).join(' + ');
       head.append(nm, ks);

@@ -25,6 +25,7 @@ OUT = ROOT / "planner" / "totem-planer.html"
 GEOMETRY = ROOT / "keymap-drawer" / "totem_layout.json"
 IDEAS = ROOT / "docs" / "ideen.md"
 PLANNED = ROOT / "docs" / "vorgemerkt.md"
+ICONS = ROOT / "planner" / "icons.json"
 LAYERS = ["BASE", "NAV", "SYM", "NUM", "SYS"]
 
 # labels from the diagram script (DE_* characters and special bindings)
@@ -56,6 +57,31 @@ BY_WIN_TWIN = {"&kp HOME": "Home", "&kp END": "End", "&kp LA(LEFT)": "Zurück", 
 
 COMBO_NAME = {"&kp RET": "Enter ↵", "&kp C_PREV": "Titel zurück", "&kp C_NEXT": "Titel vor"}
 LEFT = {0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 20, 21, 22, 23, 24, 25, 32, 33, 34}
+
+
+# keys shown as an icon (planner/icons.json, Lucide) with an optional small caption; "t" stays the searchable name
+ICON = {"&kp C_MUTE": ("volume-x", ""), "&kp LG(LS(DE_M))": ("mic-off", "Teams"),
+        "&kp LG(DE_LBKT)": ("circle-arrow-left", "Zurück"), "&kp LG(DE_RBKT)": ("circle-arrow-right", "Vor"),
+        "&bootloader": ("hard-drive-download", None), "&sys_reset": ("rotate-ccw", None),
+        "&bt BT_SEL 2": ("bluetooth", "2"), "&bt BT_SEL 3": ("bluetooth", "3"),
+        "&out OUT_TOG": ("usb", "USB/BT"), "&bt BT_CLR": ("bluetooth-off", "löschen")}
+# combos: icon (or a plain symbol) plus German name
+COMBO_ICON = {"&kp ESC": ("⎋", "Esc"), "&kp TAB": ("⇥", "Tab"), "&kp RET": ("↵", "Enter"),
+              "&kp LG(DE_Z)": ("undo-2", "Rückgängig"), "&kp LG(DE_X)": ("scissors", "Ausschneiden"),
+              "&kp LG(DE_C)": ("copy", "Kopieren"), "&kp LG(DE_V)": ("clipboard-paste", "Einfügen"),
+              "&kp LG(LS(DE_Z))": ("redo-2", "Wiederholen"), "&kp C_PREV": ("skip-back", "Titel zurück"),
+              "&kp C_NEXT": ("skip-forward", "Titel vor"), "&kp C_VOL_DN": ("volume-1", "Leiser"),
+              "&kp C_VOL_UP": ("volume-2", "Lauter")}
+
+
+def decorate(k):
+    """Add icon ("i") and caption ("c") to a key dict that has "raw" and "t"."""
+    if k.get("raw") in ICON:
+        i, c = ICON[k["raw"]]
+        k["i"] = i
+        k["c"] = k["t"] if c is None else c
+        k.pop("h", None)
+    return k
 
 
 def key_name(k):
@@ -156,7 +182,7 @@ def main():
                 k["t"] = BY_WIN_TWIN[twin]
             if b in ("&bootloader", "&sys_reset"):   # works on the half where it is pressed
                 k["t"] += " L" if pos in LEFT else " R"
-            keys.append(k)
+            keys.append(decorate(k))
         data["layers"].append({"name": name, "keys": keys})
 
     seen = set()
@@ -165,9 +191,13 @@ def main():
         if not on or tuple(c["positions"]) in seen:
             continue  # Windows-only copy of a Mac combo
         seen.add(tuple(c["positions"]))
-        t = COMBO_NAME.get(c["binding"]) or label(c["binding"])["t"]
-        data["combos"].append({"pos": c["positions"], "label": t, "layers": on})
+        icon, t = COMBO_ICON.get(c["binding"], (None, COMBO_NAME.get(c["binding"]) or label(c["binding"])["t"]))
+        entry = {"pos": c["positions"], "label": t, "layers": on}
+        if icon:
+            entry["icon"] = icon
+        data["combos"].append(entry)
 
+    data["icons"] = {k: v for k, v in json.loads(ICONS.read_text(encoding="utf-8")).items() if not k.startswith("_")}
     payload = json.dumps(data, ensure_ascii=False)
     stamp = hashlib.sha1(payload.encode()).hexdigest()[:10]
     html = TEMPLATE.read_text(encoding="utf-8")
