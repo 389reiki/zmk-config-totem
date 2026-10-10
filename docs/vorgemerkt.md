@@ -2,4 +2,4 @@
 
 Jede Zeile mit "- " erscheint im Planer unter "Vorgemerkt". Nach dem Update wird die Liste geleert.
 
-- Sym: ! auf 13 und ? auf 16 (Zeigefinger-Grundreihe, statt 0 und 2). { } auf 25/26 (statt 13/16), [ ] auf 0/9 (statt 25/26), ~ auf 2 (statt 9). Windows-Zwilling mitziehen.
+- Sym neu nach Häufigkeit: ! 13, ? 16, @ 11, * 18 (Grundreihe); & 1, \ 2, _ 8, / 28; { } 0/9, ~ 5, | 23; Backtick ` neu auf 29 (Tottaste, Makro mit Leertaste wie ^). € bleibt 12. Unverändert: # = % $ + ( ) - ß ° < > [ ] ^. Windows-Zwilling mitziehen.
