@@ -84,8 +84,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px
 .board.small .key { cursor: pointer; }
 .key .t { position: absolute; left: 4%; right: 4%; top: 50%; transform: translateY(-58%); text-align: center; font-weight: 400; font-size: calc(var(--u) * .3); line-height: 1.05; white-space: nowrap; }
 .key .t.word { font-size: calc(var(--u) * .175); }
-.key.mod, .key.hrm { background-image: linear-gradient(to top, rgba(109, 120, 148, .55), rgba(109, 120, 148, 0) 34%); }
-.key.hrm .h, .key.mod .h { color: #2f3546; font-weight: 600; }
+.key.mod, .key.hrm { box-shadow: inset 0 calc(var(--u) * .06) 0 var(--mod); }
+.key.hrm .h { color: var(--mod); font-weight: 600; }
 .key .h { position: absolute; left: 0; right: 0; bottom: 7%; text-align: center; font-size: calc(var(--u) * .155); color: var(--muted); white-space: nowrap; }
 .key .s { position: absolute; right: 8%; top: 4%; font-size: calc(var(--u) * .24); line-height: 1; color: #4b5062; }
 .key .p { position: absolute; left: 8%; top: 5%; font-family: var(--font-mono); font-size: calc(var(--u) * .13); color: var(--faint); }
@@ -419,7 +419,7 @@ __IDEAS__
     return out;
   }
   const HINT = L => ({
-    BASE: 'Groß: antippen. Klein unten: halten. Oben rechts: mit Shift. Grauer Schatten unten: Modifier (auch beim Halten).',
+    BASE: 'Groß: antippen. Klein unten: halten. Oben rechts: mit Shift. Grauer Balken oben: Modifier (auch beim Halten).',
     SYM: 'Sym antippen: genau ein Zeichen von hier. Sym halten: alle Zeichen, solange gehalten.',
     NUM: 'Num antippen: Num-Word, Zahlen bis zum nächsten Leerzeichen oder Buchstaben. Num halten: solange gehalten.',
     NAV: 'Space halten. Dauerhaft: Space halten und „Nav fest“ tippen, nochmal tippen beendet.',
