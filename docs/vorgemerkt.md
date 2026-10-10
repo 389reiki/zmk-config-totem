@@ -6,3 +6,4 @@ Jede Zeile mit "- " erscheint im Planer unter "Vorgemerkt". Nach dem Update wird
 - Kombos Esc (q+ä), Tab (ä+o), Undo, Cut, Copy, Paste, Redo nur noch auf Basis und Nav (bisher auch Sym, Num, Sys). Grund: auf Num lösen Ziffernfolgen wie 1+2 sonst Ausschneiden aus.
 - Nav 7: Ton aus (C_MUTE, beide Systeme). Nav 8: Teams-Mikro an/aus (Mac Cmd+Shift+M, Windows Ctrl+Shift+M).
 - Sym 22: § (neu, auf dem nach dem Sym-Umbau freien Platz).
+- Num 37: Shift (rechter Daumen, eingezogen; bisher Sys über die Basis). Shift + Ziffer/Punkt/Komma gibt ! " § $ % & / ( ) = : ; wie auf jeder deutschen Tastatur. num_word bekommt ignore-modifiers, damit Shift Num-Word nicht beendet. Im Planer und in den Bildern steht das Shift-Zeichen oben rechts auf den Num-Tasten.

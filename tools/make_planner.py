@@ -46,6 +46,10 @@ GERMAN = {"Word ←": "Wort ←", "Word →": "Wort →", "Del word": "Wort ⌫"
 SECOND = {"&bspc_del": "⇧ Del", "&sqt_dqt": '⇧ "', "&kp LG(DE_LBKT)": "Cmd+[", "&kp LG(DE_RBKT)": "Cmd+]"}
 # Shift variants shown on the base layer only (they are not on SYM)
 BASE_SHIFTED = {"&kp DE_COMMA": "⇧ ;", "&kp DE_DOT": "⇧ :"}
+# Shift variants on NUM (German layout, same on macOS and Windows); shown only once NUM has its own Shift key
+NUM_SHIFTED = {"&kp DE_N1": "⇧ !", "&kp DE_N2": '⇧ "', "&kp DE_N3": "⇧ §", "&kp DE_N4": "⇧ $", "&kp DE_N5": "⇧ %",
+               "&kp DE_N6": "⇧ &", "&kp DE_N7": "⇧ /", "&kp DE_N8": "⇧ (", "&kp DE_N9": "⇧ )", "&kp DE_N0": "⇧ =",
+               "&kp DE_DOT": "⇧ :", "&kp DE_COMMA": "⇧ ;", "&kp DE_MINUS": "⇧ _", "&kp DE_PLUS": "⇧ *"}
 # keys whose macOS keystroke is ambiguous: named after their Windows twin (as in the diagrams)
 BY_WIN_TWIN = {"&kp HOME": "Home", "&kp END": "End", "&kp LA(LEFT)": "Zurück", "&kp LA(RIGHT)": "Vor"}
 
@@ -145,6 +149,8 @@ def main():
             k["raw"] = b
             if name == "BASE" and b in BASE_SHIFTED:
                 k["h"] = BASE_SHIFTED[b]
+            if name == "NUM" and b in NUM_SHIFTED and "&kp LSHFT" in layers["NUM"]:
+                k["h"] = NUM_SHIFTED[b]
             twin = layers.get(name + " WIN", [None] * len(layers[name]))[pos]
             if b in ("&kp LG(LEFT)", "&kp LG(RIGHT)") and twin in BY_WIN_TWIN:
                 k["t"] = BY_WIN_TWIN[twin]
