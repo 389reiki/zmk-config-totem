@@ -134,13 +134,14 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px
 .filters { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 12px; cursor: pointer; font-weight: 700; font-size: .85rem; }
 .chip[aria-pressed="true"] { background: var(--combo); border-color: var(--combo); color: #fff; }
-.combo-grid { display: grid; grid-template-columns: minmax(0, 1fr); max-width: 1000px; gap: 14px; align-items: start; }
+.combo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 480px), 1fr)); gap: 14px; align-items: start; }
 .combo-group { margin: 0; font-size: 1.05rem; }
 .combo-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.combo-list li { display: grid; grid-template-columns: 12px 1fr auto; align-items: center; gap: 8px; }
+.combo-list li { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; }
 .combo-sw { width: 12px; height: 12px; border-radius: 3px; }
-.mini .cl { stroke-width: .045; stroke-linecap: round; opacity: .9; }
-.mini .cw { font-size: .32px; font-weight: 700; font-family: var(--font-ui); }
+.mini .cl { stroke: #8a83d9; stroke-width: .035; }
+.mini .cb { fill: #4c45a6; }
+.mini .cw { fill: #fff; font-size: .3px; font-weight: 600; text-anchor: middle; font-family: var(--font-ui); }
 .combo-list .combo-name { font-weight: 600; font-size: .95rem; }
 .combo-list .combo-ic { margin: 0; }
 .mini .cm rect { fill: #3f3a7a; stroke: #fff; stroke-width: .05; }
@@ -153,8 +154,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px
 .combo-layers { font-size: .8rem; color: var(--muted); }
 .mini { width: 100%; height: auto; display: block; }
 .mini .mk { fill: var(--cap); }
-.mini .mk.on { fill: var(--combo); }
-.mini .mt { fill: #fff; font-size: .44px; font-weight: 700; text-anchor: middle; font-family: var(--font-ui); }
+.mini .mk.on { fill: #c9c5f0; }
+.mini .mt { fill: #2b2e38; font-size: .44px; font-weight: 700; text-anchor: middle; font-family: var(--font-ui); }
 
 
 /* ideas */
@@ -557,38 +558,42 @@ __IDEAS__
     shown.forEach(c => { const g = c.group || c.label; let e = groups.find(x => x.name === g); if (!e) groups.push(e = { name: g, items: [] }); e.items.push(c); });
     const keyName = p => (state.keys.BASE[p] && state.keys.BASE[p].t) || p;
     const iconHTML = c => (DATA.icons || {})[c.icon] ? '<svg viewBox="0 0 24 24" aria-hidden="true">' + DATA.icons[c.icon] + '</svg>' : '';
-    const PAL = ['#5b4fc4', '#c2410c', '#0f7b6c', '#b5367a', '#2b6cb0'];
-    const M = 3.6;   // margin left and right of the keyboard for the labels
+    // drawn like keymap-drawer: a box with the name at the middle of its keys; where boxes would
+    // collide, the box moves above or below the keys and thin lines (dendrons) lead to each key
     groups.forEach(gp => {
       const card = document.createElement('div'); card.className = 'combo-card';
       const h = document.createElement('h3'); h.className = 'combo-group'; h.textContent = gp.name; card.appendChild(h);
-      const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', (-M - .2) + ' -0.2 ' + (W + 2 * M + .4) + ' ' + (H + .4)); svg.setAttribute('class', 'mini');
+      const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'mini');
       svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', gp.name + ': ' + gp.items.map(c => c.label + ' = ' + c.pos.map(keyName).join(' + ')).join(', '));
       const used = new Set(gp.items.flatMap(c => c.pos));
       const pt = p => ({ x: G[p].x - minX, y: G[p].y - minY });
-      // labels in the margin of the half where the combo sits, lines to each of its keys
-      const items = gp.items.map((c, n) => {
+      const boxes = [];
+      const hit = (a, b) => Math.abs(a.x - b.x) < (a.w + b.w) / 2 + .08 && Math.abs(a.y - b.y) < (a.h + b.h) / 2 + .08;
+      const items = gp.items.slice().map(c => {
         const ps = c.pos.map(pt), cx = ps.reduce((a, q) => a + q.x, 0) / ps.length, cy = ps.reduce((a, q) => a + q.y, 0) / ps.length;
-        return { c, ps, cx, cy, col: PAL[n % PAL.length], side: cx < W / 2 ? 'L' : 'R' };
-      });
-      ['L', 'R'].forEach(side => {
-        const list = items.filter(it => it.side === side).sort((a, b) => a.cy - b.cy);
-        let last = -1;
-        list.forEach(it => { it.ly = Math.max(it.cy, last + .62, .35); last = it.ly; });
-        const over = last - (H - .25); if (over > 0) list.forEach(it => it.ly -= over);
-      });
+        return { c, ps, cx, cy, w: .2 + .19 * Array.from(c.label).length, h: .5 };
+      }).sort((a, b) => a.cx - b.cx);
+      const keyBoxes = G.map((g, p) => ({ x: pt(p).x, y: pt(p).y, w: .9, h: .9 }));
+      // box never covers a key: nearest free spot above or below the combo's keys, lines lead to each key
       items.forEach(it => {
-        const lx = it.side === 'L' ? -.25 : W + .25;
-        it.ps.forEach(q => {
-          const ln = document.createElementNS(NS, 'line');
-          ln.setAttribute('x1', lx); ln.setAttribute('y1', it.ly); ln.setAttribute('x2', q.x); ln.setAttribute('y2', q.y);
-          ln.setAttribute('stroke', it.col); ln.setAttribute('class', 'cl'); svg.appendChild(ln);
-        });
-        const t = document.createElementNS(NS, 'text');
-        t.setAttribute('x', it.side === 'L' ? lx - .12 : lx + .12); t.setAttribute('y', it.ly + .13);
-        t.setAttribute('text-anchor', it.side === 'L' ? 'end' : 'start'); t.setAttribute('class', 'cw'); t.setAttribute('fill', it.col);
-        t.textContent = it.c.label; svg.appendChild(t);
+        const top = Math.min(...it.ps.map(q => q.y)), bot = Math.max(...it.ps.map(q => q.y));
+        const cands = [];
+        for (let k = 0; k < 16; k++) for (const dx of [0, -.5, .5, -1, 1]) {
+          cands.push({ x: it.cx + dx, y: top - .72 - k * .28, cost: k * .28 + Math.abs(dx) * 1.2 + (it.cy > H / 2 ? .6 : 0) });
+          cands.push({ x: it.cx + dx, y: bot + .72 + k * .28, cost: k * .28 + Math.abs(dx) * 1.2 + (it.cy > H / 2 ? 0 : .6) });
+        }
+        cands.sort((a, b) => a.cost - b.cost);
+        const free = t => { const b = { x: t.x, y: t.y, w: it.w, h: it.h }; return !boxes.some(o => hit(o, b)) && !keyBoxes.some(o => hit(o, b)); };
+        const pick = cands.find(free) || cands[0];
+        Object.assign(it, { bx: pick.x, by: pick.y, dendron: true });
+        boxes.push({ x: it.bx, y: it.by, w: it.w, h: it.h });
       });
+      const y0 = Math.min(-.2, ...boxes.map(b => b.y - b.h / 2 - .1)), y1 = Math.max(H + .2, ...boxes.map(b => b.y + b.h / 2 + .1));
+      const x0 = Math.min(-.2, ...boxes.map(b => b.x - b.w / 2 - .1)), x1 = Math.max(W + .2, ...boxes.map(b => b.x + b.w / 2 + .1));
+      svg.setAttribute('viewBox', x0 + ' ' + y0 + ' ' + (x1 - x0) + ' ' + (y1 - y0));
+      items.forEach(it => { if (!it.dendron) return; it.ps.forEach(q => {
+        const ln = document.createElementNS(NS, 'line'); ln.setAttribute('x1', it.bx); ln.setAttribute('y1', it.by); ln.setAttribute('x2', q.x); ln.setAttribute('y2', q.y);
+        ln.setAttribute('class', 'cl'); svg.appendChild(ln); }); });
       G.forEach((g, p) => {
         const on = used.has(p), x = g.x - minX, y = g.y - minY;
         const gr = document.createElementNS(NS, 'g'); gr.setAttribute('transform', 'rotate(' + (g.r || 0) + ' ' + x + ' ' + y + ')');
@@ -598,13 +603,19 @@ __IDEAS__
         if (on) { const t = document.createElementNS(NS, 'text'); t.setAttribute('x', x); t.setAttribute('y', y + .15); t.setAttribute('class', 'mt'); t.textContent = keyName(p); gr.appendChild(t); }
         svg.appendChild(gr);
       });
+      items.forEach(it => {
+        const b = document.createElementNS(NS, 'rect');
+        b.setAttribute('x', it.bx - it.w / 2); b.setAttribute('y', it.by - it.h / 2); b.setAttribute('width', it.w); b.setAttribute('height', it.h); b.setAttribute('rx', .14);
+        b.setAttribute('class', 'cb'); svg.appendChild(b);
+        const t = document.createElementNS(NS, 'text'); t.setAttribute('x', it.bx); t.setAttribute('y', it.by + .11); t.setAttribute('class', 'cw');
+        t.textContent = it.c.label; svg.appendChild(t);
+      });
       card.appendChild(svg);
       const ul = document.createElement('ul'); ul.className = 'combo-list';
       const sameLayers = gp.items.every(c => (c.layers || []).join() === (gp.items[0].layers || []).join());
-      items.forEach(it => {
-        const c = it.c, li = document.createElement('li');
-        li.innerHTML = '<span class="combo-sw"></span><span class="combo-name"></span><span class="combo-keys"></span>';
-        li.querySelector('.combo-sw').style.background = it.col;
+      gp.items.forEach(c => {
+        const li = document.createElement('li');
+        li.innerHTML = '<span class="combo-name"></span><span class="combo-keys"></span>';
         li.querySelector('.combo-name').textContent = c.label + (c.new ? ' · neu' : c.changed ? ' · geändert' : '');
         li.querySelector('.combo-keys').textContent = c.pos.map(keyName).join(' + ') + (sameLayers ? '' : ' · ' + (c.layers || []).map(l => NAMES[l]).join(', '));
         ul.appendChild(li);
