@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from keymap_lib import ROOT, read_keymap  # noqa: E402
+from keymap_lib import MAC_H, ROOT, WIN_H, read_header, read_keymap  # noqa: E402
 
 TEMPLATE = ROOT / "planner" / "template.html"
 OUT = ROOT / "planner" / "totem-planer.html"
@@ -89,6 +89,65 @@ def decorate(k):
         k["c"] = k["t"] if c is None else c
         k.pop("h", None)
     return k
+
+
+WIN_MOD = {"LGUI": "Win", "LCTRL": "Ctrl", "LALT": "Alt", "LSHFT": "Shift"}
+
+
+def char_table(path):
+    """(frozenset of modifiers, HID usage) -> character, from the comments in a keys_de_*.h header."""
+    defs, chars = read_header(path)
+    table = {}
+    for name, ch in chars.items():
+        expr = defs.get(name, "")
+        u = re.search(r"HID_USAGE_KEY_KEYBOARD_\w+", expr)
+        if u:
+            mods = frozenset(re.findall(r"\b(LS|LA|RA|LC|LG)\(", expr))
+            table.setdefault((mods, u.group(0)), ch)
+    return defs, table
+
+
+def modifier_views(binding):
+    """For a base-layer key: character with Opt / Opt+Shift (macOS) and AltGr (Windows)."""
+    name = "DE_SQT" if binding == "&sqt_dqt" else next((t for t in binding.split() if t.startswith("DE_")), None)
+    if not name:
+        return {}
+    out = {}
+    mdefs, mtab = MAC_TABLE
+    e = mdefs.get(name, "")
+    u = re.search(r"HID_USAGE_KEY_KEYBOARD_\w+", e)
+    if u:
+        base = frozenset(re.findall(r"\b(LS|LA|RA|LC|LG)\(", e))
+        o, os_ = mtab.get((base | {"LA"}, u.group(0))), mtab.get((base | {"LA", "LS"}, u.group(0)))
+        if o or os_:
+            out["opt"] = {"t": o or "", "s": os_ or ""}
+    wdefs, wtab = WIN_TABLE
+    e = wdefs.get("DEW_" + name[3:], "")
+    u = re.search(r"HID_USAGE_KEY_KEYBOARD_\w+", e)
+    if u:
+        base = frozenset(re.findall(r"\b(LS|LA|RA|LC|LG)\(", e))
+        a = wtab.get((base | {"RA"}, u.group(0)))
+        if a:
+            out["altgr"] = a
+    return out
+
+
+def win_label(mac, twin):
+    """Windows names for modifier keys whose Windows twin holds a different modifier."""
+    if not twin or twin == "&trans":
+        return None
+    m = re.fullmatch(r"&kp (L(?:GUI|CTRL|ALT|SHFT))", mac)
+    w = re.fullmatch(r"&kp (L(?:GUI|CTRL|ALT|SHFT))", twin)
+    if m and w:
+        return {"t": WIN_MOD[w.group(1)]}
+    w = re.fullmatch(r"&hm[lr] (L\w+) \S+", twin)
+    if w and mac.startswith("&hm"):
+        return {"h": WIN_MOD.get(w.group(1), w.group(1))}
+    return None
+
+
+MAC_TABLE = char_table(MAC_H)
+WIN_TABLE = char_table(WIN_H)
 
 
 def key_name(k):
@@ -185,6 +244,12 @@ def main():
             if name == "NUM" and b in NUM_SHIFTED and layers["NUM"][33] == "&trans":
                 k["h"] = NUM_SHIFTED[b]
             twin = layers.get(name + " WIN", [None] * len(layers[name]))[pos]
+            if name == "BASE":
+                twin = layers.get("WIN", [None] * len(layers[name]))[pos]
+                k.update(modifier_views(b))
+            wl = win_label(b, twin)
+            if wl:
+                k["w"] = wl
             if b in ("&kp LG(LEFT)", "&kp LG(RIGHT)") and twin in BY_WIN_TWIN:
                 k["t"] = BY_WIN_TWIN[twin]
             if b in ("&bootloader", "&sys_reset"):   # works on the half where it is pressed

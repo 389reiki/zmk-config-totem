@@ -103,6 +103,20 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px
 .key .t.ic .cap { font-size: calc(var(--u) * .135); color: var(--muted); line-height: 1; white-space: nowrap; }
 .combo-ic { display: inline-flex; vertical-align: -3px; margin-right: 6px; font-size: 1.1rem; }
 .combo-ic svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.board.fingers .key[data-f]:not(.opens):not(.held):not(.none) { background: var(--fc); }
+.key[data-f="p"], .f-legend [data-f="p"] { --fc: #e3ecfb; }
+.key[data-f="r"], .f-legend [data-f="r"] { --fc: #e2f3e7; }
+.key[data-f="m"], .f-legend [data-f="m"] { --fc: #fbf0d9; }
+.key[data-f="i"], .f-legend [data-f="i"] { --fc: #f9e1e6; }
+.key[data-f="th"], .f-legend [data-f="th"] { --fc: #ece9f6; }
+.f-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .82rem; color: var(--muted); }
+.f-legend .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: var(--fc); border: 1px solid var(--line); }
+.key.optview .h { color: var(--faint); }
+.key.optnone .t { color: var(--faint); }
+.combo-ov { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 2; }
+.combo-ov rect { fill: #4c45a6; }
+.combo-ov line { stroke: #4c45a6; stroke-width: .02; opacity: .55; }
+.combo-ov text { fill: #fff; font-size: .17px; font-weight: 600; text-anchor: middle; font-family: var(--font-ui); }
 .key.held { background: var(--hc); }
 .key.held .t, .key.held .h, .key.held .s { color: #fff; }
 .key.changed::after { content: ""; position: absolute; top: 7%; left: 7%; width: calc(var(--u) * .11); height: calc(var(--u) * .11); border-radius: 50%; background: var(--changed); }
@@ -294,7 +308,7 @@ __IDEAS__
   let state = fresh();
   try { const v = JSON.parse(localStorage.getItem(STORE) || 'null'); if (v && v.keys && v.keys.BASE) state = v; } catch (e) {}
   const save = () => { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} };
-  let prefs = { nums: false };
+  let prefs = { nums: false, opt: false, win: false, combos: false, fingers: false };
   try { prefs = Object.assign(prefs, JSON.parse(localStorage.getItem(PREF) || '{}')); } catch (e) {}
   const savePrefs = () => { try { localStorage.setItem(PREF, JSON.stringify(prefs)); } catch (e) {} };
 
@@ -423,13 +437,17 @@ __IDEAS__
     if (L === 'SYS') { const s = find('SYS'); if (s >= 0) out.push(s); else [find('NAV'), find('NUM')].forEach(i => i >= 0 && out.push(i)); }
     return out;
   }
-  const HINT = L => ({
+  const HINT = L => (prefs.opt && L === 'BASE')
+    ? (prefs.win ? 'AltGr-Zeichen unter Windows: Ctrl+Alt halten (Mittel- und Ringfinger) und die Taste tippen. Klein unten: die Taste.'
+                 : 'Opt-Ansicht: groß = mit Opt gehalten, oben rechts = mit Opt+Shift, klein unten = die Taste.')
+    : ({
     BASE: 'Groß: antippen. Klein unten: halten. Oben rechts: mit Shift. Grauer Balken oben: Modifier (auch beim Halten).',
     SYM: 'Sym antippen: genau ein Zeichen von hier. Sym halten: alle Zeichen, solange gehalten.',
     NUM: 'Num antippen: Num-Word, Zahlen bis zum nächsten Leerzeichen oder Buchstaben. Num halten: solange gehalten.',
     NAV: 'Space halten. Dauerhaft: Space halten und „Nav fest“ tippen, nochmal tippen beendet.',
     SYS: 'Rechte Daumentaste ganz außen (37) halten.'
   })[L] || '';
+  const FINGER_LEGEND = [['p', 'kleiner Finger'], ['r', 'Ringfinger'], ['m', 'Mittelfinger'], ['i', 'Zeigefinger'], ['th', 'Daumen']];
 
   // ---------- rendering keys ----------
   function sizeBoard(board) { const u = board.clientWidth / W; board.style.setProperty('--u', u + 'px'); board.style.height = (u * H) + 'px'; }
@@ -444,11 +462,20 @@ __IDEAS__
       el.style.top = 'calc(var(--u) * ' + (g.y - minY - .465) + ')';
       if (g.r) el.style.transform = 'rotate(' + g.r + 'deg)';
       const p = parts(k, pos);
+      if (prefs.win && k.w) Object.assign(p, k.w);
+      let optView = false;
+      if (prefs.opt && L === 'BASE' && pos < 32) {
+        optView = true;
+        const base = p.t;
+        if (prefs.win) { p.t = k.altgr || ''; p.s = ''; } else { p.t = (k.opt && k.opt.t) || ''; p.s = (k.opt && k.opt.s) || ''; }
+        p.h = base; el.classList.add('optview'); if (!p.t && !p.s) el.classList.add('optnone');
+      }
+      if (prefs.fingers) el.dataset.f = finger(pos);
       if (k.trans) el.classList.add('trans'); else if (k.none) el.classList.add('none');
       if (/^&kp C_/.test(k.raw || '') && !k.i) el.classList.add('media');
       if (/^&(mmv|msc|mkp) /.test(k.raw || '')) el.classList.add('mouse');
       if (/^(&kp (LSHFT|LGUI|LALT|LCTRL)|&sk LSHFT)$/.test(k.raw || '')) el.classList.add('mod');
-      if (/^&hm[lr] /.test(k.raw || '')) el.classList.add('hrm');
+      if (/^&hm[lr] /.test(k.raw || '') && !optView) el.classList.add('hrm');
       const op = opensLayer(k);
       if (op && L === 'BASE') { el.classList.add('opens'); el.style.setProperty('--oc', COLOR[op]); }
       const isHeld = held.includes(pos) && L !== 'BASE';
@@ -461,7 +488,7 @@ __IDEAS__
       const hb = isHeld ? NAMES[L] : p.h;
       el.innerHTML = '<span class="t"></span>' + (hb ? '<span class="h"></span>' : '') + (p.s ? '<span class="s"></span>' : '') + (prefs.nums && interactive ? '<span class="p"></span>' : '');
       const te = el.querySelector('.t');
-      const ICON = k.i && (DATA.icons || {})[k.i] && !(isHeld && k.trans);
+      const ICON = k.i && (DATA.icons || {})[k.i] && !(isHeld && k.trans) && !optView;
       if (ICON) {
         te.classList.add('ic');
         te.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + DATA.icons[k.i] + '</svg>' + (k.c ? '<span class="cap"></span>' : '');
@@ -477,6 +504,46 @@ __IDEAS__
       if (!interactive) el.tabIndex = -1;
       board.appendChild(el);
     });
+    board.classList.toggle('fingers', !!prefs.fingers);
+    if (prefs.combos && interactive) drawComboOverlay(board, L);
+  }
+  // finger per position (column), thumbs separately
+  function finger(pos) {
+    if (pos >= 32) return 'th';
+    const col = pos < 20 ? pos % 10 : (pos === 20 ? 0 : pos === 31 ? 9 : pos - 21);
+    return ['p', 'r', 'm', 'i', 'i', 'i', 'i', 'm', 'r', 'p'][col];
+  }
+  // combo names as small boxes on the seam between their keys (main board)
+  const COMBO_SHORT = { 'Rückgängig': 'Rückg.', 'Ausschneiden': 'Ausschn.', 'Kopieren': 'Kopieren', 'Einfügen': 'Einfügen', 'Wiederholen': 'Wiederh.', 'Titel zurück': 'Titel ←', 'Titel vor': 'Titel →' };
+  function drawComboOverlay(board, L) {
+    const list = DATA.combos.filter(c => (c.layers || []).includes(L));
+    if (!list.length) return;
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'combo-ov');
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('preserveAspectRatio', 'none'); svg.setAttribute('aria-hidden', 'true');
+    const placed = [];
+    list.forEach(c => {
+      const ps = c.pos.map(p => ({ x: G[p].x - minX, y: G[p].y - minY }));
+      const cx = ps.reduce((a, q) => a + q.x, 0) / ps.length, cy = ps.reduce((a, q) => a + q.y, 0) / ps.length;
+      const label = COMBO_SHORT[c.label] || c.label, w = .14 + .1 * Array.from(label).length, h = .27;
+      // nearest spot that covers no key label (key centre area) and no other box
+      const cores = G.map(g => ({ x: g.x - minX, y: g.y - minY }));
+      const clear = (x, y) => x - w / 2 > .05 && x + w / 2 < W - .05 && y - h / 2 > .05 && y + h / 2 < H - .05
+        && !cores.some(q => Math.abs(q.x - x) < w / 2 + .27 && Math.abs(q.y - y) < h / 2 + .3)
+        && !placed.some(o => Math.abs(o.x - x) < (o.w + w) / 2 + .04 && Math.abs(o.y - y) < h + .04);
+      let best = null;
+      for (let dy = -1.2; dy <= 1.21; dy += .05) for (let dx = -.8; dx <= .81; dx += .05) {
+        const d = Math.hypot(dx * 1.3, dy);
+        if ((!best || d < best.d) && clear(cx + dx, cy + dy)) best = { x: cx + dx, y: cy + dy, d };
+      }
+      const bx = best ? best.x : cx, y = best ? best.y : cy + .44;
+      placed.push({ x: bx, y, w });
+      const r = document.createElementNS(NS, 'rect'); r.setAttribute('x', bx - w / 2); r.setAttribute('y', y - h / 2); r.setAttribute('width', w); r.setAttribute('height', h); r.setAttribute('rx', .07);
+      const t = document.createElementNS(NS, 'text'); t.setAttribute('x', bx); t.setAttribute('y', y + .065); t.textContent = label;
+      if (best && best.d > .3) ps.forEach(q => { const ln = document.createElementNS(NS, 'line'); ln.setAttribute('x1', bx); ln.setAttribute('y1', y); ln.setAttribute('x2', q.x); ln.setAttribute('y2', q.y); svg.appendChild(ln); });
+      svg.append(r, t);
+    });
+    board.appendChild(svg);
   }
 
   // ---------- views ----------
@@ -505,11 +572,15 @@ __IDEAS__
       nav.appendChild(b);
     });
     nav.appendChild(document.createElement('hr'));
-    const lab = document.createElement('label'); lab.className = 'toggle';
-    lab.innerHTML = '<input type="checkbox" id="numsToggle"> Positionsnummern';
-    nav.appendChild(lab);
-    const cb = lab.querySelector('input'); cb.checked = prefs.nums;
-    cb.addEventListener('change', () => { prefs.nums = cb.checked; savePrefs(); renderLayers(); });
+    [['nums', 'Positionsnummern'], ['win', 'Windows-Sicht'], ['opt', prefs.win ? 'AltGr-Zeichen (Basis)' : 'Opt-Zeichen (Basis)'],
+     ['combos', 'Kombos zeigen'], ['fingers', 'Finger-Farben']].forEach(([id, txt]) => {
+      const lab = document.createElement('label'); lab.className = 'toggle';
+      lab.innerHTML = '<input type="checkbox" id="tg-' + id + '"> <span></span>';
+      lab.querySelector('span').textContent = txt;
+      nav.appendChild(lab);
+      const cb = lab.querySelector('input'); cb.checked = !!prefs[id];
+      cb.addEventListener('change', () => { prefs[id] = cb.checked; savePrefs(); renderLayers(); });
+    });
   }
   function renderLayers() {
     renderLayerList();
@@ -517,6 +588,10 @@ __IDEAS__
     $('layerTitle').textContent = NAMES[cur];
     $('layerHint').textContent = HINT(cur);
     drawBoard($('board'), cur, true);
+    let lg = $('fingerLegend');
+    if (!lg) { lg = document.createElement('div'); lg.id = 'fingerLegend'; lg.className = 'f-legend'; $('board').parentNode.after(lg); }
+    lg.hidden = !prefs.fingers;
+    lg.innerHTML = FINGER_LEGEND.map(([f, n]) => '<span><i class="sw" data-f="' + f + '"></i>' + n + '</span>').join('');
     renderSel();
   }
   function renderSel() {
