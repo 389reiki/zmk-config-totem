@@ -211,7 +211,7 @@ textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(-
 
 <div class="app">
   <header class="top">
-    <div class="brand"><h1>Totem Planer Okt 2026</h1><span class="stand">Keymap-Stand 11.10.2026 08:59 · macOS-Sicht</span></div>
+    <div class="brand"><h1>Totem Planer Okt 2026</h1><span class="stand">Keymap-Stand 10.10.2026 20:04 · macOS-Sicht</span></div>
     <div class="views" role="group" aria-label="Ansicht">
       <button type="button" data-view="layers">Ebenen</button>
       <button type="button" data-view="overview">Übersicht</button>
@@ -274,6 +274,7 @@ textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(-
 <li><strong>Warum:</strong> Enter gibt es sonst nur als Kombo t+r+n (mit kurzer Pause davor) und auf Num 20. Enter ist eine der häufigsten Tasten.</li>
 <li><strong>Risiko:</strong> 37 kurz halten und ohne weitere Taste loslassen sendet Enter, z. B. eine Chat-Nachricht. Gegenmittel: hold-preferred, dann kommt nach Ablauf der Haltezeit gar nichts.</li>
 <li><strong>Technik:</strong> Hold-Tap <code>&lt;&amp;mo&gt;, &lt;&amp;kp&gt;</code> mit <code>flavor = "hold-preferred"</code>, z. B. <code>&amp;lt_ret SYS RET</code>. Kein Windows-Zwilling nötig.</li>
+<li><strong>Vorbild (15.10.2026):</strong> eine geteilte fremde ZMK-Belegung nutzt alle sechs Daumentasten doppelt: antippen = Enter, Tab, Space, Entf; halten = Ebene. Bestätigt den Ansatz.</li>
 </ul>
 <h3>Schreibtische wechseln (Mac Spaces / Windows virtuelle Desktops)</h3>
 <p><em>Notiert am 10.10.2026 · aus dem Keymap-Audit</em></p>
@@ -289,6 +290,15 @@ textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(-
 <li><strong>Symptom, auf das zu achten ist:</strong> Beim schnellen Rollen über Space in den nächsten Buchstaben kommt ein Pfeil oder eine Nav-Funktion statt Leerzeichen + Buchstabe.</li>
 <li><strong>Ursache:</strong> Space ist Hold-Tap <code>balanced</code>: wird während des Haltens eine andere Taste gedrückt und losgelassen, gilt Space als gehalten (Nav).</li>
 <li><strong>Mögliche Abhilfe, erst wenn es passiert:</strong> <code>hold-trigger-key-positions</code> auf die linke Hand (Nav-Tasten liegen links) und <code>hold-trigger-on-release</code>, oder längere Haltezeit.</li>
+</ul>
+<h3>Buchstabe halten = passendes Tastenkürzel</h3>
+<p><em>Notiert am 15.10.2026 · Vorbild: geteilte fremde ZMK-Belegung (c halten = Kopieren, v halten = Einfügen, x halten = Esc)</em></p>
+<ul>
+<li><strong>Idee:</strong> Buchstaben, deren Kürzel man sich am Buchstaben merkt, bekommen beim Halten das Kürzel: c halten = Kopieren, v halten = Einfügen, x halten = Ausschneiden, z halten = Rückgängig.</li>
+<li><strong>Bei dir:</strong> c (Position 7), v (5), z (22). x (9) liegt außen. Mac: Cmd+Buchstabe, Windows: Ctrl+Buchstabe (Windows-Zwilling nötig).</li>
+<li><strong>Verhältnis zu heute:</strong> Die Zwischenablage-Kombos auf der unteren Reihe gibt es schon. Das hier wäre eine Alternative oder Ergänzung, weil man sich Buchstaben leichter merkt als Positionen.</li>
+<li><strong>Kosten:</strong> Wer beim langsamen Tippen auf der Taste liegen bleibt, löst das Kürzel aus (z. B. Einfügen statt v). Gleiches Risiko wie bei der Idee „ß per Halten“; z wäre doppelt belegt (ß-Idee).</li>
+<li><strong>Technik in ZMK:</strong> Hold-Tap <code>&lt;&amp;kp&gt;, &lt;&amp;kp&gt;</code> mit <code>flavor = "tap-preferred"</code>, Haltezeit eher lang (300–400 ms), z. B. <code>&amp;ht_short LG(DE_C) DE_C</code> (Mac) bzw. <code>LC(DEW_C) DEW_C</code> (Windows).</li>
 </ul>
     <p class="ideas-src">Quelle: <code>docs/ideen.md</code> im Repo. Neue Ideen sammelt Claude dort.</p>
   </article>
@@ -775,7 +785,7 @@ textarea { width: 100%; min-height: 90px; font: inherit; border: 1px solid var(-
     fillList($('planned'), DATA.planned || [], 'Nichts. Alles Besprochene ist in der Firmware.');
   }
   function exportText() {
-    let s = 'Totem-Planer: Änderungswünsche\n(Positionen wie in totem.keymap, macOS-Sicht; Windows-Zwillinge bitte mitziehen)\nAusgangsbasis: Keymap-Stand 11.10.2026 08:59\n';
+    let s = 'Totem-Planer: Änderungswünsche\n(Positionen wie in totem.keymap, macOS-Sicht; Windows-Zwillinge bitte mitziehen)\nAusgangsbasis: Keymap-Stand 10.10.2026 20:04\n';
     if ((DATA.planned || []).length) s += '\nBereits vorgemerkt:\n' + DATA.planned.map(x => '- ' + x).join('\n') + '\n';
     const lines = changeLines();
     s += '\nNeue Änderungen:\n' + (lines.length ? lines.map(x => '- ' + x).join('\n') : '- keine') + '\n';

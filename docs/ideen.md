@@ -31,6 +31,7 @@ Diese Datei ist die Quelle; der Planer zeigt sie im Reiter "Ideen".
 - **Warum:** Enter gibt es sonst nur als Kombo t+r+n (mit kurzer Pause davor) und auf Num 20. Enter ist eine der häufigsten Tasten.
 - **Risiko:** 37 kurz halten und ohne weitere Taste loslassen sendet Enter, z. B. eine Chat-Nachricht. Gegenmittel: hold-preferred, dann kommt nach Ablauf der Haltezeit gar nichts.
 - **Technik:** Hold-Tap `<&mo>, <&kp>` mit `flavor = "hold-preferred"`, z. B. `&lt_ret SYS RET`. Kein Windows-Zwilling nötig.
+- **Vorbild (15.10.2026):** eine geteilte fremde ZMK-Belegung nutzt alle sechs Daumentasten doppelt: antippen = Enter, Tab, Space, Entf; halten = Ebene. Bestätigt den Ansatz.
 
 ## Schreibtische wechseln (Mac Spaces / Windows virtuelle Desktops)
 *Notiert am 10.10.2026 · aus dem Keymap-Audit*
@@ -46,3 +47,13 @@ Diese Datei ist die Quelle; der Planer zeigt sie im Reiter "Ideen".
 - **Symptom, auf das zu achten ist:** Beim schnellen Rollen über Space in den nächsten Buchstaben kommt ein Pfeil oder eine Nav-Funktion statt Leerzeichen + Buchstabe.
 - **Ursache:** Space ist Hold-Tap `balanced`: wird während des Haltens eine andere Taste gedrückt und losgelassen, gilt Space als gehalten (Nav).
 - **Mögliche Abhilfe, erst wenn es passiert:** `hold-trigger-key-positions` auf die linke Hand (Nav-Tasten liegen links) und `hold-trigger-on-release`, oder längere Haltezeit.
+
+## Buchstabe halten = passendes Tastenkürzel
+*Notiert am 15.10.2026 · Vorbild: geteilte fremde ZMK-Belegung (c halten = Kopieren, v halten = Einfügen, x halten = Esc)*
+
+- **Idee:** Buchstaben, deren Kürzel man sich am Buchstaben merkt, bekommen beim Halten das Kürzel: c halten = Kopieren, v halten = Einfügen, x halten = Ausschneiden, z halten = Rückgängig.
+- **Bei dir:** c (Position 7), v (5), z (22). x (9) liegt außen. Mac: Cmd+Buchstabe, Windows: Ctrl+Buchstabe (Windows-Zwilling nötig).
+- **Verhältnis zu heute:** Die Zwischenablage-Kombos auf der unteren Reihe gibt es schon. Das hier wäre eine Alternative oder Ergänzung, weil man sich Buchstaben leichter merkt als Positionen.
+- **Kosten:** Wer beim langsamen Tippen auf der Taste liegen bleibt, löst das Kürzel aus (z. B. Einfügen statt v). Gleiches Risiko wie bei der Idee „ß per Halten“; z wäre doppelt belegt (ß-Idee).
+- **Technik in ZMK:** Hold-Tap `<&kp>, <&kp>` mit `flavor = "tap-preferred"`, Haltezeit eher lang (300–400 ms), z. B. `&ht_short LG(DE_C) DE_C` (Mac) bzw. `LC(DEW_C) DEW_C` (Windows).
+
