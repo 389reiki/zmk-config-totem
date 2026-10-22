@@ -209,22 +209,24 @@
     combos {
         compatible = "zmk,combos";
 
-        // All combos work on the base layer only (BASE, and WIN when the Windows overlay is on).
-        // On the other layers these positions are digits, app/tab keys etc. and must not trigger.
+        // Combos work on the base layer (BASE, and WIN when the Windows overlay is on).
+        // Esc and Tab also on NUM: there these positions are F-keys, not digits, and Tab/Esc are
+        // needed while num-word is on (e.g. moving between table cells). On the other layers the
+        // combo positions are digits, app/tab keys etc. and must not trigger.
         // require-prior-idle-ms: combos do not fire while you are typing fast.
         // Esc, Tab, Enter and media are identical on both systems.
         combo_esc {
             timeout-ms = <30>;
             require-prior-idle-ms = <150>;
             key-positions = <0 1>;          // top-left: q + ä
-            layers = <BASE WIN>;
+            layers = <BASE WIN NUM NUM_WIN>;
             bindings = <&kp ESC>;
         };
         combo_tab {
             timeout-ms = <30>;
             require-prior-idle-ms = <150>;
             key-positions = <1 2>;          // ä + o
-            layers = <BASE WIN>;
+            layers = <BASE WIN NUM NUM_WIN>;
             bindings = <&kp TAB>;
         };
 
