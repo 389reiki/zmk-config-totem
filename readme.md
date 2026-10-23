@@ -29,7 +29,7 @@ TOTEM is a 38 key column-staggered split keyboard running [ZMK](https://zmk.dev/
   - Umschalten: rechte äußere Daumentaste halten (SYS-Ebene), dann **Mac** (rechte Hand, obere Reihe, innen) oder **Win** (daneben).
   - Nach dem Ausschalten startet die Tastatur im Mac-Modus.
 - Tastencodes: `keys_de_mac.h` (macOS-Eingabequelle "Deutsch") und `keys_de_win.h` (Windows "Deutsch"). Namen nachschlagen: [docs/keycodes.md](docs/keycodes.md).
-- **Tiefschlaf:** nach 10 Minuten ohne Tastendruck schlafen beide Hälften; ein Tastendruck weckt sie (dieser Tastendruck wird nicht getippt).
+- **Tiefschlaf:** nach 10 Minuten ohne Tastendruck schlafen beide Hälften; jede Hälfte wacht durch einen Tastendruck auf sich selbst auf (dieser Tastendruck wird nicht getippt). Nach einer Pause also links und rechts je eine Taste antippen.
 - `settings_reset`-Firmware: bei Bluetooth-Problemen auf beide Hälften flashen, danach wieder die normale Firmware.
 
 ## Belegung
