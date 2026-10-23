@@ -58,6 +58,7 @@ RAW = {
     "&lt_spc NAV_HOLD SPACE": {"t": "Space", "h": "Nav"},
     "&tog NAV_LOCK": {"t": "Nav fest", "h": "an/aus"},
     "&mo SYS": {"t": "Sys", "h": "Sys"},
+    "&lt_ret SYS RET": {"t": "↵", "h": "Sys"},
     "&kp LG(LS(DE_N4))": "Scrnsht",
     "&kp LG(TAB)": "App ⇄",
     "&kp LC(LS(TAB))": "Tab ←",

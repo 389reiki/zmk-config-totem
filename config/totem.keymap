@@ -102,13 +102,25 @@
             bindings = <&mo>, <&kp>;
         };
 
-        // Symbol key: tap = one-shot symbol layer (next key only), hold = symbol layer
+        // Symbol key: tap = one-shot symbol layer (next key only), hold = symbol layer.
+        // balanced: holding Sym and typing a symbol decides "hold" as soon as that key is released,
+        // no 200 ms wait. No misfire risk: tap and hold both put the next key on SYM.
         sym_key: sym_key {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
-            flavor = "tap-preferred";
+            flavor = "balanced";
             tapping-term-ms = <200>;
             bindings = <&mo>, <&sl>;
+        };
+
+        // Sys key (right thumb, tucked): tap = Enter, hold = system layer.
+        // hold-preferred: held longer than 200 ms without another key = nothing (no accidental Enter).
+        lt_ret: lt_ret {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "hold-preferred";
+            tapping-term-ms = <200>;
+            bindings = <&mo>, <&kp>;
         };
 
         // Number key: tap = num-word (numbers until a non-number key), hold = number layer
@@ -133,19 +145,19 @@
         };
 
         // Swapper (Callum/urob, tri-state module): first tap holds Cmd (Windows: Alt) and taps Tab,
-        // further taps send Tab. Pos 22 (Shift+Tab) goes back; Shift (31) and the arrows (10-13) keep it
+        // further taps send Tab. Pos 22 (Shift+Tab) goes back; Shift (33) and the arrows (10-13) keep it
         // open; releasing Nav or any other key releases Cmd/Alt and selects the app.
         swapper_mac: swapper_mac {
             compatible = "zmk,behavior-tri-state";
             #binding-cells = <0>;
             bindings = <&kt LGUI>, <&kp TAB>, <&kt LGUI>;
-            ignored-key-positions = <10 11 12 13 22 31>;
+            ignored-key-positions = <10 11 12 13 22 33>;
         };
         swapper_win: swapper_win {
             compatible = "zmk,behavior-tri-state";
             #binding-cells = <0>;
             bindings = <&kt LALT>, <&kp TAB>, <&kt LALT>;
-            ignored-key-positions = <10 11 12 13 22 31>;
+            ignored-key-positions = <10 11 12 13 22 33>;
         };
 
         // Backspace: plain = Backspace, with Shift (incl. one-shot Shift) = forward Delete.
@@ -313,7 +325,7 @@
 
         // BASE – letters. Home-row mods by function, same finger on both systems:
         //   pinky = Ctrl (macOS) / Win (Windows), ring = Option / Alt, middle = Cmd / Ctrl.
-        //   Thumbs: left Backspace | Shift | Sym, right Num | Space/Nav | Sys (hold). Shift and Space on the middle keys.
+        //   Thumbs: left Backspace | Shift | Sym, right Num | Space/Nav | Enter/Sys. Shift and Space on the middle keys.
         //   Backspace: tap = Backspace (with Shift: Delete), hold = delete word, tap+hold = repeat.
         //   Combos (see "combos" above, base layer only): Enter = t+r+n, Esc/Tab, clipboard, media.
         base_layer {
@@ -322,7 +334,7 @@
             &kp DE_Q        &kp DE_A_UMLAUT  &kp DE_O          &kp DE_U        &kp DE_Y         &kp DE_V        &kp DE_D        &kp DE_C          &kp DE_L          &kp DE_X
             &hml LCTRL DE_H &hml LALT DE_A   &hml LGUI DE_E    &kp DE_I        &kp DE_COMMA     &kp DE_G        &kp DE_T        &hmr LGUI DE_R    &hmr LALT DE_N    &hmr LCTRL DE_S
 &kp DE_U_UMLAUT  &kp DE_K       &kp DE_Z         &sqt_dqt          &kp DE_DOT      &kp DE_O_UMLAUT  &kp DE_B        &kp DE_P        &kp DE_M          &kp DE_W          &kp DE_F          &kp DE_J
-                                                 &bsw LA(BSPC) 0   &sk LSHFT             &sym_key SYM SYM               &num_key NUM NUM   &lt_spc NAV_HOLD SPACE   &mo SYS
+                                                 &bsw LA(BSPC) 0   &sk LSHFT             &sym_key SYM SYM               &num_key NUM NUM   &lt_spc NAV_HOLD SPACE   &lt_ret SYS RET
             >;
         };
 
@@ -362,16 +374,16 @@
         //         Cmd (20), browser tabs (21/24), app back (22) / app swapper (23), PgUp (25).
         //   Middle: browser back/forward (4/5), Home/End (14/15), PgDn (26).
         //   Right: mute (7), Teams microphone (8), mouse pointer on the home row (16-19),
-        //          scrolling below (27-30), Shift (31).
-        //   Thumbs: Delete (32), clicks left/right (33/34), middle click (35), Nav fixed (37).
+        //          scrolling below (27-30), middle click (31).
+        //   Thumbs: Delete (32), Shift (33, as on base), clicks left/right (34/35), Nav fixed (37).
         //   macOS keystrokes here; the Windows equivalents are in nav_win_layer.
         nav_layer {
             display-name = "NAV";
             bindings = <
             &kp LA(LEFT)   &none            &kp LG(LS(DE_N4))  &kp LA(RIGHT)  &kp LG(DE_LBKT)  &kp LG(DE_RBKT)  &none            &kp C_MUTE       &kp LG(LS(DE_M))  &none
             &kp LEFT       &kp UP           &kp DOWN           &kp RIGHT      &kp LG(LEFT)     &kp LG(RIGHT)    &mmv MOVE_LEFT   &mmv MOVE_UP     &mmv MOVE_DOWN    &mmv MOVE_RIGHT
-&kp LGUI   &kp LC(LS(TAB))  &kp LS(TAB)      &swapper_mac       &kp LC(TAB)    &kp PG_UP        &kp PG_DN        &msc SCRL_LEFT   &msc SCRL_UP     &msc SCRL_DOWN    &msc SCRL_RIGHT  &kp LSHFT
-                                              &kp DEL            &mkp LCLK      &mkp RCLK        &mkp MCLK        &none            &tog NAV_LOCK
+&kp LGUI   &kp LC(LS(TAB))  &kp LS(TAB)      &swapper_mac       &kp LC(TAB)    &kp PG_UP        &kp PG_DN        &msc SCRL_LEFT   &msc SCRL_UP     &msc SCRL_DOWN    &msc SCRL_RIGHT  &mkp MCLK
+                                              &kp DEL            &kp LSHFT      &mkp LCLK        &mkp RCLK        &none            &tog NAV_LOCK
             >;
         };
 
@@ -434,7 +446,7 @@
             >;
         };
 
-        // SYS – hold pos 37 (right thumb, tucked). System only: host keys Mac/Win, Bluetooth, USB/BT.
+        // SYS – hold pos 37 (right thumb, tucked; tap = Enter). System only: host keys Mac/Win, Bluetooth, USB/BT.
         //   Boot (bootloader) and Reset work on the half where they are pressed: left 0/20, right 9/31.
         sys_layer {
             display-name = "SYS";

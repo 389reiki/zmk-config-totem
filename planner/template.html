@@ -412,11 +412,12 @@ __IDEAS__
     if (raw.startsWith('&sym_key')) return 'Tippen: genau ein Zeichen von Sym. Halten: Sym-Ebene.';
     if (raw.startsWith('&num_key')) return 'Tippen: NumWord, Zahlen bis zum nächsten Leerzeichen. Halten: Num-Ebene.';
     if (raw.startsWith('&mo ') && lay) return 'Halten: ' + NAMES[lay] + '-Ebene.';
+    if (raw.startsWith('&lt_ret')) return 'Tippen: Enter. Halten: Sys-Ebene. Länger als 0,2 s halten ohne weitere Taste: nichts (kein versehentliches Enter).';
     if (raw === '&sk LSHFT') return 'Tippen: nächster Buchstabe groß. Halten: Shift.';
     if (raw.startsWith('&hml') || raw.startsWith('&hmr')) return 'Tippen: ' + p.t + '. Halten: ' + p.h + ' (nur zusammen mit einer Taste der anderen Hand).';
     if (raw === '&swapper_mac') return 'App-Wechsel vorwärts (Mac Cmd+Tab, Windows Alt+Tab): mehrmals tippen geht App für App weiter, Cmd/Alt bleibt gehalten. Nav loslassen wählt die App. Die Taste daneben geht zurück.';
     if (raw === '&kp LS(TAB)') return 'Beim App-Wechsel eine App zurück.';
-    if (raw === '&tog NAV_LOCK') return 'Nav bleibt an, auch wenn du Space loslässt. Nochmal tippen: Nav aus. Dann ist auch Klick M (36) erreichbar.';
+    if (raw === '&tog NAV_LOCK') return 'Nav bleibt an, auch wenn du Space loslässt. Nochmal tippen: Nav aus.';
     if (raw.startsWith('&mmv ')) return 'Mauszeiger bewegen, solange gehalten.';
     if (raw.startsWith('&msc ')) return 'Scrollen, solange gehalten.';
     const MEDIA = { 'C_MUTE': 'Ton aus bzw. wieder an (Lautsprecher, auf Mac und Windows gleich).', 'C_PP': 'Medien: Wiedergabe starten oder pausieren.', 'C_PREV': 'Medien: vorheriger Titel.', 'C_NEXT': 'Medien: nächster Titel.', 'C_VOL_UP': 'Medien: lauter.', 'C_VOL_DN': 'Medien: leiser.' };

@@ -24,15 +24,6 @@ Diese Datei ist die Quelle; der Planer zeigt sie im Reiter "Ideen".
 - **Grenze:** Die Zählung sieht die gesendeten Zeichen, nicht die Ebene. Kombos und Halte-Tasten muss man beim Auswerten selbst zuordnen.
 - **Nicht übernommen aus dem Artikel:** getrennte Tasten für ' und " (bei dir Shift+'), Klammern als Kombos auf Basis (konkurrieren mit den Zwischenablage-Kombos), seine konkrete Belegung (US-Layout, vim, Python).
 
-## Enter auf die Sys-Taste (Antippen)
-*Notiert am 10.10.2026 · aus dem Keymap-Audit*
-
-- **Idee:** Position 37 (rechter Daumen, eingezogen): antippen = Enter, halten = Sys. Heute passiert beim Antippen nichts.
-- **Warum:** Enter gibt es sonst nur als Kombo t+r+n (mit kurzer Pause davor) und auf Num 20. Enter ist eine der häufigsten Tasten.
-- **Risiko:** 37 kurz halten und ohne weitere Taste loslassen sendet Enter, z. B. eine Chat-Nachricht. Gegenmittel: hold-preferred, dann kommt nach Ablauf der Haltezeit gar nichts.
-- **Technik:** Hold-Tap `<&mo>, <&kp>` mit `flavor = "hold-preferred"`, z. B. `&lt_ret SYS RET`. Kein Windows-Zwilling nötig.
-- **Vorbild (15.10.2026):** eine geteilte fremde ZMK-Belegung nutzt alle sechs Daumentasten doppelt: antippen = Enter, Tab, Space, Entf; halten = Ebene. Bestätigt den Ansatz.
-
 ## Schreibtische wechseln (Mac Spaces / Windows virtuelle Desktops)
 *Notiert am 10.10.2026 · aus dem Keymap-Audit*
 
