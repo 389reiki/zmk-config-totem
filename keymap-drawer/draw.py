@@ -44,6 +44,8 @@ RAW = {
     "&bspc_del": {"t": "⌫", "s": "Del"},
     "&bsw LA(BSPC) 0": {"t": "⌫", "s": "⇧ Del", "h": "Wort ⌫"},
     "&swapper_mac": "App ⇄",
+    "&win_tile_mac": {"t": "Fenster", "h": "+ Pfeile"},
+    "&win_fill_mac": "Füllen",
     "&sqt_dqt": {"t": "'", "s": '"'},
     "&tilde_mac": "~",
     "&caret_mac": "^",

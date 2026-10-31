@@ -417,6 +417,8 @@ __IDEAS__
     if (raw.startsWith('&hml') || raw.startsWith('&hmr')) return 'Tippen: ' + p.t + '. Halten: ' + p.h + ' (nur zusammen mit einer Taste der anderen Hand).';
     if (raw === '&swapper_mac') return 'App-Wechsel vorwärts (Mac Cmd+Tab, Windows Alt+Tab): mehrmals tippen geht App für App weiter, Cmd/Alt bleibt gehalten. Nav loslassen wählt die App. Die Taste daneben geht zurück.';
     if (raw === '&kp LS(TAB)') return 'Beim App-Wechsel eine App zurück.';
+    if (raw === '&win_tile_mac') return 'Fenster anordnen: halten und einen Nav-Pfeil drücken = Fenster in die linke, rechte, obere oder untere Hälfte (Mac Fn+Ctrl+Pfeil). Mit Shift dazu: zusammen mit einem anderen Fenster anordnen. Windows: hält Win (Win+←/→ einrasten, Win+↑ maximieren, Win+↓ wiederherstellen). Voraussetzung am Mac: Tastatur → Sondertasten → für die TOTEM „Feststelltaste“ auf „Globus“ stellen.';
+    if (raw === '&win_fill_mac') return 'Fenster füllt den Bildschirm (kein Vollbild). Mac Fn+Ctrl+F, Windows Win+↑. Gleiche Mac-Voraussetzung wie die Fenster-Taste.';
     if (raw === '&tog NAV_LOCK') return 'Nav bleibt an, auch wenn du Space loslässt. Nochmal tippen: Nav aus.';
     if (raw.startsWith('&mmv ')) return 'Mauszeiger bewegen, solange gehalten.';
     if (raw.startsWith('&msc ')) return 'Scrollen, solange gehalten.';

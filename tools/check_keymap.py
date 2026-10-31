@@ -37,6 +37,8 @@ EQUIVALENT = {
     "&swapper_mac": {"&swapper_win"},                    # Cmd-Tab / Alt-Tab swapper
     "&kp LG(⟨[⟩)": {"&kp LA(LEFT)"},                    # browser back
     "&kp LG(⟨]⟩)": {"&kp LA(RIGHT)"},                   # browser forward
+    "&win_tile_mac": {"&kp LGUI"},                     # hold: window tiling (Fn+Ctrl / Win) + arrows
+    "&win_fill_mac": {"&kp LG(UP)"},                    # fill screen / maximize
 }
 # Keys that do the same on both systems even though their name ends in _mac
 NEUTRAL = {"&host_mac", "&host_win"}
