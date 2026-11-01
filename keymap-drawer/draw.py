@@ -30,8 +30,8 @@ HERE = ROOT / "keymap-drawer"
 OUT = HERE / "svg"
 TMP = HERE / ".tmp"
 
-MAC_LAYERS = ["BASE", "NAV", "SYM", "NUM", "SYS"]
-COLOR = {"NAV": "#378ADD", "SYM": "#1D9E75", "NUM": "#BA7517", "SYS": "#888780"}
+MAC_LAYERS = ["BASE", "NAV", "SYM", "NUM", "FENSTER", "SYSTEM"]
+COLOR = {"NAV": "#378ADD", "SYM": "#1D9E75", "NUM": "#BA7517", "FENSTER": "#888780", "SYSTEM": "#444441"}
 # flag layers that switch a visible layer on (Space holds NAV_HOLD, which turns NAV on)
 ALIAS = {"NAV_HOLD": "NAV"}
 COMBO = "#7F77DD"
@@ -42,10 +42,8 @@ MODS = {"LGUI": "Cmd/Ctrl", "LALT": "Opt/Alt", "LCTRL": "Ctrl/Win", "LSHFT": "Sh
 # Labels for bindings whose keystroke alone does not say what they do (macOS keystrokes)
 RAW = {
     "&bspc_del": {"t": "⌫", "s": "Del"},
-    "&bsw LA(BSPC) 0": {"t": "⌫", "s": "⇧ Del", "h": "Wort ⌫"},
+    "&bsf FENSTER 0": {"t": "⌫", "s": "⇧ Del", "h": "Fenster"},
     "&swapper_mac": "App ⇄",
-    "&win_tile_mac": {"t": "Fenster", "h": "+ Pfeile"},
-    "&win_fill_mac": "Füllen",
     "&sqt_dqt": {"t": "'", "s": '"'},
     "&tilde_mac": "~",
     "&caret_mac": "^",
@@ -59,15 +57,25 @@ RAW = {
     "&num_key NUM NUM": {"t": "NumWord", "h": "Num"},
     "&lt_spc NAV_HOLD SPACE": {"t": "Space", "h": "Nav"},
     "&tog NAV_LOCK": {"t": "Nav fest", "h": "an/aus"},
-    "&mo SYS": {"t": "Sys", "h": "Sys"},
-    "&lt_ret SYS RET": {"t": "↵", "h": "Sys"},
+    "&lt_ret FENSTER RET": {"t": "↵", "h": "Fenster"},
+    "&mo PRECISE": {"t": "Präzise", "h": "halten"},
+    "&fnctl LEFT": {"t": "½ ←", "h": "Hälfte"},
+    "&fnctl RIGHT": {"t": "½ →", "h": "Hälfte"},
+    "&fnctl LS(LEFT)": {"t": "⧉ ←", "h": "mit 2."},
+    "&fnctl LS(RIGHT)": {"t": "⧉ →", "h": "mit 2."},
+    "&fnctl DE_F": "Füllen",
+    "&fnctl DE_C": "Mitte",
+    "&fnctl DE_R": {"t": "Zurück", "h": "Größe"},
+    "&kp LC(UP)": "Übersicht",
+    "&kp LC(LEFT)": "Desktop ←",
+    "&kp LC(RIGHT)": "Desktop →",
     "&kp LG(LS(DE_N4))": "Scrnsht",
     "&kp LG(TAB)": "App ⇄",
     "&kp LC(LS(TAB))": "Tab ←",
     "&kp LC(TAB)": "Tab →",
     "&kp LA(LEFT)": "Word ←",
     "&kp LA(RIGHT)": "Word →",
-    "&kp LA(BSPC)": "Del word",
+    "&kp LA(BSPC)": "Wort ⌫",
     "&kp PG_UP": "PgUp",
     "&kp PG_DN": "PgDn",
     "&kp RET": "↵",
@@ -136,7 +144,7 @@ def layer_keys(km):
     for if_layers, then_layer in km["conditional"]:
         if then_layer in COLOR and not held[then_layer]:
             for l in if_layers:
-                held[then_layer].update(held.get(l, {}))
+                held[then_layer].update(held.get(ALIAS.get(l, l), {}))
     trig = {k: v for k, v in trig.items() if k[0] != v}
     return trig, held
 

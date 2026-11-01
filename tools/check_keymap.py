@@ -37,13 +37,22 @@ EQUIVALENT = {
     "&swapper_mac": {"&swapper_win"},                    # Cmd-Tab / Alt-Tab swapper
     "&kp LG(⟨[⟩)": {"&kp LA(LEFT)"},                    # browser back
     "&kp LG(⟨]⟩)": {"&kp LA(RIGHT)"},                   # browser forward
-    "&win_tile_mac": {"&kp LGUI"},                     # hold: window tiling (Fn+Ctrl / Win) + arrows
-    "&win_fill_mac": {"&kp LG(UP)"},                    # fill screen / maximize
+    # window layer (FENSTER): macOS Globe+Ctrl shortcuts vs Windows Win shortcuts
+    "&fnctl LEFT": {"&kp LG(LEFT)"},                    # half left / snap left
+    "&fnctl RIGHT": {"&kp LG(RIGHT)"},                  # half right / snap right
+    "&fnctl ⟨f⟩": {"&kp LG(UP)"},                       # fill / maximize
+    "&fnctl ⟨r⟩": {"&kp LG(DOWN)"},                     # previous size / restore
+    "&fnctl ⟨c⟩": {"&none"},                            # center: no Windows equivalent
+    "&fnctl LS(LEFT)": {"&none"},                       # two windows side by side: no Windows equivalent
+    "&fnctl LS(RIGHT)": {"&none"},
+    "&kp LC(UP)": {"&kp LG(TAB)"},                      # overview: Mission Control / Task View
+    "&kp LC(LEFT)": {"&kp LG(LC(LEFT))"},               # desktop left
+    "&kp LC(RIGHT)": {"&kp LG(LC(RIGHT))"},             # desktop right
 }
 # Keys that do the same on both systems even though their name ends in _mac
 NEUTRAL = {"&host_mac", "&host_win"}
 # Flag layers (all &trans, only switch other layers on): no Windows twin needed
-FLAG_LAYERS = {"NAV HOLD", "NAV LOCK"}
+FLAG_LAYERS = {"NAV HOLD", "NAV LOCK", "PRECISE"}
 SWAP_MODS = {"LGUI": "LCTRL", "LCTRL": "LGUI", "RGUI": "RCTRL", "RCTRL": "RGUI"}
 
 

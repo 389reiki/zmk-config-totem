@@ -26,7 +26,7 @@ GEOMETRY = ROOT / "keymap-drawer" / "totem_layout.json"
 IDEAS = ROOT / "docs" / "ideen.md"
 PLANNED = ROOT / "docs" / "vorgemerkt.md"
 ICONS = ROOT / "planner" / "icons.json"
-LAYERS = ["BASE", "SYM", "NUM", "NAV", "SYS"]   # order in the planner
+LAYERS = ["BASE", "SYM", "NUM", "NAV", "FENSTER", "SYSTEM"]   # order in the planner
 
 # labels from the diagram script (DE_* characters and special bindings)
 _spec = importlib.util.spec_from_file_location("draw", ROOT / "keymap-drawer" / "draw.py")
