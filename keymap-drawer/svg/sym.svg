@@ -153,9 +153,13 @@ rect.key.held.trig-SYM { stroke-width: 4; }
 rect.key.trig-NUM { fill: #BA7517; fill-opacity: .45; stroke: #BA7517; }
 rect.key.held.trig-NUM { stroke-width: 4; }
 
-.layer-SYS rect.key.lay { fill: #888780; fill-opacity: .22; stroke: #888780; }
-rect.key.trig-SYS { fill: #888780; fill-opacity: .45; stroke: #888780; }
-rect.key.held.trig-SYS { stroke-width: 4; }
+.layer-FENSTER rect.key.lay { fill: #888780; fill-opacity: .22; stroke: #888780; }
+rect.key.trig-FENSTER { fill: #888780; fill-opacity: .45; stroke: #888780; }
+rect.key.held.trig-FENSTER { stroke-width: 4; }
+
+.layer-SYSTEM rect.key.lay { fill: #444441; fill-opacity: .22; stroke: #444441; }
+rect.key.trig-SYSTEM { fill: #444441; fill-opacity: .45; stroke: #444441; }
+rect.key.held.trig-SYSTEM { stroke-width: 4; }
 </style>
 <g transform="translate(30, 0)" class="layer-SYM">
 <text x="0" y="28" class="label" id="SYM">SYM:</text>
