@@ -38,13 +38,13 @@ EQUIVALENT = {
     "&kp LG(⟨[⟩)": {"&kp LA(LEFT)"},                    # browser back
     "&kp LG(⟨]⟩)": {"&kp LA(RIGHT)"},                   # browser forward
     # window layer (FENSTER): macOS Globe+Ctrl shortcuts vs Windows Win shortcuts
-    "&fnctl LEFT": {"&kp LG(LEFT)"},                    # half left / snap left
-    "&fnctl RIGHT": {"&kp LG(RIGHT)"},                  # half right / snap right
+    "&kp LC(LA(LG(LEFT)))": {"&kp LG(LEFT)"},          # half left (macOS app shortcut) / snap left
+    "&kp LC(LA(LG(RIGHT)))": {"&kp LG(RIGHT)"},        # half right / snap right
     "&fnctl ⟨f⟩": {"&kp LG(UP)"},                       # fill / maximize
     "&fnctl ⟨r⟩": {"&kp LG(DOWN)"},                     # previous size / restore
     "&fnctl ⟨c⟩": {"&none"},                            # center: no Windows equivalent
-    "&fnctl LS(LEFT)": {"&none"},                       # two windows side by side: no Windows equivalent
-    "&fnctl LS(RIGHT)": {"&none"},
+    "&kp LC(LA(LG(LS(LEFT))))": {"&none"},             # two windows side by side: no Windows equivalent
+    "&kp LC(LA(LG(LS(RIGHT))))": {"&none"},
     "&kp LC(UP)": {"&kp LG(TAB)"},                      # overview: Mission Control / Task View
     "&kp LC(LEFT)": {"&kp LG(LC(LEFT))"},               # desktop left
     "&kp LC(RIGHT)": {"&kp LG(LC(RIGHT))"},             # desktop right
